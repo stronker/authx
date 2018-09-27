@@ -5,17 +5,20 @@
 package manager
 
 import (
-	"github.com/nalej/authx/internal/app/authx/providers"
-	"github.com/nalej/derrors"
+"github.com/nalej/authx/internal/app/authx/providers"
+"github.com/nalej/derrors"
+pbAuthx "github.com/nalej/grpc-authx-go"
 )
 
 type Authx struct {
-	Password Password
-	Provider providers.BasicCredentials
+	Password            Password
+	CredentialsProvider providers.BasicCredentials
+	RoleProvider        providers.Role
+	TokenProvider		providers.Token
 }
 
 func (m *Authx) DeleteCredentials(username string) derrors.Error {
-	return m.Provider.Delete(username)
+	return m.CredentialsProvider.Delete(username)
 }
 
 func (m *Authx) AddBasicCredentials(username string, organizationID string, roleID string, password string) derrors.Error {
@@ -25,13 +28,29 @@ func (m *Authx) AddBasicCredentials(username string, organizationID string, role
 	}
 
 	entity := providers.NewBasicCredentialsData(username, hashedPassword, roleID, organizationID)
-	return m.Provider.Add(entity)
+	return m.CredentialsProvider.Add(entity)
 }
 
 func (m *Authx) LoginWithBasicCredentials(username string, password string) derrors.Error {
-	credentials, err := m.Provider.Get(username)
+	credentials, err := m.CredentialsProvider.Get(username)
 	if err != nil {
 		return err
 	}
-	return m.Password.CompareHashAndPassword(credentials.Password, password)
+	err=m.Password.CompareHashAndPassword(credentials.Password, password)
+	if err != nil{
+		return err
+	}
+	//role,err:=m.RoleProvider.Get(credentials.RoleID)
+
+	panic("implement me")
+}
+
+func (m *Authx) AddRole(role *pbAuthx.Role) derrors.Error {
+	entity := providers.NewRoleData(role.OrganizationId, role.RoleId, role.Name, role.Primitives)
+	return m.RoleProvider.Add(entity)
+}
+
+func (m *Authx) EditUserRole(username string, roleID string) derrors.Error {
+	edit := providers.NewEditBasicCredentialsData().WithRoleID(roleID)
+	return m.CredentialsProvider.Edit(username, edit)
 }

@@ -22,10 +22,32 @@ func NewBasicCredentialsData(username string, password [] byte, roleID string, o
 	}
 }
 
+type EditBasicCredentialsData struct {
+	Password *[] byte
+	RoleID   *string
+}
+
+func (d *EditBasicCredentialsData) WithPassword(password [] byte) *EditBasicCredentialsData {
+	d.Password=&password
+	return d
+}
+
+func (d *EditBasicCredentialsData) WithRoleID(roleID string) *EditBasicCredentialsData {
+	d.RoleID=&roleID
+	return d
+}
+
+
+func NewEditBasicCredentialsData() *EditBasicCredentialsData  {
+	return &EditBasicCredentialsData{}
+}
+
+
 type BasicCredentials interface {
 	Delete(username string) derrors.Error
 	Add(credentials *BasicCredentialsData) derrors.Error
 	Get(username string) (*BasicCredentialsData, derrors.Error)
+	Edit(username string, edit *EditBasicCredentialsData) derrors.Error
 }
 
 type BasicCredentialsMockup struct {
@@ -39,7 +61,7 @@ func NewBasicCredentialMockup() *BasicCredentialsMockup {
 func (p *BasicCredentialsMockup) Delete(username string) derrors.Error {
 	_, ok := p.data[username]
 	if !ok {
-		return derrors.NewOperationError("Not found username")
+		return derrors.NewOperationError("username not found")
 	}
 	delete(p.data, username)
 	return nil
@@ -53,4 +75,18 @@ func (p *BasicCredentialsMockup) Add(credentials *BasicCredentialsData) derrors.
 func (p *BasicCredentialsMockup) Get(username string) (*BasicCredentialsData, derrors.Error) {
 	data := p.data[username]
 	return &data, nil
+}
+
+func (p *BasicCredentialsMockup) Edit(username string, edit *EditBasicCredentialsData) derrors.Error {
+	data, ok := p.data[username]
+	if !ok {
+		return derrors.NewOperationError("username not found")
+	}
+	if edit.RoleID != nil {
+		data.RoleID = *edit.RoleID
+	}
+	if edit.Password != nil {
+		data.Password = *edit.Password
+	}
+	return nil
 }
