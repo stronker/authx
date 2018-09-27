@@ -21,6 +21,12 @@
   version = "v1.0"
 
 [[projects]]
+  name = "github.com/nalej/derrors"
+  packages = ["."]
+  revision = "807705c78ea87c2e6c89023f86ed7ba9dbcad082"
+  version = "v1.1.1"
+
+[[projects]]
   name = "github.com/nalej/grpc-authx-go"
   packages = ["."]
   revision = "89eca5af1e8d2871b1e888e072a184cfa36452ba"
@@ -69,6 +75,15 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/crypto"
+  packages = [
+    "bcrypt",
+    "blowfish"
+  ]
+  revision = "0e37d006457bf46f9e6692014ba72ef82c33022c"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -79,13 +94,13 @@
     "internal/timeseries",
     "trace"
   ]
-  revision = "2f5d2388922f370f4355f327fcf4cfe9f5583908"
+  revision = "f04abc6bdfa7a0171a8a0c9fd2ada9391044d056"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "c01370cb5c9b7812800ec97eb5692a14fb8d577c"
+  revision = "b09afc3d579e346c4a7e4705953acaf6f9e551bd"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -112,7 +127,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "c3f76f3b92d1ffa4c58a9ff842a58b8877655e0f"
+  revision = "221a8d4f74948678f06caaa13c9d41d22e069ae8"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -152,6 +167,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7f9044d3b045ca0cd56290700352cd201fb98c38a795149e7ee868eb0a7402b3"
+  inputs-digest = "d3a3c9c6c8cfecb95877361f16b62c4d3a24ca3a748c2f401495be32e643855a"
   solver-name = "gps-cdcl"
   solver-version = 1
