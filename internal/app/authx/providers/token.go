@@ -12,14 +12,23 @@ import (
 type TokenData struct {
 	Username       string
 	TokenID        string
-	Token          []byte
+	RefreshToken   []byte
 	ExpirationDate int64
 }
 
+func NewTokenData(username string, tokenID string, refreshToken []byte,
+	expirationDate int64) *TokenData {
+
+	return &TokenData{Username: username,
+		TokenID:        tokenID,
+		RefreshToken:   refreshToken,
+		ExpirationDate: expirationDate}
+}
+
 type Token interface {
-	Delete(username string) derrors.Error
+	Delete(username string, tokenID string) derrors.Error
 	Add(token *TokenData) derrors.Error
-	Get(username string) (*TokenData, derrors.Error)
+	Get(username string, tokenID string) (*TokenData, derrors.Error)
 }
 
 type TokenMockup struct {
