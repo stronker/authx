@@ -8,7 +8,7 @@
 
 [[constraint]]
   name = "github.com/nalej/grpc-authx-go"
-  version = "0.0.1"
+  version = "0.0.2"
 
 [[constraint]]
   name = "github.com/nalej/derrors"

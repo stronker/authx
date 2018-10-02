@@ -10,7 +10,6 @@ import (
 	"github.com/nalej/derrors"
 	pbAuthx "github.com/nalej/grpc-authx-go"
 	pbCommon "github.com/nalej/grpc-common-go"
-	pbUser "github.com/nalej/grpc-user-go"
 )
 
 type AuthxServer struct {
@@ -21,8 +20,15 @@ func NewAuthxServer() *AuthxServer {
 	return &AuthxServer{}
 }
 
-func (h *AuthxServer) DeleteCredentials(_ context.Context, request *pbUser.UserId) (*pbCommon.Success, error) {
-	panic("implement me")
+func (h *AuthxServer) DeleteCredentials(_ context.Context, request *pbAuthx.DeleteCredentialsRequest) (*pbCommon.Success, error) {
+	if request.Username == "" {
+		return nil, derrors.NewOperationError("username is mandatory")
+	}
+	err := h.manager.DeleteCredentials(request.Username)
+	if err != nil {
+		return nil, err
+	}
+	return &pbCommon.Success{}, nil
 }
 
 func (h *AuthxServer) AddBasicCredentials(_ context.Context, request *pbAuthx.AddBasicCredentialRequest) (*pbCommon.Success, error) {
@@ -57,7 +63,16 @@ func (h *AuthxServer) LoginWithBasicCredentials(_ context.Context, request *pbAu
 }
 
 func (h *AuthxServer) RefreshToken(_ context.Context, request *pbAuthx.RefreshTokenRequest) (*pbAuthx.LoginResponse, error) {
-	panic("implement me")
+	if request.Username == "" {
+		return nil, derrors.NewOperationError("username is mandatory")
+	}
+	if request.RefreshToken == "" {
+		return nil, derrors.NewOperationError("refreshToken is mandatory")
+	}
+	if request.TokenId == "" {
+		return nil, derrors.NewOperationError("tokeID is mandatory")
+	}
+	return h.manager.RefreshToken(request.Username, request.TokenId, request.RefreshToken)
 }
 
 func (h *AuthxServer) AddRole(_ context.Context, request *pbAuthx.Role) (*pbCommon.Success, error) {
@@ -83,5 +98,15 @@ func (h *AuthxServer) AddRole(_ context.Context, request *pbAuthx.Role) (*pbComm
 }
 
 func (h *AuthxServer) EditUserRole(_ context.Context, request *pbAuthx.EditUserRoleRequest) (*pbCommon.Success, error) {
-	panic("implement me")
+	if request.Username == "" {
+		return nil, derrors.NewOperationError("username is mandatory")
+	}
+	if request.NewRoleId == "" {
+		return nil, derrors.NewOperationError("newRoleID is mandatory")
+	}
+	err := h.manager.EditUserRole(request.Username, request.NewRoleId)
+	if err != nil {
+		return nil, err
+	}
+	return &pbCommon.Success{}, nil
 }

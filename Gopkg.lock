@@ -41,26 +41,14 @@
 [[projects]]
   name = "github.com/nalej/grpc-authx-go"
   packages = ["."]
-  revision = "89eca5af1e8d2871b1e888e072a184cfa36452ba"
-  version = "v0.0.1"
+  revision = "7dbf276cd59e5ae3d17ee20aa314d6aec7adf111"
+  version = "v0.0.2"
 
 [[projects]]
   name = "github.com/nalej/grpc-common-go"
   packages = ["."]
   revision = "6f63c4006bba4bbb6f6c9935a52621388658ee06"
   version = "v0.0.4"
-
-[[projects]]
-  name = "github.com/nalej/grpc-organization-go"
-  packages = ["."]
-  revision = "8b9ade4c0d679f2d4deb4b00d95e1126f2ed3abf"
-  version = "v0.0.5"
-
-[[projects]]
-  name = "github.com/nalej/grpc-user-go"
-  packages = ["."]
-  revision = "995c06f61e51b99d3e3f671490f76205867512a0"
-  version = "v0.0.1"
 
 [[projects]]
   name = "github.com/rs/zerolog"
@@ -92,7 +80,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "5295e8364332db77d75fce11f1d19c053919a9c9"
+  revision = "e3636079e1a4c1f337f212cc5cd2aca108f6c900"
 
 [[projects]]
   branch = "master"
@@ -179,6 +167,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f6c719c0f1a7e26715d6637998069ac06c56011a5265c5576ebd88312f9aff97"
+  inputs-digest = "e1ffbe8fe76bd9b17f5493813ffa79774bc6b02e4e653974d1937f56a85e0ce0"
   solver-name = "gps-cdcl"
   solver-version = 1
