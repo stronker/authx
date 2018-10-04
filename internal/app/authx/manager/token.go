@@ -25,19 +25,33 @@ func NewGeneratedToken(token string, refreshToken string) *GeneratedToken {
 }
 
 type Token interface {
-	Generate(personalClaim *token.PersonalClaim, expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error)
-	Refresh(personalClaim *token.PersonalClaim, tokenID string, refreshToken string, expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error)
+	Generate(personalClaim *token.PersonalClaim, expirationPeriod time.Duration,
+		secret string) (*GeneratedToken, derrors.Error)
+	Refresh(personalClaim *token.PersonalClaim, tokenID string, refreshToken string,
+		expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error)
+	Clean() derrors.Error
 }
 
 type JWTToken struct {
-	Provider providers.Token
-	Password Password
+	TokenProvider providers.Token
+	Password      Password
 }
 
-func (m *JWTToken) Generate(personalClaim *token.PersonalClaim, expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error) {
+func NewJWTToken(tokenProvider providers.Token, password Password) Token {
+	return &JWTToken{TokenProvider: tokenProvider, Password: password}
+
+}
+
+func NewJWTTokenMockup() Token {
+	return NewJWTToken(providers.NewTokenMockup(), NewBCryptPassword())
+}
+
+func (m *JWTToken) Generate(personalClaim *token.PersonalClaim, expirationPeriod time.Duration,
+	secret string) (*GeneratedToken, derrors.Error) {
+
 	claim := token.NewClaim(*personalClaim, Issuer, time.Now(), expirationPeriod)
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
-	tokenString, err := t.SignedString(secret)
+	tokenString, err := t.SignedString([]byte(secret))
 	if err != nil {
 		return nil, derrors.NewGenericError("impossible generate JWT token", err)
 	}
@@ -48,7 +62,7 @@ func (m *JWTToken) Generate(personalClaim *token.PersonalClaim, expirationPeriod
 		return nil, derrors.NewGenericError("impossible generate RefreshToken", err)
 	}
 	tokenData := providers.NewTokenData(claim.UserID, claim.Id, hashedRefreshToken, claim.ExpiresAt)
-	err = m.Provider.Add(tokenData)
+	err = m.TokenProvider.Add(tokenData)
 	if err != nil {
 		return nil, derrors.NewGenericError("impossible store RefreshToken", err)
 	}
@@ -58,9 +72,10 @@ func (m *JWTToken) Generate(personalClaim *token.PersonalClaim, expirationPeriod
 
 func (m *JWTToken) Refresh(personalClaim *token.PersonalClaim, tokenID string, refreshToken string,
 	expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error) {
+
 	username := personalClaim.UserID
 
-	tokenData, err := m.Provider.Get(username, tokenID)
+	tokenData, err := m.TokenProvider.Get(username, tokenID)
 	if err != nil {
 		return nil, derrors.NewGenericError("impossible recover RefreshToken", err)
 	}
@@ -79,9 +94,13 @@ func (m *JWTToken) Refresh(personalClaim *token.PersonalClaim, tokenID string, r
 		return nil, derrors.NewGenericError("impossible create new token", err)
 	}
 
-	err = m.Provider.Delete(username, tokenID)
+	err = m.TokenProvider.Delete(username, tokenID)
 	if err != nil {
 		log.Warn().Err(err).Msg("impossible delete refresh token")
 	}
 	return gt, nil
+}
+
+func (m *JWTToken) Clean() derrors.Error {
+	return m.TokenProvider.Truncate()
 }

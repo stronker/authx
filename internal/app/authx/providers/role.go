@@ -6,17 +6,16 @@ package providers
 
 import (
 	"github.com/nalej/derrors"
-	pbAuthx "github.com/nalej/grpc-authx-go"
 )
 
 type RoleData struct {
 	OrganizationId string
 	RoleId         string
 	Name           string
-	Primitives     []pbAuthx.AccessPrimitive
+	Primitives     []string
 }
 
-func NewRoleData(organizationID string, roleID string, name string, primitives []pbAuthx.AccessPrimitive) *RoleData {
+func NewRoleData(organizationID string, roleID string, name string, primitives []string) *RoleData {
 	return &RoleData{
 		OrganizationId: organizationID,
 		RoleId:         roleID,
@@ -27,7 +26,7 @@ func NewRoleData(organizationID string, roleID string, name string, primitives [
 
 type EditRoleData struct {
 	Name       *string
-	Primitives *[]pbAuthx.AccessPrimitive
+	Primitives *[]string
 }
 
 func (d *EditRoleData) WithName(name string) *EditRoleData {
@@ -35,7 +34,7 @@ func (d *EditRoleData) WithName(name string) *EditRoleData {
 	return d
 }
 
-func (d *EditRoleData) WithPrimitives(primitives []pbAuthx.AccessPrimitive) *EditRoleData {
+func (d *EditRoleData) WithPrimitives(primitives []string) *EditRoleData {
 	d.Primitives = &primitives
 	return d
 }
@@ -47,12 +46,17 @@ func NewEditRoleData() *EditRoleData {
 type Role interface {
 	Delete(roleID string) derrors.Error
 	Add(role *RoleData) derrors.Error
-	Get(roleID string) (*RoleData, derrors.Error)
-	Edit(roleID string, edit EditRoleData) derrors.Error
+	Get(organizationID string, roleID string) (*RoleData, derrors.Error)
+	Edit(organizationID string, roleID string, edit *EditRoleData) derrors.Error
+	Truncate() derrors.Error
 }
 
 type RoleMockup struct {
 	data map[string]RoleData
+}
+
+func NewRoleMockup() Role {
+	return &RoleMockup{data: map[string]RoleData{}}
 }
 
 func (p *RoleMockup) Delete(roleID string) derrors.Error {
@@ -69,21 +73,35 @@ func (p *RoleMockup) Add(role *RoleData) derrors.Error {
 	return nil
 }
 
-func (p *RoleMockup) Get(roleID string) (*RoleData, derrors.Error) {
-	data := p.data[roleID]
+func (p *RoleMockup) Get(organizationID string, roleID string) (*RoleData, derrors.Error) {
+	data, ok := p.data[roleID]
+	if !ok || data.OrganizationId != organizationID {
+		return nil, nil
+	}
+
 	return &data, nil
 }
 
-func (p *RoleMockup) Edit(roleID string, edit EditRoleData) derrors.Error {
-	data, ok := p.data[roleID]
-	if !ok {
+func (p *RoleMockup) Edit(organizationID string, roleID string, edit *EditRoleData) derrors.Error {
+	data, err := p.Get(organizationID, roleID)
+	if err != nil {
+		return err
+	}
+	if data == nil {
 		return derrors.NewOperationError("username not found")
 	}
+
 	if edit.Name != nil {
 		data.Name = *edit.Name
 	}
 	if edit.Primitives != nil {
 		data.Primitives = *edit.Primitives
 	}
+	p.data[roleID] = *data
+	return nil
+}
+
+func (p *RoleMockup) Truncate() derrors.Error {
+	p.data = map[string]RoleData{}
 	return nil
 }
