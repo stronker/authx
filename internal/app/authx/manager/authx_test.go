@@ -42,6 +42,14 @@ var _ = ginkgo.Describe("Authx", func() {
 			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
 
+		ginkgo.It("add basic credentials two times should fail", func() {
+			err := manager.AddBasicCredentials(userName, organizationID, roleID, pass)
+			gomega.Expect(err).To(gomega.Succeed())
+
+			err = manager.AddBasicCredentials(userName, organizationID, roleID, pass)
+			gomega.Expect(err).To(gomega.HaveOccurred())
+		})
+
 		ginkgo.AfterEach(func() {
 			err := manager.Clean()
 			gomega.Expect(err).To(gomega.Succeed())

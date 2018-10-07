@@ -54,6 +54,14 @@ func (m *Authx) AddBasicCredentials(username string, organizationID string, role
 		return derrors.NewOperationError("role not found")
 	}
 
+	cred, err:= m.CredentialsProvider.Get(username)
+	if err != nil {
+		return err
+	}
+	if cred != nil{
+		return derrors.NewOperationError("credential already exists")
+	}
+
 	hashedPassword, err := m.Password.GenerateHashedPassword(password)
 	if err != nil {
 		return err

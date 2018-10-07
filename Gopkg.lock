@@ -53,14 +53,20 @@
 [[projects]]
   name = "github.com/nalej/grpc-authx-go"
   packages = ["."]
-  revision = "7dbf276cd59e5ae3d17ee20aa314d6aec7adf111"
-  version = "v0.0.2"
+  revision = "489472ef5f3acd4d4ce173a0e2bd10567b69df0f"
+  version = "v0.0.4"
 
 [[projects]]
   name = "github.com/nalej/grpc-common-go"
   packages = ["."]
   revision = "6f63c4006bba4bbb6f6c9935a52621388658ee06"
   version = "v0.0.4"
+
+[[projects]]
+  name = "github.com/nalej/grpc-utils"
+  packages = ["pkg/test"]
+  revision = "5dd4662c03100806b57763212966a72e0c4b85e5"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/onsi/ginkgo"
@@ -126,8 +132,8 @@
 [[projects]]
   name = "github.com/spf13/pflag"
   packages = ["."]
-  revision = "9a97c102cda95a86cec2345a6f09f55a939babf5"
-  version = "v1.0.2"
+  revision = "298182f68c66c05229eb03ac171abe6e309ee79a"
+  version = "v1.0.3"
 
 [[projects]]
   branch = "master"
@@ -153,13 +159,13 @@
     "internal/timeseries",
     "trace"
   ]
-  revision = "4dfa2610cdf3b287375bbba5b8f2a14d3b01d8de"
+  revision = "146acd28ed5894421fb5aac80ca93bc1b1f46f87"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "e4b3c5e9061176387e7cea65e4dc5853801f3fb7"
+  revision = "4497e2df6f9e69048a54498c7affbbec3294ad47"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -198,7 +204,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "c7e5094acea1ca1b899e2259d80a6b0f882f81f8"
+  revision = "af9cb2a35e7f169ec875002c1829c9b315cddc04"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -230,7 +236,8 @@
     "resolver/passthrough",
     "stats",
     "status",
-    "tap"
+    "tap",
+    "test/bufconn"
   ]
   revision = "8dea3dc473e90c8179e519d91302d0597c0ca1d1"
   version = "v1.15.0"
@@ -257,6 +264,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7cd743d5bebfb2ea42173b2b2fe5de350d682ee356b11220ebee0b1c528d9225"
+  inputs-digest = "ea4452fac71a27fc576977aee4655101e8e1571b76bcfdb711e08c5481e0f72e"
   solver-name = "gps-cdcl"
   solver-version = 1

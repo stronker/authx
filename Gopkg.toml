@@ -27,12 +27,17 @@
     version="v1.6.0"
 
 [[constraint]]
+    name="github.com/nalej/grpc-utils"
+    version="v1.1.0"
+
+[[constraint]]
     name="github.com/onsi/gomega"
     version="v1.4.2"
 
 [[override]]
   source = "https://github.com/fsnotify/fsnotify/archive/v1.4.7.tar.gz"
   name = "gopkg.in/fsnotify.v1"
+
 
 [prune]
   go-tests = true
