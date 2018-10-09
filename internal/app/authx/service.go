@@ -7,10 +7,11 @@ package authx
 import (
 	"fmt"
 	"github.com/nalej/authx/internal/app/authx/handler"
+	"github.com/nalej/authx/internal/app/authx/manager"
+	"github.com/nalej/authx/internal/app/authx/providers"
 	pbAuthx "github.com/nalej/grpc-authx-go"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 	"net"
 )
@@ -31,21 +32,22 @@ func (s *Service) Run() {
 		return
 	}
 
-	h := handler.NewAuthxServer()
+	roleProvider := providers.NewRoleMockup()
+	credProvider := providers.NewBasicCredentialMockup()
+	passwordMgr := manager.NewBCryptPassword()
+	tokenMgr := manager.NewJWTTokenMockup()
+	authxMgr := manager.NewAuthx(passwordMgr, tokenMgr, credProvider, roleProvider, s.Secret, s.ExpirationTime)
 
-	// Create the TLS credentials
-	creds, err := credentials.NewServerTLSFromFile(s.certPath, s.keyPath)
-	if err != nil {
-		log.Fatal().Errs("could not load TLS keys: %s", []error{err})
-		return
-	}
-	grpcServer := grpc.NewServer(grpc.Creds(creds))
+	h := handler.NewAuthx(authxMgr)
+
+
+	grpcServer := grpc.NewServer()
 
 	pbAuthx.RegisterAuthxServer(grpcServer, h)
 
 	// Register reflection service on gRPC server.
 	reflection.Register(grpcServer)
-	log.Info().Int("port", s.Port).Msg("Launching gRPC server")
+	log.Info().Int("Port", s.Port).Msg("Launching gRPC server")
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatal().Errs("failed to serve: %v", []error{err})
 	}

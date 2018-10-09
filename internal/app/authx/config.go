@@ -4,8 +4,12 @@
 
 package authx
 
+import "time"
+
 type Config struct {
-	Port     int
-	keyPath  string
-	certPath string
+	Port       int
+	Secret     string
+	ExpirationTime time.Duration
 }
+
+
