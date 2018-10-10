@@ -60,7 +60,7 @@ func NewBasicCredentialMockup() *BasicCredentialsMockup {
 func (p *BasicCredentialsMockup) Delete(username string) derrors.Error {
 	_, ok := p.data[username]
 	if !ok {
-		return derrors.NewOperationError("username not found")
+		return derrors.NewNotFoundError("username not found").WithParams(username)
 	}
 	delete(p.data, username)
 	return nil
@@ -82,7 +82,7 @@ func (p *BasicCredentialsMockup) Get(username string) (*BasicCredentialsData, de
 func (p *BasicCredentialsMockup) Edit(username string, edit *EditBasicCredentialsData) derrors.Error {
 	data, ok := p.data[username]
 	if !ok {
-		return derrors.NewOperationError("username not found")
+		return derrors.NewNotFoundError("username not found").WithParams(username)
 	}
 	if edit.RoleID != nil {
 		data.RoleID = *edit.RoleID

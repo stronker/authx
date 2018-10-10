@@ -62,7 +62,7 @@ func NewRoleMockup() Role {
 func (p *RoleMockup) Delete(roleID string) derrors.Error {
 	_, ok := p.data[roleID]
 	if !ok {
-		return derrors.NewOperationError("username not found")
+		return derrors.NewNotFoundError("role not found").WithParams(roleID)
 	}
 	delete(p.data, roleID)
 	return nil
@@ -88,7 +88,7 @@ func (p *RoleMockup) Edit(organizationID string, roleID string, edit *EditRoleDa
 		return err
 	}
 	if data == nil {
-		return derrors.NewOperationError("username not found")
+		return derrors.NewNotFoundError("username not found").WithParams(organizationID, roleID)
 	}
 
 	if edit.Name != nil {

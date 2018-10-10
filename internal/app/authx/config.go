@@ -4,7 +4,11 @@
 
 package authx
 
-import "time"
+import (
+	"github.com/rs/zerolog/log"
+	"strings"
+	"time"
+)
 
 type Config struct {
 	Port       int
@@ -12,4 +16,8 @@ type Config struct {
 	ExpirationTime time.Duration
 }
 
-
+func (conf * Config) Print() {
+	log.Info().Int("port", conf.Port).Msg("gRPC port")
+	log.Info().Str("secret", strings.Repeat("*", len(conf.Secret))).Msg("Token secret")
+	log.Info().Str("duration", conf.ExpirationTime.String()).Msg("Expiration time")
+}

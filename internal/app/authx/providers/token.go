@@ -44,7 +44,7 @@ func (p *TokenMockup) Delete(username string, tokenID string) derrors.Error {
 	id:=p.generateID(tokenID, username)
 	_, ok := p.data[id]
 	if !ok {
-		return derrors.NewOperationError("username not found")
+		return derrors.NewNotFoundError("username not found").WithParams(username)
 	}
 	delete(p.data, id)
 	return nil

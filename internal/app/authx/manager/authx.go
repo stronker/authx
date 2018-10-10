@@ -51,7 +51,7 @@ func (m *Authx) AddBasicCredentials(username string, organizationID string, role
 		return err
 	}
 	if role == nil{
-		return derrors.NewOperationError("role not found")
+		return derrors.NewNotFoundError("role").WithParams(organizationID).WithParams(username)
 	}
 
 	cred, err:= m.CredentialsProvider.Get(username)
@@ -59,7 +59,7 @@ func (m *Authx) AddBasicCredentials(username string, organizationID string, role
 		return err
 	}
 	if cred != nil{
-		return derrors.NewOperationError("credential already exists")
+		return derrors.NewAlreadyExistsError("credentials already exists")
 	}
 
 	hashedPassword, err := m.Password.GenerateHashedPassword(password)
@@ -128,7 +128,7 @@ func (m *Authx) EditUserRole(username string, roleID string) derrors.Error {
 	}
 
 	if role == nil{
-		return derrors.NewOperationError("role not found")
+		return derrors.NewNotFoundError("role not found")
 	}
 
 	edit := providers.NewEditBasicCredentialsData().WithRoleID(roleID)

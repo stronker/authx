@@ -25,7 +25,7 @@ func NewService(config Config) *Service {
 }
 
 func (s *Service) Run() {
-
+	s.Config.Print()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", s.Port))
 	if err != nil {
 		log.Fatal().Errs("failed to listen: %v", []error{err})
