@@ -25,10 +25,13 @@ func TokenContexts(provider Token) {
 		})
 
 		ginkgo.It("must exist", func() {
+			exist, err := provider.Exist(token.Username, token.TokenID)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(*exist).To(gomega.BeTrue())
+
 			t, err := provider.Get(token.Username, token.TokenID)
 			gomega.Expect(err).To(gomega.BeNil())
 			gomega.Expect(t).NotTo(gomega.BeNil())
-
 		})
 
 		ginkgo.It("can delete the token", func() {
@@ -42,6 +45,13 @@ func TokenContexts(provider Token) {
 
 	})
 	ginkgo.Context("empty data store", func() {
+
+		ginkgo.It("doesn't exist", func() {
+			c, err := provider.Exist("u1", "t1")
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(*c).To(gomega.BeFalse())
+		})
+
 		ginkgo.It("must fail with get", func() {
 			c, err := provider.Get("u1", "t1")
 			gomega.Expect(err).To(gomega.HaveOccurred())

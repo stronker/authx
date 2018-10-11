@@ -24,6 +24,10 @@ func RoleContexts(provider Role) {
 		})
 
 		ginkgo.It("must exist", func() {
+			exists, err := provider.Exist("o1", "r1")
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(*exists).To(gomega.BeTrue())
+
 			r, err := provider.Get(role.OrganizationId, role.RoleId)
 			gomega.Expect(err).To(gomega.BeNil())
 			gomega.Expect(r).NotTo(gomega.BeNil())
@@ -74,6 +78,13 @@ func RoleContexts(provider Role) {
 		})
 	})
 	ginkgo.Context("empty data store", func() {
+
+		ginkgo.It("doesn't exist", func() {
+			c, err := provider.Exist("o1", "r1")
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(*c).To(gomega.BeFalse())
+		})
+
 		ginkgo.It("must add correctly", func() {
 			c, err := provider.Get("o1", "r1")
 			gomega.Expect(err).To(gomega.HaveOccurred())

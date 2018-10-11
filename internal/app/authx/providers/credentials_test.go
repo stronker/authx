@@ -24,6 +24,10 @@ func CredentialsContexts(provider BasicCredentials) {
 		})
 
 		ginkgo.It("must exist", func() {
+			exists, err := provider.Exist(credentials.Username)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(*exists).To(gomega.BeTrue())
+
 			c, err := provider.Get(credentials.Username)
 			gomega.Expect(err).To(gomega.BeNil())
 			gomega.Expect(c).NotTo(gomega.BeNil())
@@ -70,6 +74,13 @@ func CredentialsContexts(provider BasicCredentials) {
 
 	})
 	ginkgo.Context("empty data store", func() {
+
+		ginkgo.It("doesn't exist", func() {
+			c, err := provider.Exist("u1")
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(*c).To(gomega.BeFalse())
+		})
+
 		ginkgo.It("get doesn't work", func() {
 			c, err := provider.Get("u1")
 			gomega.Expect(err).To(gomega.HaveOccurred())
