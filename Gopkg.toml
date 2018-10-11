@@ -1,0 +1,46 @@
+[[constraint]]
+  name = "github.com/rs/zerolog"
+  version = "1.9.1"
+
+[[constraint]]
+  name = "github.com/spf13/cobra"
+  version = "0.0.3"
+
+[[constraint]]
+  name = "github.com/nalej/grpc-authx-go"
+  version = "0.0.2"
+
+[[constraint]]
+  name = "github.com/nalej/derrors"
+  version = "2.0.0"
+
+[[constraint]]
+  name = "github.com/dgrijalva/jwt-go"
+  version = "3.2.0"
+
+[[constraint]]
+  name = "github.com/google/uuid"
+  version = "1.0.0"
+
+[[constraint]]
+    name="github.com/onsi/ginkgo"
+    version="v1.6.0"
+
+[[constraint]]
+    name="github.com/nalej/grpc-utils"
+    version="v1.1.0"
+
+[[constraint]]
+    name="github.com/onsi/gomega"
+    version="v1.4.2"
+
+[[override]]
+  source = "https://github.com/fsnotify/fsnotify/archive/v1.4.7.tar.gz"
+  name = "gopkg.in/fsnotify.v1"
+
+
+[prune]
+  go-tests = true
+  unused-packages = true
+
+
