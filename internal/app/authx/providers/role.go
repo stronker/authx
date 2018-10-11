@@ -44,10 +44,11 @@ func NewEditRoleData() *EditRoleData {
 }
 
 type Role interface {
-	Delete(roleID string) derrors.Error
+	Delete(organizationID string, roleID string) derrors.Error
 	Add(role *RoleData) derrors.Error
 	Get(organizationID string, roleID string) (*RoleData, derrors.Error)
 	Edit(organizationID string, roleID string, edit *EditRoleData) derrors.Error
+	Exist(username string, tokenID string) (*bool, derrors.Error)
 	Truncate() derrors.Error
 }
 
@@ -59,9 +60,9 @@ func NewRoleMockup() Role {
 	return &RoleMockup{data: map[string]RoleData{}}
 }
 
-func (p *RoleMockup) Delete(roleID string) derrors.Error {
-	_, ok := p.data[roleID]
-	if !ok {
+func (p *RoleMockup) Delete(organizationID string, roleID string) derrors.Error {
+	data, ok := p.data[roleID]
+	if !ok || data.OrganizationId != organizationID {
 		return derrors.NewNotFoundError("role not found").WithParams(roleID)
 	}
 	delete(p.data, roleID)
@@ -76,7 +77,7 @@ func (p *RoleMockup) Add(role *RoleData) derrors.Error {
 func (p *RoleMockup) Get(organizationID string, roleID string) (*RoleData, derrors.Error) {
 	data, ok := p.data[roleID]
 	if !ok || data.OrganizationId != organizationID {
-		return nil, nil
+		return nil, derrors.NewNotFoundError("role not found").WithParams(organizationID, roleID)
 	}
 
 	return &data, nil
@@ -87,10 +88,6 @@ func (p *RoleMockup) Edit(organizationID string, roleID string, edit *EditRoleDa
 	if err != nil {
 		return err
 	}
-	if data == nil {
-		return derrors.NewNotFoundError("username not found").WithParams(organizationID, roleID)
-	}
-
 	if edit.Name != nil {
 		data.Name = *edit.Name
 	}
@@ -99,6 +96,15 @@ func (p *RoleMockup) Edit(organizationID string, roleID string, edit *EditRoleDa
 	}
 	p.data[roleID] = *data
 	return nil
+}
+func (p *RoleMockup) Exist(organizationID string, roleID string) (*bool, derrors.Error) {
+	result := true
+	data, ok := p.data[roleID]
+	if !ok || data.OrganizationId != organizationID {
+		result = false
+		return &result, nil
+	}
+	return &result, nil
 }
 
 func (p *RoleMockup) Truncate() derrors.Error {

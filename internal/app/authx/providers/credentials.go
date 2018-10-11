@@ -46,6 +46,7 @@ type BasicCredentials interface {
 	Add(credentials *BasicCredentialsData) derrors.Error
 	Get(username string) (*BasicCredentialsData, derrors.Error)
 	Edit(username string, edit *EditBasicCredentialsData) derrors.Error
+	Exist(username string) (*bool,derrors.Error)
 	Truncate() derrors.Error
 }
 
@@ -74,15 +75,21 @@ func (p *BasicCredentialsMockup) Add(credentials *BasicCredentialsData) derrors.
 func (p *BasicCredentialsMockup) Get(username string) (*BasicCredentialsData, derrors.Error) {
 	data, ok := p.data[username]
 	if !ok {
-		return nil, nil
+		return nil, derrors.NewNotFoundError("credentials not found").WithParams(username)
 	}
 	return &data, nil
 }
 
+
+func (p *BasicCredentialsMockup) Exist(username string) (*bool,derrors.Error){
+	_, ok := p.data[username]
+	return &ok,nil
+}
+
 func (p *BasicCredentialsMockup) Edit(username string, edit *EditBasicCredentialsData) derrors.Error {
-	data, ok := p.data[username]
-	if !ok {
-		return derrors.NewNotFoundError("username not found").WithParams(username)
+	data, err := p.Get(username)
+	if err != nil {
+		return err
 	}
 	if edit.RoleID != nil {
 		data.RoleID = *edit.RoleID
@@ -90,7 +97,7 @@ func (p *BasicCredentialsMockup) Edit(username string, edit *EditBasicCredential
 	if edit.Password != nil {
 		data.Password = *edit.Password
 	}
-	p.data[username] = data
+	p.data[username] = *data
 	return nil
 }
 

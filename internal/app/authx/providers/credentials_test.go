@@ -63,20 +63,22 @@ func CredentialsContexts(provider BasicCredentials) {
 			err := provider.Delete(credentials.Username)
 			gomega.Expect(err).To(gomega.Succeed())
 			c, err := provider.Get(credentials.Username)
-			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(c).To(gomega.BeNil())
 		})
 
-		ginkgo.AfterEach(func() {
-			err := provider.Truncate()
-			gomega.Expect(err).To(gomega.BeNil())
-		})
+
 	})
 	ginkgo.Context("empty data store", func() {
-		ginkgo.It("must add correctly", func() {
+		ginkgo.It("get doesn't work", func() {
 			c, err := provider.Get("u1")
-			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(c).To(gomega.BeNil())
+		})
+
+		ginkgo.It("must add correctly", func() {
+			err := provider.Add(NewBasicCredentialsData("u1",[] byte("pwd"),"r1","o1"))
+			gomega.Expect(err).To(gomega.Succeed())
 		})
 
 		ginkgo.It("edit doesn't work", func() {
@@ -89,5 +91,9 @@ func CredentialsContexts(provider BasicCredentials) {
 			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
 
+	})
+	ginkgo.AfterEach(func() {
+		err := provider.Truncate()
+		gomega.Expect(err).To(gomega.BeNil())
 	})
 }

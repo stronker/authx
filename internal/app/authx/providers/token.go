@@ -29,6 +29,7 @@ type Token interface {
 	Delete(username string, tokenID string) derrors.Error
 	Add(token *TokenData) derrors.Error
 	Get(username string, tokenID string) (*TokenData, derrors.Error)
+	Exist(username string, tokenID string) (*bool, derrors.Error)
 	Truncate() derrors.Error
 }
 
@@ -41,9 +42,9 @@ func NewTokenMockup() Token {
 }
 
 func (p *TokenMockup) Delete(username string, tokenID string) derrors.Error {
-	id:=p.generateID(tokenID, username)
-	_, ok := p.data[id]
-	if !ok {
+	id := p.generateID(tokenID, username)
+	_, err := p.Get(username, tokenID)
+	if err != nil {
 		return derrors.NewNotFoundError("username not found").WithParams(username)
 	}
 	delete(p.data, id)
@@ -58,9 +59,14 @@ func (p *TokenMockup) Add(token *TokenData) derrors.Error {
 func (p *TokenMockup) Get(username string, tokenID string) (*TokenData, derrors.Error) {
 	data, ok := p.data[p.generateID(tokenID, username)]
 	if !ok {
-		return nil, nil
+		return nil, derrors.NewNotFoundError("token not found").WithParams(username, tokenID)
 	}
 	return &data, nil
+}
+
+func (p *TokenMockup) Exist(username string, tokenID string) (*bool, derrors.Error) {
+	_, ok := p.data[p.generateID(tokenID, username)]
+	return &ok, nil
 }
 
 func (p *TokenMockup) Truncate() derrors.Error {

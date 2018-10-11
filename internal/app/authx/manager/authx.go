@@ -46,19 +46,16 @@ func (m *Authx) DeleteCredentials(username string) derrors.Error {
 }
 
 func (m *Authx) AddBasicCredentials(username string, organizationID string, roleID string, password string) derrors.Error {
-	role, err := m.RoleProvider.Get(organizationID, roleID)
+	_, err := m.RoleProvider.Get(organizationID, roleID)
 	if err != nil {
 		return err
-	}
-	if role == nil {
-		return derrors.NewNotFoundError("role").WithParams(organizationID).WithParams(username)
 	}
 
-	cred, err := m.CredentialsProvider.Get(username)
+	exist, err := m.CredentialsProvider.Exist(username)
 	if err != nil {
 		return err
 	}
-	if cred != nil {
+	if *exist {
 		return derrors.NewAlreadyExistsError("credentials already exists")
 	}
 

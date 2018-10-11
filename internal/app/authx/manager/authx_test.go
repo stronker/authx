@@ -158,12 +158,10 @@ var _ = ginkgo.Describe("Authx", func() {
 			gomega.Expect(newResponse).To(gomega.BeNil())
 
 		})
-
 		ginkgo.AfterEach(func() {
 			err := manager.Clean()
 			gomega.Expect(err).To(gomega.Succeed())
 		})
-
 	})
 
 })
