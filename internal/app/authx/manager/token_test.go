@@ -19,7 +19,7 @@ var _ = ginkgo.Describe("BCryptPassword", func() {
 
 func TokenContexts(manager Token) {
 	ginkgo.Context("with a basic parameters", func() {
-		claim := token.NewPersonalClaim("u1", "r1", []string{"p1", "p2"})
+		claim := token.NewPersonalClaim("u1", "r1", []string{"p1", "p2"},"o1")
 		expirationPeriod, _ := time.ParseDuration("10m")
 		secret := "myLittleSecret112131"
 		ginkgo.It("can generate a token", func() {

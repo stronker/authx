@@ -11,13 +11,14 @@ import (
 )
 
 type PersonalClaim struct {
-	UserID     string    `json:"user,omitempty"`
-	Primitives [] string `json:"access,omitempty"`
-	RoleName   string    `json:"role,omitempty"`
+	UserID         string    `json:"userID,omitempty"`
+	Primitives     [] string `json:"access,omitempty"`
+	RoleName       string    `json:"role,omitempty"`
+	OrganizationID string    `json:"organizationID,omitempty"`
 }
 
-func NewPersonalClaim(userID string, roleName string, primitives [] string) *PersonalClaim {
-	return &PersonalClaim{UserID: userID, RoleName: roleName, Primitives: primitives}
+func NewPersonalClaim(userID string, roleName string, primitives [] string, organizationID string) *PersonalClaim {
+	return &PersonalClaim{UserID: userID, RoleName: roleName, Primitives: primitives, OrganizationID: organizationID}
 }
 
 type Claim struct {

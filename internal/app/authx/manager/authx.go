@@ -50,15 +50,15 @@ func (m *Authx) AddBasicCredentials(username string, organizationID string, role
 	if err != nil {
 		return err
 	}
-	if role == nil{
+	if role == nil {
 		return derrors.NewNotFoundError("role").WithParams(organizationID).WithParams(username)
 	}
 
-	cred, err:= m.CredentialsProvider.Get(username)
+	cred, err := m.CredentialsProvider.Get(username)
 	if err != nil {
 		return err
 	}
-	if cred != nil{
+	if cred != nil {
 		return derrors.NewAlreadyExistsError("credentials already exists")
 	}
 
@@ -84,9 +84,10 @@ func (m *Authx) LoginWithBasicCredentials(username string, password string) (*pb
 	if err != nil {
 		return nil, err
 	}
-	personalClaim := token.NewPersonalClaim(username, role.Name, role.Primitives)
+	personalClaim := token.NewPersonalClaim(username, role.Name, role.Primitives, credentials.OrganizationID)
 	gToken, err := m.Token.Generate(personalClaim, m.expirationDuration, m.secret)
 	if err != nil {
+
 		return nil, err
 	}
 	response := &pbAuthx.LoginResponse{Token: gToken.Token, RefreshToken: gToken.RefreshToken}
@@ -102,7 +103,7 @@ func (m *Authx) RefreshToken(username string, tokenID string, refreshToken strin
 	if err != nil {
 		return nil, err
 	}
-	personalClaim := token.NewPersonalClaim(username, role.Name, role.Primitives)
+	personalClaim := token.NewPersonalClaim(username, role.Name, role.Primitives, credentials.OrganizationID)
 
 	gToken, err := m.Token.Refresh(personalClaim, tokenID, refreshToken, m.expirationDuration, m.secret)
 	if err != nil {
@@ -127,7 +128,7 @@ func (m *Authx) EditUserRole(username string, roleID string) derrors.Error {
 		return err
 	}
 
-	if role == nil{
+	if role == nil {
 		return derrors.NewNotFoundError("role not found")
 	}
 
