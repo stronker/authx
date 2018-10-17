@@ -16,11 +16,11 @@ import (
 	"time"
 )
 
-func WithServerUnaryInterceptor(config Config) grpc.ServerOption {
+func WithServerUnaryInterceptor(config *Config) grpc.ServerOption {
 	return grpc.UnaryInterceptor(authxInterceptor(config))
 }
 
-func authxInterceptor(config Config) grpc.UnaryServerInterceptor {
+func authxInterceptor(config *Config) grpc.UnaryServerInterceptor {
 
 	return func(ctx context.Context,
 		req interface{},
@@ -29,14 +29,25 @@ func authxInterceptor(config Config) grpc.UnaryServerInterceptor {
 
 		start := time.Now()
 
-		claim, dErr := checkJWT(ctx, config)
-		if dErr != nil {
-			return nil, conversions.ToGRPCError(dErr)
-		}
-		dErr = authorize(info.FullMethod, *claim, config)
+		_, ok := config.Authorization.Permissions[info.FullMethod]
 
-		if dErr != nil {
-			return nil, conversions.ToGRPCError(dErr)
+		if ok {
+			claim, dErr := checkJWT(ctx, config)
+			if dErr != nil {
+				return nil, conversions.ToGRPCError(dErr)
+			}
+			dErr = authorize(info.FullMethod, claim, config)
+
+			if dErr != nil {
+				return nil, conversions.ToGRPCError(dErr)
+			}
+
+		} else {
+			if !config.AllowsAll {
+				return nil, conversions.ToGRPCError(
+					derrors.NewUnauthenticatedError("unauthorized method").
+						WithParams(info.FullMethod))
+			}
 		}
 
 		// Calls the handler
@@ -52,7 +63,7 @@ func authxInterceptor(config Config) grpc.UnaryServerInterceptor {
 
 }
 
-func checkJWT(ctx context.Context, config Config) (*token.Claim, derrors.Error) {
+func checkJWT(ctx context.Context, config *Config) (*token.Claim, derrors.Error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, derrors.NewInternalError("impossible to extract metadata")
@@ -76,7 +87,7 @@ func checkJWT(ctx context.Context, config Config) (*token.Claim, derrors.Error) 
 }
 
 // authorize function authorizes the token received from Metadata
-func authorize(method string, claim token.Claim, config Config) derrors.Error {
+func authorize(method string, claim *token.Claim, config *Config) derrors.Error {
 	permission, ok := config.Authorization.Permissions[method]
 	if !ok {
 		if config.AllowsAll {
@@ -85,7 +96,7 @@ func authorize(method string, claim token.Claim, config Config) derrors.Error {
 		return derrors.NewUnauthenticatedError("unauthorized method").WithParams(method)
 	}
 
-	valid := permission.Check(claim.Primitives)
+	valid := permission.Valid(claim.Primitives)
 	if !valid {
 		return derrors.NewUnauthenticatedError("unauthorized method").WithParams(method)
 	}

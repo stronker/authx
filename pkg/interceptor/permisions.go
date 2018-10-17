@@ -10,28 +10,29 @@ type Permission struct {
 	MustNot [] string `json:"must_not,omitempty"`
 }
 
-func (p *Permission) Check(primitives [] string) bool{
+func (p *Permission) Valid(primitives [] string) bool{
 	for _,must := range p.Must {
 		check:=false
 		for _,pri := range primitives {
 			if !check && pri == must {
 				check = true
 			}
-			if !check {
-				return false
-			}
+		}
+		if !check {
+			return false
 		}
 	}
+	counter:=0
 	for _,should := range p.Should {
-		counter:=0
 		for _,pri := range primitives {
 			if pri == should {
 				counter += 1
 			}
-			if counter == 0 {
-				return false
-			}
+
 		}
+	}
+	if len(p.Should) >0 && counter==0 {
+		return false
 	}
 	for _,mustNo := range p.MustNot {
 		for _,pri := range primitives {
