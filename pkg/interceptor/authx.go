@@ -10,13 +10,11 @@ import (
 	"github.com/nalej/authx/pkg/token"
 	"github.com/nalej/derrors"
 	"github.com/nalej/grpc-utils/pkg/conversions"
-	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-	"time"
 )
 
-func WithServerUnaryInterceptor(config *Config) grpc.ServerOption {
+func WithServerAuthxInterceptor(config *Config) grpc.ServerOption {
 	return grpc.UnaryInterceptor(authxInterceptor(config))
 }
 
@@ -26,8 +24,6 @@ func authxInterceptor(config *Config) grpc.UnaryServerInterceptor {
 		req interface{},
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler) (interface{}, error) {
-
-		start := time.Now()
 
 		_, ok := config.Authorization.Permissions[info.FullMethod]
 
@@ -50,15 +46,7 @@ func authxInterceptor(config *Config) grpc.UnaryServerInterceptor {
 			}
 		}
 
-		// Calls the handler
-		h, err := handler(ctx, req)
-
-		log.Info().Msgf("Request - Method:%s\tDuration:%s\tError:%v\n",
-			info.FullMethod,
-			time.Since(start),
-			err)
-
-		return h, err
+		return handler(ctx, req)
 	}
 
 }

@@ -353,7 +353,7 @@ var _ = ginkgo.Describe("GRP interceptor method ", func() {
 
 		ginkgo.BeforeSuite(func() {
 			listener = test.GetDefaultListener()
-			server = grpc.NewServer(WithServerUnaryInterceptor(cfg))
+			server = grpc.NewServer(WithServerAuthxInterceptor(cfg))
 
 			mgr = manager.NewAuthxMockup()
 			handler := handler.NewAuthx(mgr)
