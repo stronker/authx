@@ -29,8 +29,17 @@ spec:
         imagePullPolicy: Always
         args:
         - "run"
+        - "--secret /etc/authx/secret"
         - "--debug"
         securityContext:
           runAsUser: 2000
       imagePullSecrets:
       - name: myregistrykey
+        volumeMounts:
+        - name: authx-secret-volume
+          mountPath: "/etc/authx"
+          readOnly: true
+      volumes:
+      - name: authx-secret-volume
+        secret:
+          secretName: authx-secret
