@@ -11,10 +11,13 @@ import (
 	"time"
 )
 
+// DefaultExpirationDuration is the default token expiration duration
 const DefaultExpirationDuration = "3h"
 
+// DefaultExpirationDuration is the default port where the service is deployed
 const DefaultPort = 8810
 
+// DefaultExpirationDuration is the default secret that Authx uses to sign the token.
 const DefaultSecret = "myLittleSecret"
 
 var config = authx.Config{}
