@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: authx
+  cluster: management
+  namespace: nalej
+spec:
+  selector:
+    cluster: management
+    component: authx
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 8810
+    targetPort: 8810
+    nodePort: 31810
