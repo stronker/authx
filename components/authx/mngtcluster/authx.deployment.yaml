@@ -1,5 +1,5 @@
 ###
-# System Model
+# AUTHX
 ###
 
 kind: Deployment
@@ -26,19 +26,19 @@ spec:
       containers:
       - name: authx
         image: nalej/authx:VERSION
-        imagePullPolicy: Always
+        imagePullPolicy: Never
         args:
         - "run"
-        - "--secret /etc/authx/secret"
+        - "--secret=/etc/authx/secret"
         - "--debug"
-        securityContext:
-          runAsUser: 2000
-      imagePullSecrets:
-      - name: myregistrykey
         volumeMounts:
         - name: authx-secret-volume
           mountPath: "/etc/authx"
           readOnly: true
+        securityContext:
+          runAsUser: 2000
+      imagePullSecrets:
+      - name: myregistrykey
       volumes:
       - name: authx-secret-volume
         secret:

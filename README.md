@@ -10,6 +10,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: authx-secret
+  namespace: nalej
 type: Opaque
 data:
   secret: [your_secret]
