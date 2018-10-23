@@ -22,17 +22,17 @@ const DefaultSecret = "myLittleSecret"
 
 var config = authx.Config{}
 
-var secretFile = ""
+var secretPath = ""
 
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run the AUTHX server",
 	Long:  `Launch an instance of the AUTHX server.`,
 	PreRun: func(cmd *cobra.Command, args []string) {
-		if secretFile == "" {
+		if secretPath == "" {
 			config.Secret = DefaultSecret
 		} else {
-			dat, err := ioutil.ReadFile(secretFile)
+			dat, err := ioutil.ReadFile(secretPath)
 			if err != nil {
 				panic(err)
 			}
@@ -52,6 +52,6 @@ func init() {
 
 	rootCmd.AddCommand(runCmd)
 	runCmd.Flags().IntVar(&config.Port, "port", DefaultPort, "Port to launch Authx server")
-	runCmd.Flags().StringVar(&secretFile, "secret", "", "Path to internal secret to generate Tokens")
+	runCmd.Flags().StringVar(&secretPath, "secret", "", "Path to internal secret to generate Tokens")
 	runCmd.Flags().DurationVar(&config.ExpirationTime, "expiration", d, "Expiration time of Tokens")
 }
