@@ -32,7 +32,7 @@ func (p *Permission) Valid(primitives [] string) bool {
 	for _, should := range p.Should {
 		for _, pri := range primitives {
 			if pri == should {
-				counter += 1
+				counter ++
 			}
 
 		}

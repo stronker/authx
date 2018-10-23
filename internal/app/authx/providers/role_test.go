@@ -28,16 +28,16 @@ func RoleContexts(provider Role) {
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(*exists).To(gomega.BeTrue())
 
-			r, err := provider.Get(role.OrganizationId, role.RoleId)
+			r, err := provider.Get(role.OrganizationID, role.RoleID)
 			gomega.Expect(err).To(gomega.BeNil())
 			gomega.Expect(r).NotTo(gomega.BeNil())
 
 		})
 
 		ginkgo.It("can be edited the name", func() {
-			err := provider.Edit(role.OrganizationId, role.RoleId, NewEditRoleData().WithName("nNew"))
+			err := provider.Edit(role.OrganizationID, role.RoleID, NewEditRoleData().WithName("nNew"))
 			gomega.Expect(err).To(gomega.Succeed())
-			r, err := provider.Get(role.OrganizationId, role.RoleId)
+			r, err := provider.Get(role.OrganizationID, role.RoleID)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(r).NotTo(gomega.BeNil())
 			gomega.Expect(r.Name).To(gomega.Equal("nNew"))
@@ -45,18 +45,18 @@ func RoleContexts(provider Role) {
 		})
 
 		ginkgo.It("can be edited the roleID", func() {
-			err := provider.Edit(role.OrganizationId, role.RoleId, NewEditRoleData().WithPrimitives([]string{"pNew"}))
+			err := provider.Edit(role.OrganizationID, role.RoleID, NewEditRoleData().WithPrimitives([]string{"pNew"}))
 			gomega.Expect(err).To(gomega.Succeed())
-			r, err := provider.Get(role.OrganizationId, role.RoleId)
+			r, err := provider.Get(role.OrganizationID, role.RoleID)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(r).NotTo(gomega.BeNil())
 			gomega.Expect(r.Primitives).To(gomega.Equal([]string{"pNew"}))
 
 		})
 		ginkgo.It("can be edited without changes", func() {
-			err := provider.Edit(role.OrganizationId, role.RoleId, NewEditRoleData())
+			err := provider.Edit(role.OrganizationID, role.RoleID, NewEditRoleData())
 			gomega.Expect(err).To(gomega.Succeed())
-			r, err := provider.Get(role.OrganizationId, role.RoleId)
+			r, err := provider.Get(role.OrganizationID, role.RoleID)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(r).NotTo(gomega.BeNil())
 			gomega.Expect(r.Name).To(gomega.Equal(role.Name))
@@ -65,9 +65,9 @@ func RoleContexts(provider Role) {
 		})
 
 		ginkgo.It("can delete the token", func() {
-			err := provider.Delete(role.OrganizationId, role.RoleId)
+			err := provider.Delete(role.OrganizationID, role.RoleID)
 			gomega.Expect(err).To(gomega.Succeed())
-			r, err := provider.Get(role.OrganizationId, role.RoleId)
+			r, err := provider.Get(role.OrganizationID, role.RoleID)
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(r).To(gomega.BeNil())
 		})

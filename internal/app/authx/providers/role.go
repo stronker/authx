@@ -10,8 +10,8 @@ import (
 
 // RoleData is the structure that is stored in the provider.
 type RoleData struct {
-	OrganizationId string
-	RoleId         string
+	OrganizationID string
+	RoleID         string
 	Name           string
 	Primitives     []string
 }
@@ -19,8 +19,8 @@ type RoleData struct {
 // NewRoleData create a new instance of the structure.
 func NewRoleData(organizationID string, roleID string, name string, primitives []string) *RoleData {
 	return &RoleData{
-		OrganizationId: organizationID,
-		RoleId:         roleID,
+		OrganizationID: organizationID,
+		RoleID:         roleID,
 		Name:           name,
 		Primitives:     primitives,
 	}
@@ -78,7 +78,7 @@ func NewRoleMockup() Role {
 // Delete an existing role.
 func (p *RoleMockup) Delete(organizationID string, roleID string) derrors.Error {
 	data, ok := p.data[roleID]
-	if !ok || data.OrganizationId != organizationID {
+	if !ok || data.OrganizationID != organizationID {
 		return derrors.NewNotFoundError("role not found").WithParams(roleID)
 	}
 	delete(p.data, roleID)
@@ -87,14 +87,14 @@ func (p *RoleMockup) Delete(organizationID string, roleID string) derrors.Error 
 
 // Add a new role.
 func (p *RoleMockup) Add(role *RoleData) derrors.Error {
-	p.data[role.RoleId] = *role
+	p.data[role.RoleID] = *role
 	return nil
 }
 
 // Get recovers an existing role.
 func (p *RoleMockup) Get(organizationID string, roleID string) (*RoleData, derrors.Error) {
 	data, ok := p.data[roleID]
-	if !ok || data.OrganizationId != organizationID {
+	if !ok || data.OrganizationID != organizationID {
 		return nil, derrors.NewNotFoundError("role not found").WithParams(organizationID, roleID)
 	}
 
@@ -121,7 +121,7 @@ func (p *RoleMockup) Edit(organizationID string, roleID string, edit *EditRoleDa
 func (p *RoleMockup) Exist(organizationID string, roleID string) (*bool, derrors.Error) {
 	result := true
 	data, ok := p.data[roleID]
-	if !ok || data.OrganizationId != organizationID {
+	if !ok || data.OrganizationID != organizationID {
 		result = false
 		return &result, nil
 	}

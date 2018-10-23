@@ -9,8 +9,10 @@ import (
 	"github.com/nalej/authx/version"
 )
 
+// MainVersion is the variable to store the version of the project.
 var MainVersion string
 
+// MainCommit is the variable to store the current commit.
 var MainCommit string
 
 func main() {
