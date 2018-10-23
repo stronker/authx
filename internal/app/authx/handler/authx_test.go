@@ -159,6 +159,36 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(response).To(gomega.BeNil())
 		})
 
+		ginkgo.It("change password with correct password", func() {
+			newPassword:=pass+"New"
+			response,err := client.ChangePassword(context.Background(),
+				&pbAuthx.ChangePasswordRequest{Username:userName,Password:pass,NewPassword:newPassword})
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(response).NotTo(gomega.BeNil())
+
+			loginResponse, err := client.LoginWithBasicCredentials(context.Background(),
+				&pbAuthx.LoginWithBasicCredentialsRequest{Username: userName, Password: newPassword})
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(loginResponse).NotTo(gomega.BeNil())
+		})
+		ginkgo.It("change password with correct incorrect password", func() {
+			newPassword:=pass+"New"
+			response,err := client.ChangePassword(context.Background(),
+				&pbAuthx.ChangePasswordRequest{Username:userName,Password:pass+"wrong",NewPassword:newPassword})
+
+			gomega.Expect(err).To(gomega.HaveOccurred())
+			gomega.Expect(response).To(gomega.BeNil())
+		})
+
+		ginkgo.It("change password with correct incorrect username", func() {
+			newPassword:=pass+"New"
+			response,err := client.ChangePassword(context.Background(),
+				&pbAuthx.ChangePasswordRequest{Username:userName+"wrong",Password:pass,NewPassword:newPassword})
+
+			gomega.Expect(err).To(gomega.HaveOccurred())
+			gomega.Expect(response).To(gomega.BeNil())
+		})
+
 		ginkgo.It("change to a valid roleID", func() {
 			success, err := client.EditUserRole(context.Background(),
 				&pbAuthx.EditUserRoleRequest{Username: userName, NewRoleId: roleID2})
