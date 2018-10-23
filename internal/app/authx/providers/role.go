@@ -8,6 +8,7 @@ import (
 	"github.com/nalej/derrors"
 )
 
+// RoleData is the structure that is stored in the provider.
 type RoleData struct {
 	OrganizationId string
 	RoleId         string
@@ -15,6 +16,7 @@ type RoleData struct {
 	Primitives     []string
 }
 
+// NewRoleData create a new instance of the structure.
 func NewRoleData(organizationID string, roleID string, name string, primitives []string) *RoleData {
 	return &RoleData{
 		OrganizationId: organizationID,
@@ -24,42 +26,56 @@ func NewRoleData(organizationID string, roleID string, name string, primitives [
 	}
 }
 
+// EditRoleData is the structure that is used to edit the data in the provider.
 type EditRoleData struct {
 	Name       *string
 	Primitives *[]string
 }
 
+//WithName update the name of the role.
 func (d *EditRoleData) WithName(name string) *EditRoleData {
 	d.Name = &name
 	return d
 }
 
+//WithPrimitives update the primitives.
 func (d *EditRoleData) WithPrimitives(primitives []string) *EditRoleData {
 	d.Primitives = &primitives
 	return d
 }
 
+//NewEditRoleData create a new instance of the structure.
 func NewEditRoleData() *EditRoleData {
 	return &EditRoleData{}
 }
 
+// Role is the interface to store role entities in the system.
 type Role interface {
+	// Delete an existing role.
 	Delete(organizationID string, roleID string) derrors.Error
+	// Add a new role.
 	Add(role *RoleData) derrors.Error
+	// Get recovers an existing role.
 	Get(organizationID string, roleID string) (*RoleData, derrors.Error)
+	// Edit updates an existing role.
 	Edit(organizationID string, roleID string, edit *EditRoleData) derrors.Error
+	// Exist checks if a role exists.
 	Exist(username string, tokenID string) (*bool, derrors.Error)
+	// Truncate clears the provider.
 	Truncate() derrors.Error
 }
 
+// RoleMockup is a in-memory provider.
 type RoleMockup struct {
 	data map[string]RoleData
 }
 
+// NewRoleMockup create a new instance of the RoleMockup structure.
 func NewRoleMockup() Role {
 	return &RoleMockup{data: map[string]RoleData{}}
 }
 
+// Delete an existing role.
 func (p *RoleMockup) Delete(organizationID string, roleID string) derrors.Error {
 	data, ok := p.data[roleID]
 	if !ok || data.OrganizationId != organizationID {
@@ -69,11 +85,13 @@ func (p *RoleMockup) Delete(organizationID string, roleID string) derrors.Error 
 	return nil
 }
 
+// Add a new role.
 func (p *RoleMockup) Add(role *RoleData) derrors.Error {
 	p.data[role.RoleId] = *role
 	return nil
 }
 
+// Get recovers an existing role.
 func (p *RoleMockup) Get(organizationID string, roleID string) (*RoleData, derrors.Error) {
 	data, ok := p.data[roleID]
 	if !ok || data.OrganizationId != organizationID {
@@ -83,6 +101,7 @@ func (p *RoleMockup) Get(organizationID string, roleID string) (*RoleData, derro
 	return &data, nil
 }
 
+// Edit updates an existing role.
 func (p *RoleMockup) Edit(organizationID string, roleID string, edit *EditRoleData) derrors.Error {
 	data, err := p.Get(organizationID, roleID)
 	if err != nil {
@@ -97,6 +116,8 @@ func (p *RoleMockup) Edit(organizationID string, roleID string, edit *EditRoleDa
 	p.data[roleID] = *data
 	return nil
 }
+
+// Exist checks if a role exists.
 func (p *RoleMockup) Exist(organizationID string, roleID string) (*bool, derrors.Error) {
 	result := true
 	data, ok := p.data[roleID]
@@ -107,6 +128,7 @@ func (p *RoleMockup) Exist(organizationID string, roleID string) (*bool, derrors
 	return &result, nil
 }
 
+// Truncate clears the provider.
 func (p *RoleMockup) Truncate() derrors.Error {
 	p.data = map[string]RoleData{}
 	return nil

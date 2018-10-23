@@ -14,6 +14,8 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// WithServerAuthxInterceptor is a gRPC option. If this option is included, the interceptor verifies that the user is
+// is authorized to use the method, using the JWT token.
 func WithServerAuthxInterceptor(config *Config) grpc.ServerOption {
 	return grpc.UnaryInterceptor(authxInterceptor(config))
 }
