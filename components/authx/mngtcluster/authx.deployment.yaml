@@ -1,0 +1,45 @@
+###
+# AUTHX
+###
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    cluster: management
+    component: authx
+  name: authx
+  namespace: nalej
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      cluster: management
+      component: authx
+  template:
+    metadata:
+      labels:
+        cluster: management
+        component: authx
+    spec:
+      containers:
+      - name: authx
+        image: nalej/authx:VERSION
+        imagePullPolicy: Never
+        args:
+        - "run"
+        - "--secret=/etc/authx/secret"
+        - "--debug"
+        volumeMounts:
+        - name: authx-secret-volume
+          mountPath: "/etc/authx"
+          readOnly: true
+        securityContext:
+          runAsUser: 2000
+      imagePullSecrets:
+      - name: myregistrykey
+      volumes:
+      - name: authx-secret-volume
+        secret:
+          secretName: authx-secret

@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// PersonalClaim is the claim that include system information.
 type PersonalClaim struct {
 	UserID         string    `json:"userID,omitempty"`
 	Primitives     [] string `json:"access,omitempty"`
@@ -17,15 +18,18 @@ type PersonalClaim struct {
 	OrganizationID string    `json:"organizationID,omitempty"`
 }
 
+// NewPersonalClaim creates a new instance of the structure.
 func NewPersonalClaim(userID string, roleName string, primitives [] string, organizationID string) *PersonalClaim {
 	return &PersonalClaim{UserID: userID, RoleName: roleName, Primitives: primitives, OrganizationID: organizationID}
 }
 
+// Claim joins the personal claim and the standard JWT claim.
 type Claim struct {
 	jwt.StandardClaims
 	PersonalClaim
 }
 
+// NewClaim create a new instance of the structure.
 func NewClaim(personalClaim PersonalClaim, issuer string, creationTime time.Time, expirationPeriod time.Duration) *Claim {
 	stdClaim := jwt.StandardClaims{
 		Issuer:    issuer,
@@ -38,6 +42,7 @@ func NewClaim(personalClaim PersonalClaim, issuer string, creationTime time.Time
 	return &Claim{StandardClaims: stdClaim, PersonalClaim: personalClaim}
 }
 
+// GenerateUUID creates a new random UUID.
 func GenerateUUID() string {
 	return uuid.New().String()
 }

@@ -11,10 +11,12 @@ import (
 	pbAuthx "github.com/nalej/grpc-authx-go"
 	"time"
 )
-
+// DefaultExpirationDuration is the default duration used in the mockup.
 const DefaultExpirationDuration = "10h"
+// DefaultSecret is the default secret used in the mockup.
 const DefaultSecret = "MyLittleSecret"
 
+// Authx is the component that manages the business logic.
 type Authx struct {
 	Password            Password
 	Token               Token
@@ -25,6 +27,7 @@ type Authx struct {
 	expirationDuration time.Duration
 }
 
+// NewAuthx creates a new manager.
 func NewAuthx(password Password, tokenManager Token, credentialsProvider providers.BasicCredentials,
 	roleProvide providers.Role, secret string, expirationDuration time.Duration) *Authx {
 
@@ -34,6 +37,7 @@ func NewAuthx(password Password, tokenManager Token, credentialsProvider provide
 
 }
 
+// NewAuthxMockup create a new mockup manager.
 func NewAuthxMockup() *Authx {
 	d, _ := time.ParseDuration(DefaultExpirationDuration)
 	return NewAuthx(NewBCryptPassword(), NewJWTTokenMockup(),
@@ -41,10 +45,12 @@ func NewAuthxMockup() *Authx {
 		DefaultSecret, d)
 }
 
+// DeleteCredentials deletes the credential for a specific username.
 func (m *Authx) DeleteCredentials(username string) derrors.Error {
 	return m.CredentialsProvider.Delete(username)
 }
 
+// AddBasicCredentials generate credential for a specific user.
 func (m *Authx) AddBasicCredentials(username string, organizationID string, roleID string, password string) derrors.Error {
 	_, err := m.RoleProvider.Get(organizationID, roleID)
 	if err != nil {
@@ -68,6 +74,7 @@ func (m *Authx) AddBasicCredentials(username string, organizationID string, role
 	return m.CredentialsProvider.Add(entity)
 }
 
+// LoginWithBasicCredentials check the password and returns a valid token.
 func (m *Authx) LoginWithBasicCredentials(username string, password string) (*pbAuthx.LoginResponse, derrors.Error) {
 	credentials, err := m.CredentialsProvider.Get(username)
 	if err != nil {
@@ -91,6 +98,7 @@ func (m *Authx) LoginWithBasicCredentials(username string, password string) (*pb
 	return response, nil
 }
 
+// RefreshToken renew an old token.
 func (m *Authx) RefreshToken(username string, tokenID string, refreshToken string) (*pbAuthx.LoginResponse, derrors.Error) {
 	credentials, err := m.CredentialsProvider.Get(username)
 	if err != nil {
@@ -110,11 +118,13 @@ func (m *Authx) RefreshToken(username string, tokenID string, refreshToken strin
 	return response, nil
 }
 
+// AddRole add a new role to the authorization system.
 func (m *Authx) AddRole(role *pbAuthx.Role) derrors.Error {
 	entity := providers.NewRoleData(role.OrganizationId, role.RoleId, role.Name, PrimitivesToString(role.Primitives))
 	return m.RoleProvider.Add(entity)
 }
 
+// EditUserRole change the RoleID to a specific user.
 func (m *Authx) EditUserRole(username string, roleID string) derrors.Error {
 	credentials, err := m.CredentialsProvider.Get(username)
 	if err != nil {
@@ -133,6 +143,7 @@ func (m *Authx) EditUserRole(username string, roleID string) derrors.Error {
 	return m.CredentialsProvider.Edit(username, edit)
 }
 
+// Clean removes all the data.
 func (m *Authx) Clean() derrors.Error {
 	err := m.Token.Clean()
 	if err != nil {
@@ -149,6 +160,7 @@ func (m *Authx) Clean() derrors.Error {
 	return nil
 }
 
+// PrimitivesToString transform the primitive to strings.
 func PrimitivesToString(primitives [] pbAuthx.AccessPrimitive) [] string {
 	strPrimitives := make([] string, 0, len(primitives))
 	for _, p := range primitives {

@@ -13,39 +13,51 @@ import (
 	"time"
 )
 
+// Issuer name of the application that generates new tokens.
 const Issuer string = "authx"
 
+// GeneratedToken is the object that defines the basic structure.
 type GeneratedToken struct {
+	// Token is the token generated.
 	Token        string
+	// RefreshToken is the id required to renew an old token.
 	RefreshToken string
 }
 
+// NewGeneratedToken build a new object of this structure.
 func NewGeneratedToken(token string, refreshToken string) *GeneratedToken {
 	return &GeneratedToken{Token: token, RefreshToken: refreshToken}
 }
-
+// Token is a interface manages the business logic of tokens.
 type Token interface {
+	// Generate a new token with the personal claim.
 	Generate(personalClaim *token.PersonalClaim, expirationPeriod time.Duration,
 		secret string) (*GeneratedToken, derrors.Error)
+	// Refresh renew an old token.
 	Refresh(personalClaim *token.PersonalClaim, tokenID string, refreshToken string,
 		expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error)
+	// Clean remove all the data from the providers.
 	Clean() derrors.Error
 }
 
+// JWTToken is an implementation of token using JWT.
 type JWTToken struct {
 	TokenProvider providers.Token
 	Password      Password
 }
 
+// NewJWTToken create a new instance of JWTToken
 func NewJWTToken(tokenProvider providers.Token, password Password) Token {
 	return &JWTToken{TokenProvider: tokenProvider, Password: password}
 
 }
 
+// NewJWTTokenMockup create a new mockup of JWTToken
 func NewJWTTokenMockup() Token {
 	return NewJWTToken(providers.NewTokenMockup(), NewBCryptPassword())
 }
 
+// Generate a new JWT token with the personal claim.
 func (m *JWTToken) Generate(personalClaim *token.PersonalClaim, expirationPeriod time.Duration,
 	secret string) (*GeneratedToken, derrors.Error) {
 
@@ -70,6 +82,7 @@ func (m *JWTToken) Generate(personalClaim *token.PersonalClaim, expirationPeriod
 	return gToken, nil
 }
 
+// Refresh renew an old token.
 func (m *JWTToken) Refresh(personalClaim *token.PersonalClaim, tokenID string, refreshToken string,
 	expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error) {
 
@@ -101,6 +114,7 @@ func (m *JWTToken) Refresh(personalClaim *token.PersonalClaim, tokenID string, r
 	return gt, nil
 }
 
+// Clean remove all the data from the providers.
 func (m *JWTToken) Clean() derrors.Error {
 	return m.TokenProvider.Truncate()
 }

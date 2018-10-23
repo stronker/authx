@@ -13,14 +13,18 @@ import (
 	"github.com/nalej/grpc-utils/pkg/conversions"
 )
 
+// Authx is the struct that handles the gRPC service.
 type Authx struct {
+	// Manager is the struct responsible of the service business logic.
 	Manager *manager.Authx
 }
 
+// NewAuthx creates a new handler.
 func NewAuthx(manager *manager.Authx) *Authx {
 	return &Authx{Manager: manager}
 }
 
+// DeleteCredentials remove an existing credential using the username.
 func (h *Authx) DeleteCredentials(_ context.Context, request *pbAuthx.DeleteCredentialsRequest) (*pbCommon.Success, error) {
 	if request.Username == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("username is mandatory"))
@@ -32,6 +36,7 @@ func (h *Authx) DeleteCredentials(_ context.Context, request *pbAuthx.DeleteCred
 	return &pbCommon.Success{}, nil
 }
 
+// AddBasicCredentials adds a new credential specifying a password.
 func (h *Authx) AddBasicCredentials(_ context.Context, request *pbAuthx.AddBasicCredentialRequest) (*pbCommon.Success, error) {
 	if request.Username == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("username is mandatory"))
@@ -53,6 +58,7 @@ func (h *Authx) AddBasicCredentials(_ context.Context, request *pbAuthx.AddBasic
 	return &pbCommon.Success{}, nil
 }
 
+// LoginWithBasicCredentials login in the system and recovers a auth token.
 func (h *Authx) LoginWithBasicCredentials(_ context.Context, request *pbAuthx.LoginWithBasicCredentialsRequest) (*pbAuthx.LoginResponse, error) {
 	if request.Username == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("username is mandatory"))
@@ -68,6 +74,7 @@ func (h *Authx) LoginWithBasicCredentials(_ context.Context, request *pbAuthx.Lo
 	return response, nil
 }
 
+// RefreshToken renews an existing token.
 func (h *Authx) RefreshToken(_ context.Context, request *pbAuthx.RefreshTokenRequest) (*pbAuthx.LoginResponse, error) {
 	if request.Username == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("username is mandatory"))
@@ -75,6 +82,7 @@ func (h *Authx) RefreshToken(_ context.Context, request *pbAuthx.RefreshTokenReq
 	if request.RefreshToken == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("refreshToken is mandatory"))
 	}
+	//TODO maybe we should revisit this, to send the old token instead of the tokenID could be a good idea.
 	if request.TokenId == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("tokenID is mandatory"))
 	}
@@ -86,6 +94,7 @@ func (h *Authx) RefreshToken(_ context.Context, request *pbAuthx.RefreshTokenReq
 	return response, nil
 }
 
+// AddRole adds a role with a authorization properties.
 func (h *Authx) AddRole(_ context.Context, request *pbAuthx.Role) (*pbCommon.Success, error) {
 	if request.RoleId == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("roleID is mandatory"))
@@ -108,6 +117,7 @@ func (h *Authx) AddRole(_ context.Context, request *pbAuthx.Role) (*pbCommon.Suc
 
 }
 
+// EditUserRole change the roleID to a specific user.
 func (h *Authx) EditUserRole(_ context.Context, request *pbAuthx.EditUserRoleRequest) (*pbCommon.Success, error) {
 	if request.Username == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("username is mandatory"))

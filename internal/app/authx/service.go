@@ -16,14 +16,18 @@ import (
 	"net"
 )
 
+// Service is the Authx service instance.
 type Service struct {
+	// Config is the required parameters.
 	Config
 }
 
+// NewService create a new service instance.
 func NewService(config Config) *Service {
 	return &Service{Config: config}
 }
 
+//Run launch the Authx service.
 func (s *Service) Run() {
 	s.Config.Print()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", s.Port))
