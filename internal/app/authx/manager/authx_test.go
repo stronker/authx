@@ -151,7 +151,7 @@ var _ = ginkgo.Describe("Authx", func() {
 			gomega.Expect(ok).To(gomega.BeTrue())
 			gomega.Expect(cl).NotTo(gomega.BeNil())
 
-			newResponse,err:=manager.RefreshToken(userName, cl.Id, response.RefreshToken)
+			newResponse,err:=manager.RefreshToken(response.Token, response.RefreshToken)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(newResponse).NotTo(gomega.BeNil())
 
@@ -172,7 +172,7 @@ var _ = ginkgo.Describe("Authx", func() {
 			gomega.Expect(ok).To(gomega.BeTrue())
 			gomega.Expect(cl).NotTo(gomega.BeNil())
 
-			newResponse,err:=manager.RefreshToken(userName, cl.Id, response.RefreshToken+"wrong")
+			newResponse,err:=manager.RefreshToken(response.Token, response.RefreshToken+"wrong")
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(newResponse).To(gomega.BeNil())
 

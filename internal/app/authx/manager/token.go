@@ -34,7 +34,7 @@ type Token interface {
 	Generate(personalClaim *token.PersonalClaim, expirationPeriod time.Duration,
 		secret string) (*GeneratedToken, derrors.Error)
 	// Refresh renew an old token.
-	Refresh(personalClaim *token.PersonalClaim, tokenID string, refreshToken string,
+	Refresh(oldToken string, refreshToken string,
 		expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error)
 	// Clean remove all the data from the providers.
 	Clean() derrors.Error
@@ -95,7 +95,7 @@ func (m *JWTToken) Refresh(oldToken string, refreshToken string,
 
 	cl, ok := tk.Claims.(*token.Claim)
 	if !ok {
-		return nil, derrors.NewInternalError("impossible recover toke")
+		return nil, derrors.NewInternalError("impossible recover token")
 	}
 	username := cl.UserID
 	tokenID:= cl.Id

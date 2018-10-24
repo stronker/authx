@@ -230,8 +230,7 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(cl).NotTo(gomega.BeNil())
 
 			newResponse, err := client.RefreshToken(context.Background(),
-				&pbAuthx.RefreshTokenRequest{Username:userName,
-				TokenId:cl.Id,
+				&pbAuthx.RefreshTokenRequest{Token:response.Token,
 				RefreshToken:response.RefreshToken})
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(newResponse).NotTo(gomega.BeNil())
@@ -255,8 +254,7 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(cl).NotTo(gomega.BeNil())
 
 			newResponse, err := client.RefreshToken(context.Background(),
-				&pbAuthx.RefreshTokenRequest{Username:userName,
-					TokenId:cl.Id,
+				&pbAuthx.RefreshTokenRequest{Token:response.Token,
 					RefreshToken:response.RefreshToken+"wrong"})
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(newResponse).To(gomega.BeNil())
