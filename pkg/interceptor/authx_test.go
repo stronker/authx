@@ -44,7 +44,7 @@ var _ = ginkgo.Describe("Authorize method", func() {
 		cfg := NewConfig(&AuthorizationConfig{Permissions: map[string]Permission{}},
 			"myLittleSecret", "auth", false)
 
-		ginkgo.It("allows any method", func() {
+		ginkgo.It("should allows any method", func() {
 			err := authorize("service1", claim, cfg)
 			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
@@ -70,16 +70,16 @@ var _ = ginkgo.Describe("Authorize method", func() {
 		ginkgo.Context("without primitives", func() {
 			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{}, "o1"),
 				"i1", time.Now(), duration)
-			ginkgo.It("allows unknown method", func() {
+			ginkgo.It("should allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
 				gomega.Expect(err).To(gomega.Succeed())
 			})
 
-			ginkgo.It("doesn't allow method1", func() {
+			ginkgo.It("should not allow method1", func() {
 				err := authorize(method1, claim, cfg)
 				gomega.Expect(err).To(gomega.HaveOccurred())
 			})
-			ginkgo.It("doesn't allow method2", func() {
+			ginkgo.It("should not allow method2", func() {
 				err := authorize(method2, claim, cfg)
 				gomega.Expect(err).To(gomega.HaveOccurred())
 			})
@@ -88,16 +88,16 @@ var _ = ginkgo.Describe("Authorize method", func() {
 		ginkgo.Context("with primitive1", func() {
 			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{primitive1}, "o1"),
 				"i1", time.Now(), duration)
-			ginkgo.It("allows unknown method", func() {
+			ginkgo.It("should allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
 				gomega.Expect(err).To(gomega.Succeed())
 			})
 
-			ginkgo.It("allows method1", func() {
+			ginkgo.It("should allow method1", func() {
 				err := authorize(method1, claim, cfg)
 				gomega.Expect(err).To(gomega.Succeed())
 			})
-			ginkgo.It("doesn't allow method2", func() {
+			ginkgo.It("should not allow method2", func() {
 				err := authorize(method2, claim, cfg)
 				gomega.Expect(err).To(gomega.HaveOccurred())
 			})
@@ -105,16 +105,16 @@ var _ = ginkgo.Describe("Authorize method", func() {
 		ginkgo.Context("with primitive2", func() {
 			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{primitive2}, "o1"),
 				"i1", time.Now(), duration)
-			ginkgo.It("allows unknown method", func() {
+			ginkgo.It("should allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
 				gomega.Expect(err).To(gomega.Succeed())
 			})
 
-			ginkgo.It("doesn't allow method1", func() {
+			ginkgo.It("should not allow method1", func() {
 				err := authorize(method1, claim, cfg)
 				gomega.Expect(err).To(gomega.HaveOccurred())
 			})
-			ginkgo.It("allows method2", func() {
+			ginkgo.It("should allow method2", func() {
 				err := authorize(method2, claim, cfg)
 				gomega.Expect(err).To(gomega.Succeed())
 			})
@@ -123,16 +123,16 @@ var _ = ginkgo.Describe("Authorize method", func() {
 		ginkgo.Context("with all primitives", func() {
 			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{primitive1, primitive2}, "o1"),
 				"i1", time.Now(), duration)
-			ginkgo.It("allows unknown method", func() {
+			ginkgo.It("should allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
 				gomega.Expect(err).To(gomega.Succeed())
 			})
 
-			ginkgo.It("allows method1", func() {
+			ginkgo.It("should allow method1", func() {
 				err := authorize(method1, claim, cfg)
 				gomega.Expect(err).To(gomega.Succeed())
 			})
-			ginkgo.It("allows method2", func() {
+			ginkgo.It("should allow method2", func() {
 				err := authorize(method2, claim, cfg)
 				gomega.Expect(err).To(gomega.Succeed())
 			})
@@ -159,16 +159,16 @@ var _ = ginkgo.Describe("Authorize method", func() {
 		ginkgo.Context("without primitives", func() {
 			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{}, "o1"),
 				"i1", time.Now(), duration)
-			ginkgo.It("doesn't allow unknown method", func() {
+			ginkgo.It("should not allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
 				gomega.Expect(err).To(gomega.HaveOccurred())
 			})
 
-			ginkgo.It("doesn't allow method1", func() {
+			ginkgo.It("should not allow method1", func() {
 				err := authorize(method1, claim, cfg)
 				gomega.Expect(err).To(gomega.HaveOccurred())
 			})
-			ginkgo.It("doesn't allow method2", func() {
+			ginkgo.It("should not allow method2", func() {
 				err := authorize(method2, claim, cfg)
 				gomega.Expect(err).To(gomega.HaveOccurred())
 			})
@@ -177,16 +177,16 @@ var _ = ginkgo.Describe("Authorize method", func() {
 		ginkgo.Context("with primitive1", func() {
 			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{primitive1}, "o1"),
 				"i1", time.Now(), duration)
-			ginkgo.It("doesn't allow unknown method", func() {
+			ginkgo.It("should not allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
 				gomega.Expect(err).To(gomega.HaveOccurred())
 			})
 
-			ginkgo.It("allows method1", func() {
+			ginkgo.It("should allow method1", func() {
 				err := authorize(method1, claim, cfg)
 				gomega.Expect(err).To(gomega.Succeed())
 			})
-			ginkgo.It("doesn't allow method2", func() {
+			ginkgo.It("should not allow method2", func() {
 				err := authorize(method2, claim, cfg)
 				gomega.Expect(err).To(gomega.HaveOccurred())
 			})
@@ -194,16 +194,16 @@ var _ = ginkgo.Describe("Authorize method", func() {
 		ginkgo.Context("with primitive2", func() {
 			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{primitive2}, "o1"),
 				"i1", time.Now(), duration)
-			ginkgo.It("doesn't allow unknown method", func() {
+			ginkgo.It("should not allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
 				gomega.Expect(err).To(gomega.HaveOccurred())
 			})
 
-			ginkgo.It("doesn't allow method1", func() {
+			ginkgo.It("should not allow method1", func() {
 				err := authorize(method1, claim, cfg)
 				gomega.Expect(err).To(gomega.HaveOccurred())
 			})
-			ginkgo.It("allows method2", func() {
+			ginkgo.It("should allow method2", func() {
 				err := authorize(method2, claim, cfg)
 				gomega.Expect(err).To(gomega.Succeed())
 			})
@@ -212,16 +212,16 @@ var _ = ginkgo.Describe("Authorize method", func() {
 		ginkgo.Context("with all primitives", func() {
 			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{primitive1, primitive2}, "o1"),
 				"i1", time.Now(), duration)
-			ginkgo.It("doesn't allow unknown method", func() {
+			ginkgo.It("should not allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
 				gomega.Expect(err).To(gomega.HaveOccurred())
 			})
 
-			ginkgo.It("allows method1", func() {
+			ginkgo.It("should allow method1", func() {
 				err := authorize(method1, claim, cfg)
 				gomega.Expect(err).To(gomega.Succeed())
 			})
-			ginkgo.It("allows method2", func() {
+			ginkgo.It("should allow method2", func() {
 				err := authorize(method2, claim, cfg)
 				gomega.Expect(err).To(gomega.Succeed())
 			})
@@ -246,7 +246,7 @@ var _ = ginkgo.Describe("checkJWT method", func() {
 
 		ctx := metadata.NewIncomingContext(context.Background(), md)
 
-		ginkgo.It("works", func() {
+		ginkgo.It("should work", func() {
 			claim, err := checkJWT(ctx, cfg)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(claim).NotTo(gomega.BeNil())
@@ -271,7 +271,7 @@ var _ = ginkgo.Describe("checkJWT method", func() {
 
 		ctx := metadata.NewIncomingContext(context.Background(), md)
 
-		ginkgo.It("doesn't work", func() {
+		ginkgo.It("should not work", func() {
 			claim, err := checkJWT(ctx, cfg)
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(claim).To(gomega.BeNil())
@@ -293,7 +293,7 @@ var _ = ginkgo.Describe("checkJWT method", func() {
 		parentCtx, _ := context.WithTimeout(context.TODO(), duration)
 		ctx := metadata.NewIncomingContext(parentCtx, md)
 
-		ginkgo.It("doesn't works", func() {
+		ginkgo.It("should not work", func() {
 			claim, err := checkJWT(ctx, cfg)
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(claim).To(gomega.BeNil())
@@ -315,7 +315,7 @@ var _ = ginkgo.Describe("checkJWT method", func() {
 		parentCtx, _ := context.WithTimeout(context.TODO(), duration)
 		ctx := metadata.NewOutgoingContext(parentCtx, md)
 
-		ginkgo.It("doesn't works", func() {
+		ginkgo.It("should not work", func() {
 			claim, err := checkJWT(ctx, cfg)
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(claim).To(gomega.BeNil())
@@ -405,7 +405,7 @@ var _ = ginkgo.Describe("GRP interceptor method ", func() {
 			gomega.Expect(success).NotTo(gomega.BeNil())
 		})
 
-		ginkgo.It("add basic credentials with correct roleID and incorrect JWT", func() {
+		ginkgo.It("should add basic credentials with correct roleID and incorrect JWT", func() {
 
 			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1",
 				[] string{primitive1, primitive2}, "o1"),
@@ -426,7 +426,7 @@ var _ = ginkgo.Describe("GRP interceptor method ", func() {
 			gomega.Expect(success).To(gomega.BeNil())
 		})
 
-		ginkgo.It("add basic credentials with correct roleID and correct JWT", func() {
+		ginkgo.It("should add basic credentials with correct roleID and correct JWT", func() {
 
 			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1",
 				[] string{primitive2}, "o1"),

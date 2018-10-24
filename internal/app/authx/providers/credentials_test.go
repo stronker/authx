@@ -75,29 +75,29 @@ func CredentialsContexts(provider BasicCredentials) {
 	})
 	ginkgo.Context("empty data store", func() {
 
-		ginkgo.It("doesn't exist", func() {
+		ginkgo.It("should not exist", func() {
 			c, err := provider.Exist("u1")
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(*c).To(gomega.BeFalse())
 		})
 
-		ginkgo.It("get doesn't work", func() {
+		ginkgo.It("should not work", func() {
 			c, err := provider.Get("u1")
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(c).To(gomega.BeNil())
 		})
 
-		ginkgo.It("must add correctly", func() {
+		ginkgo.It("should  add correctly", func() {
 			err := provider.Add(NewBasicCredentialsData("u1",[] byte("pwd"),"r1","o1"))
 			gomega.Expect(err).To(gomega.Succeed())
 		})
 
-		ginkgo.It("edit doesn't work", func() {
+		ginkgo.It("should  not work", func() {
 			err := provider.Edit("u1", NewEditBasicCredentialsData().WithRoleID("rNew"))
 			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
 
-		ginkgo.It("delete doesn't work", func() {
+		ginkgo.It("should not work", func() {
 			err := provider.Delete("u1")
 			gomega.Expect(err).To(gomega.HaveOccurred())
 		})

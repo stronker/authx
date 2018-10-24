@@ -144,14 +144,14 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(success).NotTo(gomega.BeNil())
 		})
 
-		ginkgo.It("login with correct password", func() {
+		ginkgo.It("should login with correct password", func() {
 			response, err := client.LoginWithBasicCredentials(context.Background(),
 				&pbAuthx.LoginWithBasicCredentialsRequest{Username: userName, Password: pass})
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(response).NotTo(gomega.BeNil())
 		})
 
-		ginkgo.It("login with incorrect password", func() {
+		ginkgo.It("should login with incorrect password", func() {
 			response, err := client.LoginWithBasicCredentials(context.Background(),
 				&pbAuthx.LoginWithBasicCredentialsRequest{Username: userName, Password: pass + "wrong"})
 
@@ -159,7 +159,7 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(response).To(gomega.BeNil())
 		})
 
-		ginkgo.It("change password with correct password", func() {
+		ginkgo.It("should change password with correct password", func() {
 			newPassword:=pass+"New"
 			response,err := client.ChangePassword(context.Background(),
 				&pbAuthx.ChangePasswordRequest{Username:userName,Password:pass,NewPassword:newPassword})
@@ -171,7 +171,7 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(loginResponse).NotTo(gomega.BeNil())
 		})
-		ginkgo.It("change password with correct incorrect password", func() {
+		ginkgo.It("should change password with incorrect password", func() {
 			newPassword:=pass+"New"
 			response,err := client.ChangePassword(context.Background(),
 				&pbAuthx.ChangePasswordRequest{Username:userName,Password:pass+"wrong",NewPassword:newPassword})
@@ -180,7 +180,7 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(response).To(gomega.BeNil())
 		})
 
-		ginkgo.It("change password with correct incorrect username", func() {
+		ginkgo.It("should change password with incorrect username", func() {
 			newPassword:=pass+"New"
 			response,err := client.ChangePassword(context.Background(),
 				&pbAuthx.ChangePasswordRequest{Username:userName+"wrong",Password:pass,NewPassword:newPassword})
@@ -189,31 +189,31 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(response).To(gomega.BeNil())
 		})
 
-		ginkgo.It("change to a valid roleID", func() {
+		ginkgo.It("should change to a valid roleID", func() {
 			success, err := client.EditUserRole(context.Background(),
 				&pbAuthx.EditUserRoleRequest{Username: userName, NewRoleId: roleID2})
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(success).NotTo(gomega.BeNil())
 		})
 
-		ginkgo.It("change to a invalid roleID", func() {
+		ginkgo.It("should change to a invalid roleID", func() {
 			success, err := client.EditUserRole(context.Background(),
 				&pbAuthx.EditUserRoleRequest{Username: userName, NewRoleId: roleID2+"wrong"})
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(success).To(gomega.BeNil())
 		})
-		ginkgo.It("delete credentials", func() {
+		ginkgo.It("should delete credentials", func() {
 			success,err := client.DeleteCredentials(context.Background(),&pbAuthx.DeleteCredentialsRequest{Username:userName})
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(success).NotTo(gomega.BeNil())
 		})
-		ginkgo.It("delete wrong credentials", func() {
+		ginkgo.It("should delete wrong credentials", func() {
 			success,err := client.DeleteCredentials(context.Background(),&pbAuthx.DeleteCredentialsRequest{Username:userName+"wrong"})
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(success).To(gomega.BeNil())
 		})
 
-		ginkgo.It("refresh token", func() {
+		ginkgo.It("should refresh token", func() {
 			response, err := client.LoginWithBasicCredentials(context.Background(),
 				&pbAuthx.LoginWithBasicCredentialsRequest{Username: userName, Password: pass})
 			gomega.Expect(err).To(gomega.Succeed())
@@ -238,7 +238,7 @@ var _ = ginkgo.Describe("Applications", func() {
 
 		})
 
-		ginkgo.It("reject invalid refresh token", func() {
+		ginkgo.It("should reject invalid refresh token", func() {
 			response, err := client.LoginWithBasicCredentials(context.Background(),
 				&pbAuthx.LoginWithBasicCredentialsRequest{Username: userName, Password: pass})
 			gomega.Expect(err).To(gomega.Succeed())
