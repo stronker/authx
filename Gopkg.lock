@@ -53,8 +53,8 @@
 [[projects]]
   name = "github.com/nalej/grpc-authx-go"
   packages = ["."]
-  revision = "390ac3d5ad85597d452ae10077edde3a16ce436a"
-  version = "v0.0.11"
+  revision = "dd97bf77dce0a6ae40e023060aab6bb6dd3448bb"
+  version = "v0.0.12"
 
 [[projects]]
   name = "github.com/nalej/grpc-common-go"
@@ -162,13 +162,13 @@
     "internal/timeseries",
     "trace"
   ]
-  revision = "04a2e542c03f1d053ab3e4d6e5abcd4b66e2be8e"
+  revision = "9b4f9f5ad5197c79fd623a3638e70d8b26cef344"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "8a28ead16f52c8aaeffbf79239b251dfdf6c4f96"
+  revision = "44b849a8bc13eb42e95e6c6c5e360481b73ec710"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -245,8 +245,8 @@
     "tap",
     "test/bufconn"
   ]
-  revision = "8dea3dc473e90c8179e519d91302d0597c0ca1d1"
-  version = "v1.15.0"
+  revision = "2e463a05d100327ca47ac218281906921038fd95"
+  version = "v1.16.0"
 
 [[projects]]
   name = "gopkg.in/fsnotify.v1"
@@ -270,6 +270,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "21ff9e8e630a3778069345a333f6ca90644b4f6a3c57e2b46f06ff748fa36214"
+  inputs-digest = "c19d4b5964e1349014bf72562740ae9157929468cd34ec841c3538c1069a7881"
   solver-name = "gps-cdcl"
   solver-version = 1
