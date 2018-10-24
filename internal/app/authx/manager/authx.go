@@ -11,8 +11,10 @@ import (
 	pbAuthx "github.com/nalej/grpc-authx-go"
 	"time"
 )
+
 // DefaultExpirationDuration is the default duration used in the mockup.
 const DefaultExpirationDuration = "10h"
+
 // DefaultSecret is the default secret used in the mockup.
 const DefaultSecret = "MyLittleSecret"
 
@@ -96,6 +98,23 @@ func (m *Authx) LoginWithBasicCredentials(username string, password string) (*pb
 	}
 	response := &pbAuthx.LoginResponse{Token: gToken.Token, RefreshToken: gToken.RefreshToken}
 	return response, nil
+}
+
+func (m *Authx) ChangePassword(username string, password string, newPassword string) derrors.Error {
+	credentials, err := m.CredentialsProvider.Get(username)
+	if err != nil {
+		return err
+	}
+	err = m.Password.CompareHashAndPassword(credentials.Password, password)
+	if err != nil {
+		return err
+	}
+	hashedPassword, err := m.Password.GenerateHashedPassword(newPassword)
+	if err != nil {
+		return err
+	}
+	edit := providers.NewEditBasicCredentialsData().WithPassword(hashedPassword)
+	return m.CredentialsProvider.Edit(username, edit)
 }
 
 // RefreshToken renew an old token.

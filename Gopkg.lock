@@ -53,8 +53,8 @@
 [[projects]]
   name = "github.com/nalej/grpc-authx-go"
   packages = ["."]
-  revision = "7dbf276cd59e5ae3d17ee20aa314d6aec7adf111"
-  version = "v0.0.2"
+  revision = "390ac3d5ad85597d452ae10077edde3a16ce436a"
+  version = "v0.0.11"
 
 [[projects]]
   name = "github.com/nalej/grpc-common-go"
@@ -270,6 +270,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6d7bfd92ed20090590d565a4f2e291909d8087acb5d321dcf658472b96546fd0"
+  inputs-digest = "21ff9e8e630a3778069345a333f6ca90644b4f6a3c57e2b46f06ff748fa36214"
   solver-name = "gps-cdcl"
   solver-version = 1

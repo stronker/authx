@@ -74,6 +74,26 @@ func (h *Authx) LoginWithBasicCredentials(_ context.Context, request *pbAuthx.Lo
 	return response, nil
 }
 
+// ChangePassword update an existing password.
+func (h *Authx) ChangePassword(ctx context.Context, request *pbAuthx.ChangePasswordRequest) (*pbCommon.Success, error){
+	if request.Username == "" {
+		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("username is mandatory"))
+	}
+	if request.Password == "" {
+		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("password is mandatory"))
+	}
+
+	if request.NewPassword == "" {
+		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("newPassword is mandatory"))
+	}
+
+	err := h.Manager.ChangePassword(request.Username, request.Password, request.NewPassword)
+	if err != nil {
+		return nil, conversions.ToGRPCError(err)
+	}
+	return &pbCommon.Success{}, nil
+}
+
 // RefreshToken renews an existing token.
 func (h *Authx) RefreshToken(_ context.Context, request *pbAuthx.RefreshTokenRequest) (*pbAuthx.LoginResponse, error) {
 	if request.Username == "" {

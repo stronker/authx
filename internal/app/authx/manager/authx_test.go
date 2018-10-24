@@ -32,17 +32,17 @@ var _ = ginkgo.Describe("Authx", func() {
 			gomega.Expect(err).To(gomega.Succeed())
 		})
 
-		ginkgo.It("add basic credentials with correct roleID", func() {
+		ginkgo.It("should add basic credentials with correct roleID", func() {
 			err := manager.AddBasicCredentials(userName, organizationID, roleID, pass)
 			gomega.Expect(err).To(gomega.Succeed())
 		})
 
-		ginkgo.It("add basic credentials with incorrect roleID", func() {
+		ginkgo.It("should add basic credentials with incorrect roleID", func() {
 			err := manager.AddBasicCredentials(userName, organizationID, roleID+"wrong", pass)
 			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
 
-		ginkgo.It("add basic credentials two times should fail", func() {
+		ginkgo.It("should add basic credentials two times should fail", func() {
 			err := manager.AddBasicCredentials(userName, organizationID, roleID, pass)
 			gomega.Expect(err).To(gomega.Succeed())
 
@@ -87,37 +87,56 @@ var _ = ginkgo.Describe("Authx", func() {
 			gomega.Expect(err).To(gomega.Succeed())
 		})
 
-		ginkgo.It("login with correct password", func() {
+		ginkgo.It("should login with correct password", func() {
 			response, err := manager.LoginWithBasicCredentials(userName, pass)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(response).NotTo(gomega.BeNil())
 		})
 
-		ginkgo.It("login with incorrect password", func() {
+		ginkgo.It("should login with incorrect password", func() {
 			response, err := manager.LoginWithBasicCredentials(userName, pass+"wrong")
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(response).To(gomega.BeNil())
 		})
 
-		ginkgo.It("change to a valid roleID", func() {
+		ginkgo.It("should change to a valid roleID", func() {
 			err := manager.EditUserRole(userName, roleID2)
 			gomega.Expect(err).To(gomega.Succeed())
 		})
 
-		ginkgo.It("change to a invalid roleID", func() {
+		ginkgo.It("should change to a invalid roleID", func() {
 			err := manager.EditUserRole(userName, roleID2+"wrong")
 			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
-		ginkgo.It("delete credentials", func() {
+		ginkgo.It("should delete credentials", func() {
 			err := manager.DeleteCredentials(userName)
 			gomega.Expect(err).To(gomega.Succeed())
 		})
-		ginkgo.It("delete wrong credentials", func() {
+		ginkgo.It("should delete wrong credentials", func() {
 			err := manager.DeleteCredentials(userName + "wrong")
 			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
+		ginkgo.It("should change password with correct password", func() {
+			newPassword:=pass+"New"
+			err := manager.ChangePassword(userName,pass,newPassword)
+			gomega.Expect(err).To(gomega.Succeed())
+			response,err:=manager.LoginWithBasicCredentials(userName,newPassword)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(response).NotTo(gomega.BeNil())
+		})
+		ginkgo.It("should change password with correct incorrect password", func() {
+			newPassword:=pass+"New"
+			err := manager.ChangePassword(userName,pass+"wrong",newPassword)
+			gomega.Expect(err).To(gomega.HaveOccurred())
+		})
 
-		ginkgo.It("refresh token", func() {
+		ginkgo.It("should change password with correct incorrect username", func() {
+			newPassword:=pass+"New"
+			err := manager.ChangePassword(userName+"wrong",pass,newPassword)
+			gomega.Expect(err).To(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should refresh token", func() {
 			response, err := manager.LoginWithBasicCredentials(userName, pass)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(response).NotTo(gomega.BeNil())
@@ -138,7 +157,7 @@ var _ = ginkgo.Describe("Authx", func() {
 
 		})
 
-		ginkgo.It("reject invalid refresh token", func() {
+		ginkgo.It("should reject invalid refresh token", func() {
 			response, err := manager.LoginWithBasicCredentials(userName, pass)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(response).NotTo(gomega.BeNil())
