@@ -54,7 +54,7 @@ func TokenContexts(manager Token) {
 			gomega.Expect(ok).To(gomega.BeTrue())
 			gomega.Expect(cl).NotTo(gomega.BeNil())
 
-			gTNew, err := manager.Refresh(claim, cl.Id, gT.RefreshToken, expirationPeriod, secret)
+			gTNew, err := manager.Refresh(gT.Token, gT.RefreshToken, expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gTNew).NotTo(gomega.BeNil())
 			gomega.Expect(gTNew).NotTo(gomega.Equal(gT))
@@ -78,7 +78,7 @@ func TokenContexts(manager Token) {
 			gomega.Expect(ok).To(gomega.BeTrue())
 			gomega.Expect(cl).NotTo(gomega.BeNil())
 
-			gTNew, err := manager.Refresh(claim, cl.Id, gT.RefreshToken, expirationPeriod, secret)
+			gTNew, err := manager.Refresh(gT.Token,gT.RefreshToken, expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(gTNew).To(gomega.BeNil())
 
@@ -100,13 +100,13 @@ func TokenContexts(manager Token) {
 			gomega.Expect(ok).To(gomega.BeTrue())
 			gomega.Expect(cl).NotTo(gomega.BeNil())
 
-			gTNew, err := manager.Refresh(claim, cl.Id, gT.RefreshToken+"wrong", expirationPeriod, secret)
+			gTNew, err := manager.Refresh(gT.Token, gT.RefreshToken+"wrong", expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(gTNew).To(gomega.BeNil())
 
 		})
 
-		ginkgo.It("must be able to reject the tokenID is incorrect", func() {
+		ginkgo.It("must be able to reject the token is incorrect", func() {
 
 			gT, err := manager.Generate(claim, expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -122,7 +122,7 @@ func TokenContexts(manager Token) {
 			gomega.Expect(ok).To(gomega.BeTrue())
 			gomega.Expect(cl).NotTo(gomega.BeNil())
 
-			gTNew, err := manager.Refresh(claim, cl.Id+"wrong", gT.RefreshToken, expirationPeriod, secret)
+			gTNew, err := manager.Refresh(gT.Token+"wrong", gT.RefreshToken, expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(gTNew).To(gomega.BeNil())
 
@@ -143,12 +143,12 @@ func TokenContexts(manager Token) {
 			gomega.Expect(ok).To(gomega.BeTrue())
 			gomega.Expect(cl).NotTo(gomega.BeNil())
 
-			gTNew, err := manager.Refresh(claim, cl.Id, gT.RefreshToken, expirationPeriod, secret)
+			gTNew, err := manager.Refresh(gT.Token, gT.RefreshToken, expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gTNew).NotTo(gomega.BeNil())
 			gomega.Expect(gTNew).NotTo(gomega.Equal(gT))
 
-			gTWrong, err := manager.Refresh(claim, cl.Id, gT.RefreshToken, expirationPeriod, secret)
+			gTWrong, err := manager.Refresh(gT.Token, gT.RefreshToken, expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(gTWrong).To(gomega.BeNil())
 

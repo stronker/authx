@@ -118,18 +118,8 @@ func (m *Authx) ChangePassword(username string, password string, newPassword str
 }
 
 // RefreshToken renew an old token.
-func (m *Authx) RefreshToken(username string, tokenID string, refreshToken string) (*pbAuthx.LoginResponse, derrors.Error) {
-	credentials, err := m.CredentialsProvider.Get(username)
-	if err != nil {
-		return nil, err
-	}
-	role, err := m.RoleProvider.Get(credentials.OrganizationID, credentials.RoleID)
-	if err != nil {
-		return nil, err
-	}
-	personalClaim := token.NewPersonalClaim(username, role.Name, role.Primitives, credentials.OrganizationID)
-
-	gToken, err := m.Token.Refresh(personalClaim, tokenID, refreshToken, m.expirationDuration, m.secret)
+func (m *Authx) RefreshToken(oldToken string, refreshToken string) (*pbAuthx.LoginResponse, derrors.Error) {
+	gToken, err := m.Token.Refresh(oldToken, refreshToken, m.expirationDuration, m.secret)
 	if err != nil {
 		return nil, err
 	}

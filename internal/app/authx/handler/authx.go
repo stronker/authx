@@ -75,7 +75,7 @@ func (h *Authx) LoginWithBasicCredentials(_ context.Context, request *pbAuthx.Lo
 }
 
 // ChangePassword update an existing password.
-func (h *Authx) ChangePassword(ctx context.Context, request *pbAuthx.ChangePasswordRequest) (*pbCommon.Success, error){
+func (h *Authx) ChangePassword(ctx context.Context, request *pbAuthx.ChangePasswordRequest) (*pbCommon.Success, error) {
 	if request.Username == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("username is mandatory"))
 	}
@@ -96,18 +96,16 @@ func (h *Authx) ChangePassword(ctx context.Context, request *pbAuthx.ChangePassw
 
 // RefreshToken renews an existing token.
 func (h *Authx) RefreshToken(_ context.Context, request *pbAuthx.RefreshTokenRequest) (*pbAuthx.LoginResponse, error) {
-	if request.Username == "" {
-		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("username is mandatory"))
-	}
+
 	if request.RefreshToken == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("refreshToken is mandatory"))
 	}
-	//TODO maybe we should revisit this, to send the old token instead of the tokenID could be a good idea.
-	if request.TokenId == "" {
-		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("tokenID is mandatory"))
+
+	if request.Token == "" {
+		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("token is mandatory"))
 	}
 
-	response, err := h.Manager.RefreshToken(request.Username, request.TokenId, request.RefreshToken)
+	response, err := h.Manager.RefreshToken(request.Token, request.RefreshToken)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
 	}

@@ -34,7 +34,7 @@ type Token interface {
 	Generate(personalClaim *token.PersonalClaim, expirationPeriod time.Duration,
 		secret string) (*GeneratedToken, derrors.Error)
 	// Refresh renew an old token.
-	Refresh(personalClaim *token.PersonalClaim, tokenID string, refreshToken string,
+	Refresh(oldToken string, refreshToken string,
 		expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error)
 	// Clean remove all the data from the providers.
 	Clean() derrors.Error
@@ -83,10 +83,22 @@ func (m *JWTToken) Generate(personalClaim *token.PersonalClaim, expirationPeriod
 }
 
 // Refresh renew an old token.
-func (m *JWTToken) Refresh(personalClaim *token.PersonalClaim, tokenID string, refreshToken string,
+func (m *JWTToken) Refresh(oldToken string, refreshToken string,
 	expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error) {
 
-	username := personalClaim.UserID
+	tk, jwtErr := jwt.ParseWithClaims(oldToken, &token.Claim{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
+	})
+	if jwtErr != nil {
+		return nil, derrors.NewInternalError("impossible recover RefreshToken", jwtErr)
+	}
+
+	cl, ok := tk.Claims.(*token.Claim)
+	if !ok {
+		return nil, derrors.NewInternalError("impossible recover token")
+	}
+	username := cl.UserID
+	tokenID:= cl.Id
 
 	tokenData, err := m.TokenProvider.Get(username, tokenID)
 	if err != nil {
@@ -102,7 +114,7 @@ func (m *JWTToken) Refresh(personalClaim *token.PersonalClaim, tokenID string, r
 		return nil, derrors.NewGenericError("the refresh token is not valid", err)
 	}
 
-	gt, err := m.Generate(personalClaim, expirationPeriod, secret)
+	gt, err := m.Generate(&cl.PersonalClaim, expirationPeriod, secret)
 	if err != nil {
 		return nil, derrors.NewGenericError("impossible create new token", err)
 	}
