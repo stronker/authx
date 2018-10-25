@@ -4,11 +4,31 @@
 
 package interceptor
 
+import (
+	"encoding/json"
+	"github.com/nalej/derrors"
+	"io/ioutil"
+)
+
 // AuthorizationConfig is structure that contains a set of permissions. The key of the map is the method name.
 type AuthorizationConfig struct {
-	AllowsAll bool `json:"allowsAll"`
+	AllowsAll bool `json:"allows_all"`
 	// Permission is a map of permissions the key is the method name.
 	Permissions map[string]Permission `json:"permissions"`
+}
+
+func LoadAuthorizationConfig(path string) (*AuthorizationConfig, derrors.Error) {
+	dat, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, derrors.NewInvalidArgumentError("impossible read config file", err)
+	}
+
+	authCfg := &AuthorizationConfig{}
+	jErr := json.Unmarshal(dat, authCfg)
+	if jErr != nil {
+		return nil, derrors.NewInternalError("impossible unmarshal file", jErr)
+	}
+	return authCfg, nil
 }
 
 // Config is the complete configuration file.
