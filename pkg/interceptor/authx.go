@@ -41,7 +41,7 @@ func authxInterceptor(config *Config) grpc.UnaryServerInterceptor {
 			}
 
 		} else {
-			if !config.AllowsAll {
+			if !config.Authorization.AllowsAll {
 				return nil, conversions.ToGRPCError(
 					derrors.NewUnauthenticatedError("unauthorized method").
 						WithParams(info.FullMethod))
@@ -80,7 +80,7 @@ func checkJWT(ctx context.Context, config *Config) (*token.Claim, derrors.Error)
 func authorize(method string, claim *token.Claim, config *Config) derrors.Error {
 	permission, ok := config.Authorization.Permissions[method]
 	if !ok {
-		if config.AllowsAll {
+		if config.Authorization.AllowsAll {
 			return nil
 		}
 		return derrors.NewUnauthenticatedError("unauthorized method").WithParams(method)
