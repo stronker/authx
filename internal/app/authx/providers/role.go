@@ -6,6 +6,7 @@ package providers
 
 import (
 	"github.com/nalej/derrors"
+	"github.com/nalej/grpc-authx-go"
 )
 
 // RoleData is the structure that is stored in the provider.
@@ -23,6 +24,29 @@ func NewRoleData(organizationID string, roleID string, name string, primitives [
 		RoleID:         roleID,
 		Name:           name,
 		Primitives:     primitives,
+	}
+}
+
+func PrimitiveToGRPC(name string) grpc_authx_go.AccessPrimitive {
+	switch name {
+	case grpc_authx_go.AccessPrimitive_ORG.String() : return grpc_authx_go.AccessPrimitive_ORG
+	case grpc_authx_go.AccessPrimitive_APPS.String() : return grpc_authx_go.AccessPrimitive_APPS
+	case grpc_authx_go.AccessPrimitive_RESOURCES.String() : return grpc_authx_go.AccessPrimitive_RESOURCES
+	case grpc_authx_go.AccessPrimitive_PROFILE.String() : return grpc_authx_go.AccessPrimitive_PROFILE
+	}
+	panic("access primitive not found")
+}
+
+func (r * RoleData) ToGRPC() *grpc_authx_go.Role {
+	primitives := make([]grpc_authx_go.AccessPrimitive, 0)
+	for _, p := range r.Primitives {
+		primitives = append(primitives, PrimitiveToGRPC(p))
+	}
+	return &grpc_authx_go.Role{
+		OrganizationId:       r.OrganizationID,
+		RoleId:               r.RoleID,
+		Name:                 r.Name,
+		Primitives:           primitives,
 	}
 }
 
@@ -61,6 +85,8 @@ type Role interface {
 	Edit(organizationID string, roleID string, edit *EditRoleData) derrors.Error
 	// Exist checks if a role exists.
 	Exist(username string, tokenID string) (*bool, derrors.Error)
+	// List the roles associated with an organization.
+	List(organizationID string) ([]RoleData, derrors.Error)
 	// Truncate clears the provider.
 	Truncate() derrors.Error
 }
@@ -126,6 +152,17 @@ func (p *RoleMockup) Exist(organizationID string, roleID string) (*bool, derrors
 		return &result, nil
 	}
 	return &result, nil
+}
+
+// List the roles associated with an organization.
+func (p *RoleMockup) List(organizationID string) ([]RoleData, derrors.Error) {
+	result := make([]RoleData, 0)
+	for _, r := range p.data {
+		if r.OrganizationID == organizationID {
+			result = append(result, r)
+		}
+	}
+	return result, nil
 }
 
 // Truncate clears the provider.

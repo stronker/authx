@@ -9,6 +9,8 @@ import (
 	"github.com/nalej/authx/pkg/token"
 	"github.com/nalej/derrors"
 	pbAuthx "github.com/nalej/grpc-authx-go"
+	"github.com/nalej/grpc-organization-go"
+	"github.com/nalej/grpc-user-go"
 	"time"
 )
 
@@ -150,6 +152,18 @@ func (m *Authx) EditUserRole(username string, roleID string) derrors.Error {
 
 	edit := providers.NewEditBasicCredentialsData().WithRoleID(roleID)
 	return m.CredentialsProvider.Edit(username, edit)
+}
+
+func (m * Authx) ListRoles(organizationID * grpc_organization_go.OrganizationId) ([]providers.RoleData, derrors.Error){
+	return m.RoleProvider.List(organizationID.OrganizationId)
+}
+
+func (m * Authx) GetUserRole(userID * grpc_user_go.UserId)( * providers.RoleData, derrors.Error){
+	cred, err := m.CredentialsProvider.Get(userID.Email)
+	if err != nil{
+		return nil, err
+	}
+	return m.RoleProvider.Get(userID.OrganizationId, cred.RoleID)
 }
 
 // Clean removes all the data.

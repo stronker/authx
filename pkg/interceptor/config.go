@@ -12,6 +12,7 @@ import (
 
 // AuthorizationConfig is structure that contains a set of permissions. The key of the map is the method name.
 type AuthorizationConfig struct {
+	// AllowsAll If the header is not found, allow access depending on this parameter.
 	AllowsAll bool `json:"allows_all"`
 	// Permission is a map of permissions the key is the method name.
 	Permissions map[string]Permission `json:"permissions"`
@@ -33,8 +34,11 @@ func LoadAuthorizationConfig(path string) (*AuthorizationConfig, derrors.Error) 
 
 // Config is the complete configuration file.
 type Config struct {
+
 	Authorization *AuthorizationConfig
+	// Secret contains the shared secret with the authx component to sign the JWT token.
 	Secret        string
+	// Name of the header where the token is found.
 	Header        string
 }
 

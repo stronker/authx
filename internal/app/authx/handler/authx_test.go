@@ -10,6 +10,8 @@ import (
 	"github.com/nalej/authx/internal/app/authx/manager"
 	"github.com/nalej/authx/pkg/token"
 	pbAuthx "github.com/nalej/grpc-authx-go"
+	"github.com/nalej/grpc-organization-go"
+	"github.com/nalej/grpc-user-go"
 	"github.com/nalej/grpc-utils/pkg/test"
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
@@ -102,6 +104,27 @@ var _ = ginkgo.Describe("Applications", func() {
 				})
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(success).To(gomega.BeNil())
+		})
+
+		ginkgo.It("should be able to retrieve the user role", func(){
+			success, err := client.AddBasicCredentials(context.Background(),
+				&pbAuthx.AddBasicCredentialRequest{OrganizationId: organizationID,
+					RoleId:   roleID,
+					Username: userName,
+					Password: pass,
+				})
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(success).NotTo(gomega.BeNil())
+
+			userID := &grpc_user_go.UserId{
+				OrganizationId:       organizationID,
+				Email:                userName,
+			}
+
+			role, err := client.GetUserRole(context.Background(), userID)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(role.OrganizationId).Should(gomega.Equal(organizationID))
+			gomega.Expect(role.RoleId).Should(gomega.Equal(roleID))
 		})
 
 	})
@@ -259,6 +282,15 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(newResponse).To(gomega.BeNil())
 
+		})
+
+		ginkgo.It("should be able to retrieve the list roles", func(){
+		    orgID := &grpc_organization_go.OrganizationId{
+				OrganizationId:       organizationID,
+			}
+		    roles, err := client.ListRoles(context.Background(), orgID)
+		    gomega.Expect(err).To(gomega.Succeed())
+		    gomega.Expect(len(roles.Roles)).Should(gomega.Equal(2))
 		})
 
 	})
