@@ -7,6 +7,7 @@ package interceptor
 import (
 	"encoding/json"
 	"github.com/nalej/derrors"
+	"github.com/rs/zerolog/log"
 	"io/ioutil"
 )
 
@@ -29,6 +30,7 @@ func LoadAuthorizationConfig(path string) (*AuthorizationConfig, derrors.Error) 
 	if jErr != nil {
 		return nil, derrors.NewInternalError("impossible unmarshal file", jErr)
 	}
+	log.Debug().Int("permissions", len(authCfg.Permissions)).Msg("Authorization matrix loaded")
 	return authCfg, nil
 }
 

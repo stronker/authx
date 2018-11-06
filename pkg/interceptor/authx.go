@@ -40,6 +40,10 @@ func authxInterceptor(config *Config) grpc.UnaryServerInterceptor {
 				return nil, conversions.ToGRPCError(dErr)
 			}
 
+			newContext := metadata.AppendToOutgoingContext(ctx,
+				"userID", claim.UserID, "organizationID", claim.OrganizationID)
+			return handler(newContext, req)
+
 		} else {
 			if !config.Authorization.AllowsAll {
 				return nil, conversions.ToGRPCError(
