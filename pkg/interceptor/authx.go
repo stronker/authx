@@ -10,6 +10,7 @@ import (
 	"github.com/nalej/authx/pkg/token"
 	"github.com/nalej/derrors"
 	"github.com/nalej/grpc-utils/pkg/conversions"
+	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -40,6 +41,7 @@ func authxInterceptor(config *Config) grpc.UnaryServerInterceptor {
 				return nil, conversions.ToGRPCError(dErr)
 			}
 
+			log.Debug().Str("userID", claim.UserID).Str("organizationID", claim.OrganizationID).Msg("creating new context")
 			newContext := metadata.AppendToOutgoingContext(ctx,
 				"userID", claim.UserID, "organizationID", claim.OrganizationID)
 			return handler(newContext, req)
