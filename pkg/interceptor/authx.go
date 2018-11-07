@@ -44,6 +44,7 @@ func authxInterceptor(config *Config) grpc.UnaryServerInterceptor {
 			log.Debug().Str("userID", claim.UserID).Str("organizationID", claim.OrganizationID).Msg("creating new context")
 			newContext := metadata.AppendToOutgoingContext(ctx,
 				"userID", claim.UserID, "organizationID", claim.OrganizationID)
+			log.Debug().Interface("newContext", newContext).Interface("ctx", ctx).Msg("Context")
 			return handler(newContext, req)
 
 		} else {
@@ -53,7 +54,7 @@ func authxInterceptor(config *Config) grpc.UnaryServerInterceptor {
 						WithParams(info.FullMethod))
 			}
 		}
-
+		log.Warn().Msg("auth metadata has not been added")
 		return handler(ctx, req)
 	}
 
