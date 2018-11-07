@@ -42,16 +42,13 @@ func authxInterceptor(config *Config) grpc.UnaryServerInterceptor {
 			}
 
 			log.Debug().Str("userID", claim.UserID).Str("organizationID", claim.OrganizationID).Msg("creating new context")
-			newContext := metadata.AppendToOutgoingContext(ctx,
-				"userID", claim.UserID, "organizationID", claim.OrganizationID)
-			log.Debug().Interface("newContext", newContext).Interface("ctx", ctx).Msg("Context")
-			newMD := metadata.Pairs("userID", claim.UserID, "organizationID", claim.OrganizationID)
+			newMD := metadata.Pairs("user_id", claim.UserID, "organization_id", claim.OrganizationID)
 			oldMD, ok := metadata.FromIncomingContext(ctx)
 			if !ok {
 				return nil, derrors.NewInternalError("impossible to extract metadata")
 			}
-			newContext2 := metadata.NewIncomingContext(ctx, metadata.Join(oldMD, newMD))
-			return handler(newContext2, req)
+			newContext := metadata.NewIncomingContext(ctx, metadata.Join(oldMD, newMD))
+			return handler(newContext, req)
 
 		} else {
 			if !config.Authorization.AllowsAll {
