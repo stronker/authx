@@ -10,6 +10,7 @@ import (
 	"github.com/nalej/authx/pkg/token"
 	"github.com/nalej/derrors"
 	"github.com/nalej/grpc-utils/pkg/conversions"
+	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -40,14 +41,23 @@ func authxInterceptor(config *Config) grpc.UnaryServerInterceptor {
 				return nil, conversions.ToGRPCError(dErr)
 			}
 
+			log.Debug().Str("userID", claim.UserID).Str("organizationID", claim.OrganizationID).Msg("creating new context")
+			newMD := metadata.Pairs("user_id", claim.UserID, "organization_id", claim.OrganizationID)
+			oldMD, ok := metadata.FromIncomingContext(ctx)
+			if !ok {
+				return nil, derrors.NewInternalError("impossible to extract metadata")
+			}
+			newContext := metadata.NewIncomingContext(ctx, metadata.Join(oldMD, newMD))
+			return handler(newContext, req)
+
 		} else {
-			if !config.AllowsAll {
+			if !config.Authorization.AllowsAll {
 				return nil, conversions.ToGRPCError(
 					derrors.NewUnauthenticatedError("unauthorized method").
 						WithParams(info.FullMethod))
 			}
 		}
-
+		log.Warn().Msg("auth metadata has not been added")
 		return handler(ctx, req)
 	}
 
@@ -80,7 +90,7 @@ func checkJWT(ctx context.Context, config *Config) (*token.Claim, derrors.Error)
 func authorize(method string, claim *token.Claim, config *Config) derrors.Error {
 	permission, ok := config.Authorization.Permissions[method]
 	if !ok {
-		if config.AllowsAll {
+		if config.Authorization.AllowsAll {
 			return nil
 		}
 		return derrors.NewUnauthenticatedError("unauthorized method").WithParams(method)
