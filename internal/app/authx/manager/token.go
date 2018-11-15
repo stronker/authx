@@ -65,18 +65,18 @@ func (m *JWTToken) Generate(personalClaim *token.PersonalClaim, expirationPeriod
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 	tokenString, err := t.SignedString([]byte(secret))
 	if err != nil {
-		return nil, derrors.NewGenericError("impossible generate JWT token", err)
+		return nil, derrors.NewInternalError("impossible generate JWT token", err)
 	}
 
 	refreshToken := token.GenerateUUID()
 	hashedRefreshToken, err := m.Password.GenerateHashedPassword(refreshToken)
 	if err != nil {
-		return nil, derrors.NewGenericError("impossible generate RefreshToken", err)
+		return nil, derrors.NewInternalError("impossible generate RefreshToken", err)
 	}
 	tokenData := providers.NewTokenData(claim.UserID, claim.Id, hashedRefreshToken, claim.ExpiresAt)
 	err = m.TokenProvider.Add(tokenData)
 	if err != nil {
-		return nil, derrors.NewGenericError("impossible store RefreshToken", err)
+		return nil, derrors.NewInternalError("impossible store RefreshToken", err)
 	}
 	gToken := NewGeneratedToken(tokenString, refreshToken)
 	return gToken, nil
@@ -90,33 +90,33 @@ func (m *JWTToken) Refresh(oldToken string, refreshToken string,
 		return []byte(secret), nil
 	})
 	if jwtErr != nil {
-		return nil, derrors.NewInternalError("impossible recover RefreshToken", jwtErr)
+		return nil, derrors.NewUnauthenticatedError("impossible recover RefreshToken", jwtErr)
 	}
 
 	cl, ok := tk.Claims.(*token.Claim)
 	if !ok {
-		return nil, derrors.NewInternalError("impossible recover token")
+		return nil, derrors.NewUnauthenticatedError("impossible recover token")
 	}
 	username := cl.UserID
 	tokenID:= cl.Id
 
 	tokenData, err := m.TokenProvider.Get(username, tokenID)
 	if err != nil {
-		return nil, derrors.NewGenericError("impossible recover RefreshToken", err)
+		return nil, derrors.NewUnauthenticatedError("impossible recover RefreshToken", err)
 	}
 	ts := time.Now().Unix()
 	if tokenData == nil || ts > tokenData.ExpirationDate {
-		return nil, derrors.NewGenericError("the refresh token is expired")
+		return nil, derrors.NewUnauthenticatedError("the refresh token is expired")
 	}
 
 	err = m.Password.CompareHashAndPassword(tokenData.RefreshToken, refreshToken)
 	if err != nil {
-		return nil, derrors.NewGenericError("the refresh token is not valid", err)
+		return nil, derrors.NewUnauthenticatedError("the refresh token is not valid", err)
 	}
 
 	gt, err := m.Generate(&cl.PersonalClaim, expirationPeriod, secret)
 	if err != nil {
-		return nil, derrors.NewGenericError("impossible create new token", err)
+		return nil, derrors.NewInternalError("impossible create new token", err)
 	}
 
 	err = m.TokenProvider.Delete(username, tokenID)
