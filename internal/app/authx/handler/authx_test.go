@@ -16,6 +16,8 @@ import (
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/grpc/test/bufconn"
 )
 
@@ -179,6 +181,7 @@ var _ = ginkgo.Describe("Applications", func() {
 				&pbAuthx.LoginWithBasicCredentialsRequest{Username: userName, Password: pass + "wrong"})
 
 			gomega.Expect(err).To(gomega.HaveOccurred())
+			gomega.Expect(status.Convert(err).Code()).Should(gomega.Equal(codes.Unauthenticated))
 			gomega.Expect(response).To(gomega.BeNil())
 		})
 
@@ -200,6 +203,7 @@ var _ = ginkgo.Describe("Applications", func() {
 				&pbAuthx.ChangePasswordRequest{Username:userName,Password:pass+"wrong",NewPassword:newPassword})
 
 			gomega.Expect(err).To(gomega.HaveOccurred())
+			gomega.Expect(status.Convert(err).Code()).Should(gomega.Equal(codes.Unauthenticated))
 			gomega.Expect(response).To(gomega.BeNil())
 		})
 

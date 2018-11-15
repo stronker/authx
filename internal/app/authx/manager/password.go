@@ -5,8 +5,8 @@
 package manager
 
 import (
-	"github.com/nalej/derrors"
-	"golang.org/x/crypto/bcrypt"
+"github.com/nalej/derrors"
+"golang.org/x/crypto/bcrypt"
 )
 
 //Password is an interface to generate hash of passwords.
@@ -30,12 +30,17 @@ type BCryptPassword struct {
 // GenerateHashedPassword generates a password with a random salt.
 func (m *BCryptPassword) GenerateHashedPassword(password string) ([] byte, derrors.Error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	return hashedPassword, derrors.AsError(err, "error hashing the password")
+	if err != nil {
+		return nil, derrors.NewInternalError("error hashing the password", err)
+	}
+	return hashedPassword, nil
 }
 
 // CompareHashAndPassword compare a hashed password with a specif password.
 func (m *BCryptPassword) CompareHashAndPassword(hashedPassword [] byte, password string) derrors.Error {
-	return derrors.AsError(bcrypt.CompareHashAndPassword(hashedPassword, []byte(password)), "error comparing passwords")
+	err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
+	if err != nil {
+		return derrors.NewUnauthenticatedError("password is not valid", err)
+	}
+	return nil
 }
-
-
