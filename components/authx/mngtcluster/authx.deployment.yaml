@@ -25,8 +25,8 @@ spec:
     spec:
       containers:
       - name: authx
-        image: nalej/authx:VERSION
-        imagePullPolicy: Never
+        image: nalejregistry.azurecr.io/nalej/authx:VERSION
+        imagePullPolicy: IfNotPresent
         args:
         - "run"
         - "--secret=/etc/authx/secret"
@@ -38,7 +38,7 @@ spec:
         securityContext:
           runAsUser: 2000
       imagePullSecrets:
-      - name: myregistrykey
+      - name: nalej-registry
       volumes:
       - name: authx-secret-volume
         secret:
