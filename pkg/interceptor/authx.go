@@ -41,8 +41,13 @@ func authxInterceptor(config *Config) grpc.UnaryServerInterceptor {
 				return nil, conversions.ToGRPCError(dErr)
 			}
 
-			log.Debug().Str("userID", claim.UserID).Str("organizationID", claim.OrganizationID).Msg("creating new context")
-			newMD := metadata.Pairs("user_id", claim.UserID, "organization_id", claim.OrganizationID)
+			values := make([]string, 0)
+			values = append(values, "user_id", claim.UserID, "organization_id", claim.OrganizationID)
+			for _, p := range claim.Primitives {
+				values = append(values, p, "true")
+			}
+			log.Debug().Strs("md", values).Msg("creating new context")
+			newMD := metadata.Pairs(values...)
 			oldMD, ok := metadata.FromIncomingContext(ctx)
 			if !ok {
 				return nil, derrors.NewInternalError("impossible to extract metadata")
