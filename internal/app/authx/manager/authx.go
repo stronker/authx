@@ -131,7 +131,7 @@ func (m *Authx) RefreshToken(oldToken string, refreshToken string) (*pbAuthx.Log
 
 // AddRole add a new role to the authorization system.
 func (m *Authx) AddRole(role *pbAuthx.Role) derrors.Error {
-	entity := providers.NewRoleData(role.OrganizationId, role.RoleId, role.Name, PrimitivesToString(role.Primitives))
+	entity := providers.NewRoleData(role.OrganizationId, role.RoleId, role.Name, role.Internal, PrimitivesToString(role.Primitives))
 	return m.RoleProvider.Add(entity)
 }
 
