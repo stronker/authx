@@ -14,39 +14,48 @@ type RoleData struct {
 	OrganizationID string
 	RoleID         string
 	Name           string
+	Internal       bool
 	Primitives     []string
 }
 
 // NewRoleData create a new instance of the structure.
-func NewRoleData(organizationID string, roleID string, name string, primitives []string) *RoleData {
+func NewRoleData(organizationID string, roleID string, name string, internal bool, primitives []string) *RoleData {
 	return &RoleData{
 		OrganizationID: organizationID,
 		RoleID:         roleID,
 		Name:           name,
+		Internal:       internal,
 		Primitives:     primitives,
 	}
 }
 
 func PrimitiveToGRPC(name string) grpc_authx_go.AccessPrimitive {
 	switch name {
-	case grpc_authx_go.AccessPrimitive_ORG.String() : return grpc_authx_go.AccessPrimitive_ORG
-	case grpc_authx_go.AccessPrimitive_APPS.String() : return grpc_authx_go.AccessPrimitive_APPS
-	case grpc_authx_go.AccessPrimitive_RESOURCES.String() : return grpc_authx_go.AccessPrimitive_RESOURCES
-	case grpc_authx_go.AccessPrimitive_PROFILE.String() : return grpc_authx_go.AccessPrimitive_PROFILE
+	case grpc_authx_go.AccessPrimitive_ORG.String():
+		return grpc_authx_go.AccessPrimitive_ORG
+	case grpc_authx_go.AccessPrimitive_APPS.String():
+		return grpc_authx_go.AccessPrimitive_APPS
+	case grpc_authx_go.AccessPrimitive_RESOURCES.String():
+		return grpc_authx_go.AccessPrimitive_RESOURCES
+	case grpc_authx_go.AccessPrimitive_PROFILE.String():
+		return grpc_authx_go.AccessPrimitive_PROFILE
+	case grpc_authx_go.AccessPrimitive_APPCLUSTEROPS.String():
+		return grpc_authx_go.AccessPrimitive_APPCLUSTEROPS
 	}
 	panic("access primitive not found")
 }
 
-func (r * RoleData) ToGRPC() *grpc_authx_go.Role {
+func (r *RoleData) ToGRPC() *grpc_authx_go.Role {
 	primitives := make([]grpc_authx_go.AccessPrimitive, 0)
 	for _, p := range r.Primitives {
 		primitives = append(primitives, PrimitiveToGRPC(p))
 	}
 	return &grpc_authx_go.Role{
-		OrganizationId:       r.OrganizationID,
-		RoleId:               r.RoleID,
-		Name:                 r.Name,
-		Primitives:           primitives,
+		OrganizationId: r.OrganizationID,
+		RoleId:         r.RoleID,
+		Name:           r.Name,
+		Internal:       r.Internal,
+		Primitives:     primitives,
 	}
 }
 

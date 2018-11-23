@@ -17,7 +17,7 @@ var _ = ginkgo.Describe("RoleMockup", func() {
 func RoleContexts(provider Role) {
 
 	ginkgo.Context("with a register", func() {
-		role := NewRoleData("o1", "r1", "n1", [] string{"p1", "p2"})
+		role := NewRoleData("o1", "r1", "n1", false, [] string{"p1", "p2"})
 		ginkgo.BeforeEach(func() {
 			err := provider.Add(role)
 			gomega.Expect(err).To(gomega.BeNil())
