@@ -7,6 +7,7 @@ package providers
 import (
 	"github.com/nalej/derrors"
 	"github.com/nalej/grpc-authx-go"
+	"sync"
 )
 
 // RoleData is the structure that is stored in the provider.
@@ -102,6 +103,7 @@ type Role interface {
 
 // RoleMockup is a in-memory provider.
 type RoleMockup struct {
+	sync.Mutex
 	data map[string]RoleData
 }
 
@@ -112,6 +114,8 @@ func NewRoleMockup() Role {
 
 // Delete an existing role.
 func (p *RoleMockup) Delete(organizationID string, roleID string) derrors.Error {
+	p.Lock()
+	defer p.Unlock()
 	data, ok := p.data[roleID]
 	if !ok || data.OrganizationID != organizationID {
 		return derrors.NewNotFoundError("role not found").WithParams(roleID)
@@ -122,12 +126,16 @@ func (p *RoleMockup) Delete(organizationID string, roleID string) derrors.Error 
 
 // Add a new role.
 func (p *RoleMockup) Add(role *RoleData) derrors.Error {
+	p.Lock()
+	defer p.Unlock()
 	p.data[role.RoleID] = *role
 	return nil
 }
 
 // Get recovers an existing role.
 func (p *RoleMockup) Get(organizationID string, roleID string) (*RoleData, derrors.Error) {
+	p.Lock()
+	defer p.Unlock()
 	data, ok := p.data[roleID]
 	if !ok || data.OrganizationID != organizationID {
 		return nil, derrors.NewNotFoundError("role not found").WithParams(organizationID, roleID)
@@ -138,6 +146,7 @@ func (p *RoleMockup) Get(organizationID string, roleID string) (*RoleData, derro
 
 // Edit updates an existing role.
 func (p *RoleMockup) Edit(organizationID string, roleID string, edit *EditRoleData) derrors.Error {
+
 	data, err := p.Get(organizationID, roleID)
 	if err != nil {
 		return err
@@ -154,6 +163,8 @@ func (p *RoleMockup) Edit(organizationID string, roleID string, edit *EditRoleDa
 
 // Exist checks if a role exists.
 func (p *RoleMockup) Exist(organizationID string, roleID string) (*bool, derrors.Error) {
+	p.Lock()
+	defer p.Unlock()
 	result := true
 	data, ok := p.data[roleID]
 	if !ok || data.OrganizationID != organizationID {
@@ -165,6 +176,8 @@ func (p *RoleMockup) Exist(organizationID string, roleID string) (*bool, derrors
 
 // List the roles associated with an organization.
 func (p *RoleMockup) List(organizationID string) ([]RoleData, derrors.Error) {
+	p.Lock()
+	defer p.Unlock()
 	result := make([]RoleData, 0)
 	for _, r := range p.data {
 		if r.OrganizationID == organizationID {
@@ -176,6 +189,8 @@ func (p *RoleMockup) List(organizationID string) ([]RoleData, derrors.Error) {
 
 // Truncate clears the provider.
 func (p *RoleMockup) Truncate() derrors.Error {
+	p.Lock()
+	defer p.Unlock()
 	p.data = map[string]RoleData{}
 	return nil
 }

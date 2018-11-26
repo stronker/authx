@@ -4,7 +4,10 @@
 
 package providers
 
-import "github.com/nalej/derrors"
+import (
+	"github.com/nalej/derrors"
+	"sync"
+)
 // BasicCredentialsData is the struct that is store in the database.
 type BasicCredentialsData struct {
 	// Username is the credential id.
@@ -68,6 +71,7 @@ type BasicCredentials interface {
 
 // BasicCredentialsMockup is an implementation of this provider only for testing
 type BasicCredentialsMockup struct {
+	sync.Mutex
 	data map[string]BasicCredentialsData
 }
 
@@ -78,6 +82,8 @@ func NewBasicCredentialMockup() *BasicCredentialsMockup {
 
 // Delete remove a specific user credentials.
 func (p *BasicCredentialsMockup) Delete(username string) derrors.Error {
+	//p.Lock()
+	//defer p.Unlock()
 	_, ok := p.data[username]
 	if !ok {
 		return derrors.NewNotFoundError("username not found").WithParams(username)
@@ -88,12 +94,16 @@ func (p *BasicCredentialsMockup) Delete(username string) derrors.Error {
 
 // Add adds a new basic credentials.
 func (p *BasicCredentialsMockup) Add(credentials *BasicCredentialsData) derrors.Error {
+	p.Lock()
+	defer p.Unlock()
 	p.data[credentials.Username] = *credentials
 	return nil
 }
 
 // Get recover a user credentials.
 func (p *BasicCredentialsMockup) Get(username string) (*BasicCredentialsData, derrors.Error) {
+	p.Lock()
+	defer p.Unlock()
 	data, ok := p.data[username]
 	if !ok {
 		return nil, derrors.NewNotFoundError("credentials not found").WithParams(username)
@@ -103,12 +113,15 @@ func (p *BasicCredentialsMockup) Get(username string) (*BasicCredentialsData, de
 
 // Exist check if exists a specific credentials.
 func (p *BasicCredentialsMockup) Exist(username string) (*bool,derrors.Error){
+	p.Lock()
+	defer p.Unlock()
 	_, ok := p.data[username]
 	return &ok,nil
 }
 
 // Edit update a specific user credentials.
 func (p *BasicCredentialsMockup) Edit(username string, edit *EditBasicCredentialsData) derrors.Error {
+
 	data, err := p.Get(username)
 	if err != nil {
 		return err
@@ -125,6 +138,8 @@ func (p *BasicCredentialsMockup) Edit(username string, edit *EditBasicCredential
 
 // Truncate removes all credentials.
 func (p *BasicCredentialsMockup) Truncate() derrors.Error {
+	p.Lock()
 	p.data = map[string]BasicCredentialsData{}
+	defer p.Unlock()
 	return nil
 }
