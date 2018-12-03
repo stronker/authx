@@ -90,6 +90,11 @@ pipeline {
         stage("Publish image to Docker") {
             when { branch 'master' }
             steps {
+                container("golang") {
+                    dir("${packagePath}") {
+                        sh "make build-linux"
+                    }
+                }
                 container("docker") {
                     dir("${packagePath}") {
                         script {
