@@ -20,7 +20,7 @@ type Role interface {
 	// Edit updates an existing role.
 	Edit(organizationID string, roleID string, edit *entities.EditRoleData) derrors.Error
 	// Exist checks if a role exists.
-	Exist(username string, tokenID string) (*bool, derrors.Error)
+	Exist(organizationID string, roleID string) (*bool, derrors.Error)
 	// List the roles associated with an organization.
 	List(organizationID string) ([]entities.RoleData, derrors.Error)
 	// Truncate clears the provider.

@@ -2,10 +2,10 @@ package entities
 
 // TokenData is the information that the system stores.
 type TokenData struct {
-	Username       string
-	TokenID        string
-	RefreshToken   []byte
-	ExpirationDate int64
+	Username       string `cql:"user_name"`
+	TokenID        string `cql:"token_id"`
+	RefreshToken   []byte `cql:"refresh_token"`
+	ExpirationDate int64 `cql:"expiration_date"`
 }
 
 // NewTokenData creates an instance of the structure
