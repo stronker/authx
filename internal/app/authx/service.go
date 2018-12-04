@@ -8,7 +8,8 @@ import (
 	"fmt"
 	"github.com/nalej/authx/internal/app/authx/handler"
 	"github.com/nalej/authx/internal/app/authx/manager"
-	"github.com/nalej/authx/internal/app/authx/providers"
+	"github.com/nalej/authx/internal/app/authx/providers/credentials"
+	"github.com/nalej/authx/internal/app/authx/providers/role"
 	pbAuthx "github.com/nalej/grpc-authx-go"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
@@ -36,8 +37,8 @@ func (s *Service) Run() {
 		return
 	}
 
-	roleProvider := providers.NewRoleMockup()
-	credProvider := providers.NewBasicCredentialMockup()
+	roleProvider := role.NewRoleMockup()
+	credProvider := credentials.NewBasicCredentialMockup()
 	passwordMgr := manager.NewBCryptPassword()
 	tokenMgr := manager.NewJWTTokenMockup()
 	authxMgr := manager.NewAuthx(passwordMgr, tokenMgr, credProvider, roleProvider, s.Secret, s.ExpirationTime)

@@ -2,22 +2,19 @@
  * Copyright (C) 2018 Nalej - All Rights Reserved
  */
 
-package providers
+package credentials
 
 import (
+	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 )
 
-var _ = ginkgo.Describe("BasicCredentialsMockup", func() {
-	var provider = NewBasicCredentialMockup()
-	CredentialsContexts(provider)
-})
 
 func CredentialsContexts(provider BasicCredentials) {
 
 	ginkgo.Context("with a register", func() {
-		credentials := NewBasicCredentialsData("u1", []byte("p1"), "r1", "o1")
+		credentials := entities.NewBasicCredentialsData("u1", []byte("p1"), "r1", "o1")
 		ginkgo.BeforeEach(func() {
 			err := provider.Add(credentials)
 			gomega.Expect(err).To(gomega.BeNil())
@@ -35,7 +32,7 @@ func CredentialsContexts(provider BasicCredentials) {
 		})
 
 		ginkgo.It("can be edited the password", func() {
-			err := provider.Edit(credentials.Username, NewEditBasicCredentialsData().WithPassword([]byte("pNew")))
+			err := provider.Edit(credentials.Username, entities.NewEditBasicCredentialsData().WithPassword([]byte("pNew")))
 			gomega.Expect(err).To(gomega.Succeed())
 			c, err := provider.Get(credentials.Username)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -45,7 +42,7 @@ func CredentialsContexts(provider BasicCredentials) {
 		})
 
 		ginkgo.It("can be edited the roleID", func() {
-			err := provider.Edit(credentials.Username, NewEditBasicCredentialsData().WithRoleID("rNew"))
+			err := provider.Edit(credentials.Username, entities.NewEditBasicCredentialsData().WithRoleID("rNew"))
 			gomega.Expect(err).To(gomega.Succeed())
 			c, err := provider.Get(credentials.Username)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -54,7 +51,7 @@ func CredentialsContexts(provider BasicCredentials) {
 
 		})
 		ginkgo.It("can be edited without changes", func() {
-			err := provider.Edit(credentials.Username, NewEditBasicCredentialsData())
+			err := provider.Edit(credentials.Username, entities.NewEditBasicCredentialsData())
 			gomega.Expect(err).To(gomega.Succeed())
 			c, err := provider.Get(credentials.Username)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -88,12 +85,12 @@ func CredentialsContexts(provider BasicCredentials) {
 		})
 
 		ginkgo.It("should  add correctly", func() {
-			err := provider.Add(NewBasicCredentialsData("u1",[] byte("pwd"),"r1","o1"))
+			err := provider.Add(entities.NewBasicCredentialsData("u1",[] byte("pwd"),"r1","o1"))
 			gomega.Expect(err).To(gomega.Succeed())
 		})
 
 		ginkgo.It("should  not work", func() {
-			err := provider.Edit("u1", NewEditBasicCredentialsData().WithRoleID("rNew"))
+			err := provider.Edit("u1", entities.NewEditBasicCredentialsData().WithRoleID("rNew"))
 			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
 

@@ -5,7 +5,9 @@
 package manager
 
 import (
-	"github.com/nalej/authx/internal/app/authx/providers"
+	"github.com/nalej/authx/internal/app/authx/entities"
+	"github.com/nalej/authx/internal/app/authx/providers/credentials"
+	"github.com/nalej/authx/internal/app/authx/providers/role"
 	"github.com/nalej/authx/pkg/token"
 	"github.com/nalej/derrors"
 	pbAuthx "github.com/nalej/grpc-authx-go"
@@ -24,16 +26,16 @@ const DefaultSecret = "MyLittleSecret"
 type Authx struct {
 	Password            Password
 	Token               Token
-	CredentialsProvider providers.BasicCredentials
-	RoleProvider        providers.Role
+	CredentialsProvider credentials.BasicCredentials
+	RoleProvider        role.Role
 
 	secret             string
 	expirationDuration time.Duration
 }
 
 // NewAuthx creates a new manager.
-func NewAuthx(password Password, tokenManager Token, credentialsProvider providers.BasicCredentials,
-	roleProvide providers.Role, secret string, expirationDuration time.Duration) *Authx {
+func NewAuthx(password Password, tokenManager Token, credentialsProvider credentials.BasicCredentials,
+	roleProvide role.Role, secret string, expirationDuration time.Duration) *Authx {
 
 	return &Authx{Password: password, Token: tokenManager,
 		CredentialsProvider: credentialsProvider, RoleProvider: roleProvide,
@@ -45,7 +47,7 @@ func NewAuthx(password Password, tokenManager Token, credentialsProvider provide
 func NewAuthxMockup() *Authx {
 	d, _ := time.ParseDuration(DefaultExpirationDuration)
 	return NewAuthx(NewBCryptPassword(), NewJWTTokenMockup(),
-		providers.NewBasicCredentialMockup(), providers.NewRoleMockup(),
+		credentials.NewBasicCredentialMockup(), role.NewRoleMockup(),
 		DefaultSecret, d)
 }
 
@@ -74,7 +76,7 @@ func (m *Authx) AddBasicCredentials(username string, organizationID string, role
 		return err
 	}
 
-	entity := providers.NewBasicCredentialsData(username, hashedPassword, roleID, organizationID)
+	entity := entities.NewBasicCredentialsData(username, hashedPassword, roleID, organizationID)
 	return m.CredentialsProvider.Add(entity)
 }
 
@@ -115,7 +117,7 @@ func (m *Authx) ChangePassword(username string, password string, newPassword str
 	if err != nil {
 		return err
 	}
-	edit := providers.NewEditBasicCredentialsData().WithPassword(hashedPassword)
+	edit := entities.NewEditBasicCredentialsData().WithPassword(hashedPassword)
 	return m.CredentialsProvider.Edit(username, edit)
 }
 
@@ -131,7 +133,7 @@ func (m *Authx) RefreshToken(oldToken string, refreshToken string) (*pbAuthx.Log
 
 // AddRole add a new role to the authorization system.
 func (m *Authx) AddRole(role *pbAuthx.Role) derrors.Error {
-	entity := providers.NewRoleData(role.OrganizationId, role.RoleId, role.Name, role.Internal, PrimitivesToString(role.Primitives))
+	entity := entities.NewRoleData(role.OrganizationId, role.RoleId, role.Name, role.Internal, PrimitivesToString(role.Primitives))
 	return m.RoleProvider.Add(entity)
 }
 
@@ -150,15 +152,15 @@ func (m *Authx) EditUserRole(username string, roleID string) derrors.Error {
 		return derrors.NewNotFoundError("role not found")
 	}
 
-	edit := providers.NewEditBasicCredentialsData().WithRoleID(roleID)
+	edit := entities.NewEditBasicCredentialsData().WithRoleID(roleID)
 	return m.CredentialsProvider.Edit(username, edit)
 }
 
-func (m * Authx) ListRoles(organizationID * grpc_organization_go.OrganizationId) ([]providers.RoleData, derrors.Error){
+func (m * Authx) ListRoles(organizationID * grpc_organization_go.OrganizationId) ([]entities.RoleData, derrors.Error){
 	return m.RoleProvider.List(organizationID.OrganizationId)
 }
 
-func (m * Authx) GetUserRole(userID * grpc_user_go.UserId)( * providers.RoleData, derrors.Error){
+func (m * Authx) GetUserRole(userID * grpc_user_go.UserId)( * entities.RoleData, derrors.Error){
 	cred, err := m.CredentialsProvider.Get(userID.Email)
 	if err != nil{
 		return nil, err
