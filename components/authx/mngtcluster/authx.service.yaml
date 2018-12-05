@@ -2,7 +2,9 @@ kind: Service
 apiVersion: v1
 metadata:
   name: authx
-  cluster: management
+  labels:
+    cluster: management
+    compoment: authx
   namespace: nalej
 spec:
   selector:

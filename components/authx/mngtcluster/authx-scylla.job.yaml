@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: scylla-authx
+  namespace: nalej
+spec:
+  template:
+    metadata:
+      name: scylla-authx
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: scylladb
+        image: scylladb/scylla:2.0.0
+        command: ["/bin/bash"]
+        args: [ "./opt/node_alive.sh"]
+        tty: true
+        volumeMounts:
+        - name: authx-scylla
+          mountPath: /opt/authx-scylla.cql
+          subPath: authx-scylla.cql
+        - name: authx-scylla
+          mountPath: /opt/node_alive.sh
+          subPath: node_alive.sh
+      volumes:
+      - name: authx-scylla
+        configMap:
+          name: authx-scylla
