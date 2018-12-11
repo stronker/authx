@@ -22,16 +22,27 @@ func NewTokenMockup() Token {
 	return &TokenMockup{data: make(map[string]entities.TokenData,0)}
 }
 
+func (p *TokenMockup) unsafeGet(username string, tokenID string) (*entities.TokenData, derrors.Error) {
+
+	data, ok := p.data[p.generateID(tokenID, username)]
+	if !ok {
+		return nil, derrors.NewNotFoundError("token not found").WithParams(username, tokenID)
+	}
+	return &data, nil
+}
+
 // Delete an existing token.
 func (p *TokenMockup) Delete(username string, tokenID string) derrors.Error {
 
+	p.Lock()
+	defer p.Unlock()
+
 	id := p.generateID(tokenID, username)
-	_, err := p.Get(username, tokenID)
+	_, err := p.unsafeGet(username, tokenID)
 	if err != nil {
 		return derrors.NewNotFoundError("username not found").WithParams(username)
 	}
-	p.Lock()
-	defer p.Unlock()
+
 	delete(p.data, id)
 	return nil
 }
