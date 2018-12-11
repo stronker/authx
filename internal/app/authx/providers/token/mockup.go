@@ -14,7 +14,7 @@ import (
 // TokenMockup is an in-memory mockup.
 type TokenMockup struct {
 	sync.Mutex
-	data map[string]TokenData
+	data map[string]entities.TokenData
 }
 
 // NewTokenMockup create a new instance of TokenMockup.
@@ -37,7 +37,7 @@ func (p *TokenMockup) Delete(username string, tokenID string) derrors.Error {
 }
 
 // Add a token.
-func (p *TokenMockup) Add(token *TokenData) derrors.Error {
+func (p *TokenMockup) Add(token *entities.TokenData) derrors.Error {
 	p.Lock()
 	defer p.Unlock()
 	p.data[p.generateID(token.TokenID, token.Username)] = *token
@@ -45,7 +45,7 @@ func (p *TokenMockup) Add(token *TokenData) derrors.Error {
 }
 
 // Get an existing token.
-func (p *TokenMockup) Get(username string, tokenID string) (*TokenData, derrors.Error) {
+func (p *TokenMockup) Get(username string, tokenID string) (*entities.TokenData, derrors.Error) {
 	p.Lock()
 	defer p.Unlock()
 	data, ok := p.data[p.generateID(tokenID, username)]
