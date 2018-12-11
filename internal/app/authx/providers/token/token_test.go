@@ -2,23 +2,19 @@
  * Copyright (C) 2018 Nalej - All Rights Reserved
  */
 
-package providers
+package token
 
 import (
+	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 	"time"
 )
 
-var _ = ginkgo.Describe("TokenMockup", func() {
-	var provider = NewTokenMockup()
-	TokenContexts(provider)
-})
-
 func TokenContexts(provider Token) {
 
 	ginkgo.Context("with a register", func() {
-		token := NewTokenData("u1", "t1", []byte("r1"), time.Now().Unix())
+		token := entities.NewTokenData("u1", "t1", []byte("r1"), time.Now().Unix())
 		ginkgo.BeforeEach(func() {
 			err := provider.Add(token)
 			gomega.Expect(err).To(gomega.BeNil())
@@ -59,7 +55,7 @@ func TokenContexts(provider Token) {
 		})
 
 		ginkgo.It("must add correctly", func() {
-			err := provider.Add(NewTokenData("u1", "t1", []byte("rt1"), 11111))
+			err := provider.Add(entities.NewTokenData("u1", "t1", []byte("rt1"), 11111))
 			gomega.Expect(err).To(gomega.Succeed())
 		})
 

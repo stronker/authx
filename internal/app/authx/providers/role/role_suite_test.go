@@ -1,9 +1,4 @@
-/*
- * Copyright (C) 2018 Nalej - All Rights Reserved
- */
-
-package providers
-
+package role
 
 import (
 	"github.com/onsi/ginkgo"
@@ -11,8 +6,7 @@ import (
 	"testing"
 )
 
-
 func TestCredentialsPackage(t *testing.T) {
 	gomega.RegisterFailHandler(ginkgo.Fail)
-	ginkgo.RunSpecs(t, "Providers package suite")
+	ginkgo.RunSpecs(t, "Role providers package suite")
 }

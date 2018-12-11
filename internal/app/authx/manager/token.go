@@ -6,8 +6,9 @@ package manager
 
 import (
 	"github.com/dgrijalva/jwt-go"
-	"github.com/nalej/authx/internal/app/authx/providers"
-	"github.com/nalej/authx/pkg/token"
+	"github.com/nalej/authx/internal/app/authx/entities"
+	nalejToken "github.com/nalej/authx/internal/app/authx/providers/token"
+	 "github.com/nalej/authx/pkg/token"
 	"github.com/nalej/derrors"
 	"github.com/rs/zerolog/log"
 	"time"
@@ -42,19 +43,19 @@ type Token interface {
 
 // JWTToken is an implementation of token using JWT.
 type JWTToken struct {
-	TokenProvider providers.Token
+	TokenProvider nalejToken.Token
 	Password      Password
 }
 
 // NewJWTToken create a new instance of JWTToken
-func NewJWTToken(tokenProvider providers.Token, password Password) Token {
+func NewJWTToken(tokenProvider nalejToken.Token, password Password) Token {
 	return &JWTToken{TokenProvider: tokenProvider, Password: password}
 
 }
 
 // NewJWTTokenMockup create a new mockup of JWTToken
 func NewJWTTokenMockup() Token {
-	return NewJWTToken(providers.NewTokenMockup(), NewBCryptPassword())
+	return NewJWTToken(nalejToken.NewTokenMockup(), NewBCryptPassword())
 }
 
 // Generate a new JWT token with the personal claim.
@@ -73,7 +74,7 @@ func (m *JWTToken) Generate(personalClaim *token.PersonalClaim, expirationPeriod
 	if err != nil {
 		return nil, derrors.NewInternalError("impossible generate RefreshToken", err)
 	}
-	tokenData := providers.NewTokenData(claim.UserID, claim.Id, hashedRefreshToken, claim.ExpiresAt)
+	tokenData := entities.NewTokenData(claim.UserID, claim.Id, hashedRefreshToken, claim.ExpiresAt)
 	err = m.TokenProvider.Add(tokenData)
 	if err != nil {
 		return nil, derrors.NewInternalError("impossible store RefreshToken", err)

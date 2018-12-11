@@ -8,7 +8,8 @@ import (
 	"fmt"
 	"github.com/nalej/authx/internal/app/authx/handler"
 	"github.com/nalej/authx/internal/app/authx/manager"
-	"github.com/nalej/authx/internal/app/authx/providers"
+	"github.com/nalej/authx/internal/app/authx/providers/credentials"
+	"github.com/nalej/authx/internal/app/authx/providers/role"
 	pbAuthx "github.com/nalej/grpc-authx-go"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
@@ -22,25 +23,59 @@ type Service struct {
 	Config
 }
 
+type Providers struct {
+	roleProvider role.Role
+	credProvider credentials.BasicCredentials
+}
+
 // NewService create a new service instance.
 func NewService(config Config) *Service {
 	return &Service{Config: config}
 }
 
+func (s *Service) CreateInMemoryProviders() * Providers {
+	return &Providers {
+		roleProvider: role.NewRoleMockup(),
+		credProvider: credentials.NewBasicCredentialMockup(),
+	}
+}
+
+func (s *Service) CreateDBScyllaProviders() * Providers {
+	return &Providers {
+		roleProvider: role.NewScyllaRoleProvider(
+			s.Config.ScyllaDBAddress, s.Config.ScyllaDBPort, s.Config.KeySpace),
+		credProvider: credentials.NewScyllaCredentialsProvider(
+			s.Config.ScyllaDBAddress, s.Config.ScyllaDBPort, s.Config.KeySpace),
+	}
+}
+
+// GetProviders builds the providers according to the selected backend.
+func (s *Service) GetProviders() * Providers {
+	if s.Config.UseInMemoryProviders {
+		return s.CreateInMemoryProviders()
+	} else if s.Config.UseDBScyllaProviders {
+		return s.CreateDBScyllaProviders()
+	}
+	log.Fatal().Msg("unsupported type of provider")
+	return nil
+}
+
 //Run launch the Authx service.
 func (s *Service) Run() {
 	s.Config.Print()
+	p := s.GetProviders()
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", s.Port))
 	if err != nil {
 		log.Fatal().Errs("failed to listen: %v", []error{err})
 		return
 	}
 
-	roleProvider := providers.NewRoleMockup()
-	credProvider := providers.NewBasicCredentialMockup()
+	//roleProvider := role.NewRoleMockup()
+	//credProvider := credentials.NewBasicCredentialMockup()
 	passwordMgr := manager.NewBCryptPassword()
 	tokenMgr := manager.NewJWTTokenMockup()
-	authxMgr := manager.NewAuthx(passwordMgr, tokenMgr, credProvider, roleProvider, s.Secret, s.ExpirationTime)
+	authxMgr := manager.NewAuthx(passwordMgr, tokenMgr, p.credProvider, p.roleProvider, s.Secret, s.ExpirationTime)
 
 	h := handler.NewAuthx(authxMgr)
 
