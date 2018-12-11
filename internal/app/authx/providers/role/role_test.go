@@ -2,22 +2,19 @@
  * Copyright (C) 2018 Nalej - All Rights Reserved
  */
 
-package providers
+package role
 
 import (
+	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 )
 
-var _ = ginkgo.Describe("RoleMockup", func() {
-	var provider = NewRoleMockup()
-	RoleContexts(provider)
-})
 
 func RoleContexts(provider Role) {
 
 	ginkgo.Context("with a register", func() {
-		role := NewRoleData("o1", "r1", "n1", false, [] string{"p1", "p2"})
+		role := entities.NewRoleData("o1", "r1", "n1", false, [] string{"p1", "p2"})
 		ginkgo.BeforeEach(func() {
 			err := provider.Add(role)
 			gomega.Expect(err).To(gomega.BeNil())
@@ -35,7 +32,7 @@ func RoleContexts(provider Role) {
 		})
 
 		ginkgo.It("can be edited the name", func() {
-			err := provider.Edit(role.OrganizationID, role.RoleID, NewEditRoleData().WithName("nNew"))
+			err := provider.Edit(role.OrganizationID, role.RoleID, entities.NewEditRoleData().WithName("nNew"))
 			gomega.Expect(err).To(gomega.Succeed())
 			r, err := provider.Get(role.OrganizationID, role.RoleID)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -45,7 +42,7 @@ func RoleContexts(provider Role) {
 		})
 
 		ginkgo.It("can be edited the roleID", func() {
-			err := provider.Edit(role.OrganizationID, role.RoleID, NewEditRoleData().WithPrimitives([]string{"pNew"}))
+			err := provider.Edit(role.OrganizationID, role.RoleID, entities.NewEditRoleData().WithPrimitives([]string{"pNew"}))
 			gomega.Expect(err).To(gomega.Succeed())
 			r, err := provider.Get(role.OrganizationID, role.RoleID)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -54,7 +51,7 @@ func RoleContexts(provider Role) {
 
 		})
 		ginkgo.It("can be edited without changes", func() {
-			err := provider.Edit(role.OrganizationID, role.RoleID, NewEditRoleData())
+			err := provider.Edit(role.OrganizationID, role.RoleID, entities.NewEditRoleData())
 			gomega.Expect(err).To(gomega.Succeed())
 			r, err := provider.Get(role.OrganizationID, role.RoleID)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -92,7 +89,7 @@ func RoleContexts(provider Role) {
 		})
 
 		ginkgo.It("edit doesn't work", func() {
-			err := provider.Edit("o1", "r1", NewEditRoleData().WithName("nNew"))
+			err := provider.Edit("o1", "r1", entities.NewEditRoleData().WithName("nNew"))
 			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
 

@@ -54,4 +54,10 @@ func init() {
 	runCmd.Flags().IntVar(&config.Port, "port", DefaultPort, "Port to launch Authx server")
 	runCmd.Flags().StringVar(&secretPath, "secret", "", "Path to internal secret to generate Tokens")
 	runCmd.Flags().DurationVar(&config.ExpirationTime, "expiration", d, "Expiration time of Tokens")
+
+	runCmd.Flags().BoolVar(&config.UseInMemoryProviders, "userInMemoryProviders", false, "Whether in-memory providers should be used. ONLY for development")
+	runCmd.Flags().BoolVar(&config.UseDBScyllaProviders, "useDBScyllaProviders", true, "Whether dbscylla providers should be used")
+	runCmd.Flags().StringVar(&config.ScyllaDBAddress, "scyllaDBAddress", "", "address to connect to scylla database")
+	runCmd.Flags().IntVar(&config.ScyllaDBPort, "scyllaDBPort", 9042, "port to connect to scylla database")
+	runCmd.Flags().StringVar(&config.KeySpace, "scyllaDBKeyspace", "", "keyspace of scylla database")
 }
