@@ -87,7 +87,7 @@ func (sp *ScyllaRoleProvider) Delete(organizationID string, roleID string) derro
 	cqlErr := sp.Session.Query(stmt, organizationID, roleID).Exec()
 
 	if cqlErr != nil {
-		return conversions.ToDerror(cqlErr)
+		return derrors.AsError(cqlErr, "cannot delete role")
 	}
 
 	return nil
@@ -113,7 +113,7 @@ func (sp *ScyllaRoleProvider) Add(role *entities.RoleData) derrors.Error {
 	cqlErr := q.ExecRelease()
 
 	if cqlErr != nil {
-		return conversions.ToDerror(cqlErr)
+		return derrors.AsError(cqlErr, "cannot add new role")
 	}
 
 	return nil
@@ -137,7 +137,7 @@ func (sp *ScyllaRoleProvider) Get(organizationID string, roleID string) (*entiti
 		if err.Error() == rowNotFound {
 			return nil, derrors.NewNotFoundError("role").WithParams(organizationID, roleID)
 		}else{
-			return nil, conversions.ToDerror(err)
+			return nil, derrors.AsError(err, "cannot get role")
 		}
 	}
 
@@ -164,7 +164,7 @@ func (sp *ScyllaRoleProvider) Edit(organizationID string, roleID string, edit *e
 	cqlErr := q.ExecRelease()
 
 	if cqlErr != nil {
-		return conversions.ToDerror(cqlErr)
+		return derrors.AsError(cqlErr, "cannot edit role")
 	}
 
 	return nil
@@ -191,7 +191,7 @@ func (sp *ScyllaRoleProvider) Exist(organizationID string, roleID string) (*bool
 		if err.Error() == rowNotFound {
 			return &ok, nil
 		}else{
-			return &ok, conversions.ToDerror(err)
+			return &ok, derrors.AsError(err, "cannot determine role exists")
 		}
 	}
 	ok = true
@@ -215,7 +215,7 @@ func (sp *ScyllaRoleProvider) List(organizationID string) ([]entities.RoleData, 
 	cqlErr := gocqlx.Select(&result, q.Query)
 
 	if cqlErr != nil {
-		return nil, conversions.ToDerror(cqlErr)
+		return nil, derrors.AsError(cqlErr, "cannot list roles")
 	}
 
 	return result, nil
@@ -229,8 +229,9 @@ func (sp *ScyllaRoleProvider) Truncate() derrors.Error{
 
 	err := sp.Session.Query("TRUNCATE TABLE roles").Exec()
 	if err != nil {
-		log.Info().Str("trace", conversions.ToDerror(err).DebugReport()).Msg("failed to truncate the table")
-		return conversions.ToDerror(err)
+		dErr := derrors.AsError(err, "cannot truncate role table")
+		log.Error().Str("trace", dErr.DebugReport()).Msg("failed to truncate the table")
+		return dErr
 	}
 
 	return nil
