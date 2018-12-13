@@ -38,7 +38,7 @@ func (sp *ScyllaCredentialsProvider) Connect() derrors.Error {
 
 	session, err := conf.CreateSession()
 	if err != nil {
-		log.Error().Str("provider", "ScyllaApplicationProvider").Str("trace", conversions.ToDerror(err).DebugReport()).Msg("unable to connect")
+		log.Error().Str("provider", "ScyllaCredentialsProvider").Str("trace", conversions.ToDerror(err).DebugReport()).Msg("unable to connect")
 		return conversions.ToDerror(err)
 	}
 

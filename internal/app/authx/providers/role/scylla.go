@@ -39,7 +39,7 @@ func (sp *ScyllaRoleProvider) Connect() derrors.Error {
 
 	session, err := conf.CreateSession()
 	if err != nil {
-		log.Error().Str("provider", "ScyllaApplicationProvider").Str("trace", conversions.ToDerror(err).DebugReport()).Msg("unable to connect")
+		log.Error().Str("provider", "ScyllaRolesProvider").Str("trace", conversions.ToDerror(err).DebugReport()).Msg("unable to connect")
 		return conversions.ToDerror(err)
 	}
 
@@ -201,9 +201,13 @@ func (sp *ScyllaRoleProvider) Exist(organizationID string, roleID string) (*bool
 // List the roles associated with an organization.
 func (sp *ScyllaRoleProvider) List(organizationID string) ([]entities.RoleData, derrors.Error){
 
+	if err := sp.CheckConnectionAndConnect(); err != nil {
+		return nil, err
+	}
+
 	result := make([]entities.RoleData, 0)
 
-	stmt, names := qb.Select(table).Columns("name", "primitives").Where(qb.Eq(tablePK_1)).ToCql()
+	stmt, names := qb.Select(table).Where(qb.Eq(tablePK_1)).ToCql()
 	q:= gocqlx.Query(sp.Session.Query(stmt), names).BindMap(qb.M{
 		tablePK_1: organizationID,
 	})
