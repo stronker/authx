@@ -39,7 +39,7 @@ func (sp *ScyllaTokenProvider) Connect() derrors.Error {
 	session, err := conf.CreateSession()
 	if err != nil {
 		log.Error().Str("provider", "ScyllaTokeProvider").Str("trace", conversions.ToDerror(err).DebugReport()).Msg("unable to connect")
-		return conversions.ToDerror(err)
+		return derrors.AsError(err, "cannot connect")
 	}
 
 	sp.Session = session
@@ -74,7 +74,7 @@ func (sp *ScyllaTokenProvider) Delete(username string, tokenID string) derrors.E
 	exists, err := sp.Exist(username, tokenID)
 
 	if err != nil {
-		return conversions.ToDerror(err)
+		return err
 	}
 	if ! *exists {
 		return derrors.NewNotFoundError("role").WithParams(username, tokenID)
@@ -84,7 +84,7 @@ func (sp *ScyllaTokenProvider) Delete(username string, tokenID string) derrors.E
 	cqlErr := sp.Session.Query(stmt, username, tokenID).Exec()
 
 	if cqlErr != nil {
-		return conversions.ToDerror(cqlErr)
+		return derrors.AsError(cqlErr, "cannot delete token")
 	}
 
 	return nil
@@ -111,7 +111,7 @@ func (sp *ScyllaTokenProvider) Add(token *entities.TokenData) derrors.Error{
 	cqlErr := q.ExecRelease()
 
 	if cqlErr != nil {
-		return conversions.ToDerror(cqlErr)
+		return derrors.AsError(cqlErr, "cannot add token")
 	}
 
 	return nil
@@ -135,7 +135,7 @@ func (sp *ScyllaTokenProvider) Get(username string, tokenID string) (*entities.T
 		if err.Error() == rowNotFound {
 			return nil, derrors.NewNotFoundError("token").WithParams(username, tokenID)
 		}else{
-			return nil, conversions.ToDerror(err)
+			return nil, derrors.AsError(err, "cannot get token")
 		}
 	}
 
@@ -163,7 +163,7 @@ func (sp *ScyllaTokenProvider) Exist(username string, tokenID string) (*bool, de
 		if err.Error() == rowNotFound {
 			return &ok, nil
 		}else{
-			return &ok, conversions.ToDerror(err)
+			return &ok, derrors.AsError(err, "cannot determinate token exists")
 		}
 	}
 	ok = true
@@ -179,7 +179,7 @@ func (sp *ScyllaTokenProvider) Truncate() derrors.Error{
 	err := sp.Session.Query("TRUNCATE TABLE tokens").Exec()
 	if err != nil {
 		log.Info().Str("trace", conversions.ToDerror(err).DebugReport()).Msg("failed to truncate the table")
-		return conversions.ToDerror(err)
+		return derrors.AsError(err, "cannot truncate token table")
 	}
 
 	return nil

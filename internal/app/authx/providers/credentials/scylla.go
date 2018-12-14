@@ -39,7 +39,7 @@ func (sp *ScyllaCredentialsProvider) Connect() derrors.Error {
 	session, err := conf.CreateSession()
 	if err != nil {
 		log.Error().Str("provider", "ScyllaCredentialsProvider").Str("trace", conversions.ToDerror(err).DebugReport()).Msg("unable to connect")
-		return conversions.ToDerror(err)
+		return derrors.AsError(err, "cannot create session")
 	}
 
 	sp.Session = session
@@ -60,7 +60,7 @@ func (sp *ScyllaCredentialsProvider) CheckConnectionAndConnect () derrors.Error 
 	log.Info().Str("provider", "ScyllaCredentialsProvider"). Msg("session not connected, trying to connect it!")
 	err := sp.Connect()
 	if err != nil {
-		return err
+		return derrors.AsError(err, "cannot connect")
 	}
 
 	return nil
@@ -78,7 +78,7 @@ func (sp *ScyllaCredentialsProvider) Delete(username string) derrors.Error {
 	exists, err := sp.Exist(username)
 
 	if err != nil {
-		return conversions.ToDerror(err)
+		return err
 	}
 	if ! *exists {
 		return derrors.NewNotFoundError("credentials").WithParams(username)
@@ -89,7 +89,7 @@ func (sp *ScyllaCredentialsProvider) Delete(username string) derrors.Error {
 	cqlErr := sp.Session.Query(stmt, username).Exec()
 
 	if cqlErr != nil {
-		return conversions.ToDerror(cqlErr)
+		return derrors.AsError(cqlErr, "cannot delete credentials")
 	}
 
 	return nil
@@ -116,7 +116,7 @@ func (sp *ScyllaCredentialsProvider) Add(credentials *entities.BasicCredentialsD
 	cqlErr := q.ExecRelease()
 
 	if cqlErr != nil {
-		return conversions.ToDerror(cqlErr)
+		return derrors.AsError(cqlErr, "cannot add credentials")
 	}
 
 	return nil
@@ -140,7 +140,7 @@ func (sp *ScyllaCredentialsProvider) Get(username string) (*entities.BasicCreden
 		if err.Error() == rowNotFound {
 			return nil, derrors.NewNotFoundError(username)
 		}else{
-			return nil, conversions.ToDerror(err)
+			return nil, derrors.AsError(err, "cannot get credentials")
 		}
 	}
 
@@ -166,11 +166,10 @@ func (sp *ScyllaCredentialsProvider) Edit(username string, edit *entities.EditBa
 	cqlErr := q.ExecRelease()
 
 	if cqlErr != nil {
-		return conversions.ToDerror(cqlErr)
+		return derrors.AsError(cqlErr, "cannot update credentials")
 	}
 
 	return nil
-
 
 }
 // Exist check if exists a specific credentials.
@@ -192,7 +191,7 @@ func (sp *ScyllaCredentialsProvider) Exist(username string) (*bool,derrors.Error
 		if err.Error() == rowNotFound {
 			return &ok, nil
 		}else{
-			return &ok, conversions.ToDerror(err)
+			return &ok, derrors.AsError(err, "cannot determine credentials exists")
 		}
 	}
 
@@ -209,7 +208,7 @@ func (sp *ScyllaCredentialsProvider) Truncate() derrors.Error {
 	err := sp.Session.Query("TRUNCATE TABLE credentials").Exec()
 	if err != nil {
 		log.Info().Str("trace", conversions.ToDerror(err).DebugReport()).Msg("failed to truncate the table")
-		return conversions.ToDerror(err)
+		return derrors.AsError(err, "cannot truncate credentials table")
 	}
 
 	return nil

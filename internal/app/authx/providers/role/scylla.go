@@ -40,7 +40,7 @@ func (sp *ScyllaRoleProvider) Connect() derrors.Error {
 	session, err := conf.CreateSession()
 	if err != nil {
 		log.Error().Str("provider", "ScyllaRolesProvider").Str("trace", conversions.ToDerror(err).DebugReport()).Msg("unable to connect")
-		return conversions.ToDerror(err)
+		return derrors.AsError(err, "cannot connect")
 	}
 
 	sp.Session = session
@@ -77,7 +77,7 @@ func (sp *ScyllaRoleProvider) Delete(organizationID string, roleID string) derro
 	exists, err := sp.Exist(organizationID, roleID)
 
 	if err != nil {
-		return conversions.ToDerror(err)
+		return err
 	}
 	if ! *exists {
 		return derrors.NewNotFoundError("role").WithParams(organizationID, roleID)
