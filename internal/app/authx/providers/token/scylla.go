@@ -163,7 +163,7 @@ func (sp *ScyllaTokenProvider) Exist(username string, tokenID string) (*bool, de
 		if err.Error() == rowNotFound {
 			return &ok, nil
 		}else{
-			return &ok, derrors.AsError(err, "cannot determinate token exists")
+			return &ok, derrors.AsError(err, "cannot determinate if token exists")
 		}
 	}
 	ok = true

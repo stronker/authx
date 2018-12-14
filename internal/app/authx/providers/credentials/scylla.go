@@ -191,7 +191,7 @@ func (sp *ScyllaCredentialsProvider) Exist(username string) (*bool,derrors.Error
 		if err.Error() == rowNotFound {
 			return &ok, nil
 		}else{
-			return &ok, derrors.AsError(err, "cannot determine credentials exists")
+			return &ok, derrors.AsError(err, "cannot determine if credentials exists")
 		}
 	}
 

@@ -191,7 +191,7 @@ func (sp *ScyllaRoleProvider) Exist(organizationID string, roleID string) (*bool
 		if err.Error() == rowNotFound {
 			return &ok, nil
 		}else{
-			return &ok, derrors.AsError(err, "cannot determine role exists")
+			return &ok, derrors.AsError(err, "cannot determine if role exists")
 		}
 	}
 	ok = true
