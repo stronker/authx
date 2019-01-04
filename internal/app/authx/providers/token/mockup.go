@@ -9,6 +9,7 @@ import (
 	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/nalej/derrors"
 	"sync"
+	"time"
 )
 
 // TokenMockup is an in-memory mockup.
@@ -84,4 +85,23 @@ func (p *TokenMockup) Truncate() derrors.Error {
 
 func (p *TokenMockup) generateID(tokenID string, username string) string {
 	return fmt.Sprintf("%s:%s", username, tokenID)
+}
+
+func (p *TokenMockup) DeleteExpiredTokens()derrors.Error {
+	p.Lock()
+	defer p.Unlock()
+
+	idBorrow := make([]string, 0)
+
+	for _, token := range p.data{
+		if token.ExpirationDate < time.Now().Unix() {
+			id := p.generateID(token.TokenID, token.Username)
+			idBorrow = append(idBorrow, id)
+		}
+
+	}
+	for _, id := range idBorrow{
+		delete(p.data, id)
+	}
+	return nil
 }

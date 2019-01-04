@@ -9,6 +9,7 @@ import (
 	"github.com/scylladb/gocqlx"
 	"github.com/scylladb/gocqlx/qb"
 	"sync"
+	"time"
 )
 
 const table = "tokens"
@@ -16,6 +17,8 @@ const tablePK_1 = "username"
 const tablePK_2 = "token_id"
 
 const rowNotFound = "not found"
+
+const ttlExpired = time.Duration(3)*time.Hour
 
 type ScyllaTokenProvider struct {
 	Address string
@@ -177,7 +180,7 @@ func (sp *ScyllaTokenProvider) Add(token *entities.TokenData) derrors.Error{
 	}
 
 	// add new basic credential
-	stmt, names := qb.Insert(table).Columns("username", "token_id", "refresh_token", "expiration_date").ToCql()
+	stmt, names := qb.Insert(table).Columns("username", "token_id", "refresh_token", "expiration_date").TTL(ttlExpired).ToCql()
 	q := gocqlx.Query(sp.Session.Query(stmt), names).BindStruct(token)
 	cqlErr := q.ExecRelease()
 
@@ -262,5 +265,10 @@ func (sp *ScyllaTokenProvider) Truncate() derrors.Error{
 		return derrors.AsError(err, "cannot truncate token table")
 	}
 
+	return nil
+}
+
+func (sp *ScyllaTokenProvider) DeleteExpiredTokens() derrors.Error  {
+	// nothing to do, ttl uses to delete expired tokens
 	return nil
 }

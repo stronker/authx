@@ -22,5 +22,7 @@ type Token interface {
 	Exist(username string, tokenID string) (*bool, derrors.Error)
 	// Truncate cleans all data.
 	Truncate() derrors.Error
+
+	DeleteExpiredTokens() derrors.Error
 }
 
