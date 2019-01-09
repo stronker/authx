@@ -1,4 +1,6 @@
 def nsHelper = new org.daisho.k8s.Namespace()
+def utils = new org.daisho.Utils()
+
 
 pipeline {
     agent { node { label 'k8s' } }
@@ -11,6 +13,7 @@ pipeline {
             steps { container("kubectl") { 
                 script {
                     env.namespaceName = nsHelper.createRandomNamespace()
+                    env.authxSecret = utils.randomString(32)
                 }
             } }
         }
@@ -21,7 +24,10 @@ pipeline {
         }
         stage("Launch authx deploy pipeline") {
             steps { 
-                build job: 'deploy/components/authx', parameters: [[$class: 'StringParameterValue', name: 'namespace', value: env.namespaceName]]
+                build job: 'deploy/components/authx', parameters: [
+                    [$class: 'StringParameterValue', name: 'namespace', value: env.namespaceName],
+                    [$class: 'StringParameterValue', name: 'sharedSecret', value: env.authxSecret]
+                ]
             }
         }
     }
