@@ -9,7 +9,7 @@ metadata:
     cluster: management
     component: authx
   name: authx
-  namespace: nalej
+  namespace: __NPH_NAMESPACE
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -25,14 +25,14 @@ spec:
     spec:
       containers:
       - name: authx
-        image: nalejregistry.azurecr.io/nalej/authx:VERSION
+        image: nalejregistry.azurecr.io/nalej/authx:__NPH_VERSION
         imagePullPolicy: IfNotPresent
         args:
         - "run"
         - "--secret=/etc/authx/secret"
         - "--debug"
         - "--useDBScyllaProviders=true"
-        - "--scyllaDBAddress=scylladb.nalej"
+        - "--scyllaDBAddress=scylladb.__NPH_NAMESPACE"
         - "--scyllaDBKeyspace=authx"
         - "--scyllaDBPort=9042"
         volumeMounts:

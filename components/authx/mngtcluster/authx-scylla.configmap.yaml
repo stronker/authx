@@ -4,7 +4,7 @@ metadata:
   labels:
     cluster: management
   name: authx-scylla
-  namespace: nalej
+  namespace: __NPH_NAMESPACE
 data:
   authx-scylla.cql: |
     create KEYSPACE IF NOT EXISTS authx WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 3};
