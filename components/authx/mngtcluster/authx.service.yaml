@@ -10,9 +10,8 @@ spec:
   selector:
     cluster: management
     component: authx
-  type: NodePort
+  type: ClusterIP
   ports:
   - protocol: TCP
     port: 8810
     targetPort: 8810
-    nodePort: 31810
