@@ -1,5 +1,3 @@
-@Library('nalej-helpers@feature/k8s-secret-generator')
-
 String packageName = "authx"
 String packagePath = "src/github.com/nalej/" + packageName
 String yamlPath = packagePath + "/bin/yaml/mngtcluster"
