@@ -5,14 +5,13 @@ metadata:
   labels:
     cluster: management
     compoment: authx
-  namespace: nalej
+  namespace: __NPH_NAMESPACE
 spec:
   selector:
     cluster: management
     component: authx
-  type: NodePort
+  type: ClusterIP
   ports:
   - protocol: TCP
     port: 8810
     targetPort: 8810
-    nodePort: 31810
