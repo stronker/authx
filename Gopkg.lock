@@ -92,12 +92,12 @@
   version = "v2.0.0"
 
 [[projects]]
-  digest = "1:72998ed6198d1d6c131320e9e5e47235d4b164bd7959c4072fbbf797ba059c72"
+  digest = "1:a80a818741d7fafa0d56baddb85077cd8ee85913b65aec8a4e756963193e0175"
   name = "github.com/nalej/grpc-authx-go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "60d9088f1b70ed57ccf4d12721edd79629e80d51"
-  version = "v0.0.20"
+  revision = "31320613d12fb6f511a5bf44f5f56610d305daed"
+  version = "v0.0.36"
 
 [[projects]]
   digest = "1:44dfeb321f4866e9e786f9e8a4c6c95af0216065f013273e06a10ca54aa9d1d2"
@@ -105,6 +105,14 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "3a819d5336e7dcdd6b103eb0c78aafd48a01e70c"
+  version = "v0.0.29"
+
+[[projects]]
+  digest = "1:bd55645a90f6faa680b73a386de15d1336aed3f7c72c5859c918c039e6b36795"
+  name = "github.com/nalej/grpc-device-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "6b2d7b8a39b83cf0426c4e2f0f73bdbdb7a5e23e"
   version = "v0.0.29"
 
 [[projects]]
@@ -232,11 +240,11 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
+  revision = "64072686203f69e3fd20143576b27200f18ab0fa"
 
 [[projects]]
   branch = "master"
-  digest = "1:8b5682a2f0d3f944f12b9e87aeb6bbf451b55665ff6b87999c999b2240c390e9"
+  digest = "1:a7161e8b471152d8ef5ee4e60d501922bf174dfccd0723ec27d782bd53bf438f"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -251,15 +259,15 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "610586996380ceef02dd726cc09df7e00a3f8e56"
+  revision = "ed066c81e75eba56dd9bd2139ade88125b855585"
 
 [[projects]]
   branch = "master"
-  digest = "1:391d584c32997a99b556d2ed9e0333464a2eef452dceba43f8ef65d4bc78731a"
+  digest = "1:64ec1e1de5cec5e1579df2ff7ac10b20e3bf1cb4393846f631fb204dd9cb44f6"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "73d4af5aa059c8c2dfcf25aad4efd6ce7bc9adc1"
+  revision = "054c452bb702e465e95ce8e7a3d9a6cf0cd1188d"
 
 [[projects]]
   digest = "1:436b24586f8fee329e0dd65fd67c817681420cda1d7f934345c13fe78c212a73"
@@ -305,10 +313,10 @@
     "googleapis/rpc/status",
   ]
   pruneopts = "UT"
-  revision = "bd91e49a0898e27abb88c339b432fa53d7497ac0"
+  revision = "db91494dd46c1fdcbbde05e5ff5eb56df8f7d79a"
 
 [[projects]]
-  digest = "1:8cfaba8e2c27f599ace6038347ad1ad209bb873e9b8be4a6ef6034a4a7172365"
+  digest = "1:61ea4e024f5a9353eb1f012e260dd57e17bf20c33a3f86857f457ce7f7a559a8"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -347,8 +355,8 @@
     "test/bufconn",
   ]
   pruneopts = "UT"
-  revision = "df014850f6dee74ba2fc94874043a9f3f75fbfd8"
-  version = "v1.17.0"
+  revision = "a02b0774206b209466313a0b525d2c738fe407eb"
+  version = "v1.18.0"
 
 [[projects]]
   digest = "1:abeb38ade3f32a92943e5be54f55ed6d6e3b6602761d74b4aab4c9dd45c18abd"
@@ -393,6 +401,7 @@
     "github.com/nalej/derrors",
     "github.com/nalej/grpc-authx-go",
     "github.com/nalej/grpc-common-go",
+    "github.com/nalej/grpc-device-go",
     "github.com/nalej/grpc-organization-go",
     "github.com/nalej/grpc-user-go",
     "github.com/nalej/grpc-utils/pkg/conversions",
