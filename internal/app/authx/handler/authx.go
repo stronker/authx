@@ -9,10 +9,11 @@ import (
 	"github.com/nalej/authx/internal/app/authx/manager"
 	"github.com/nalej/authx/internal/app/entities"
 	"github.com/nalej/derrors"
+	"github.com/nalej/grpc-authx-go"
 	pbAuthx "github.com/nalej/grpc-authx-go"
 	pbCommon "github.com/nalej/grpc-common-go"
+	"github.com/nalej/grpc-device-go"
 	"github.com/nalej/grpc-organization-go"
-	"github.com/nalej/grpc-authx-go"
 	"github.com/nalej/grpc-user-go"
 	"github.com/nalej/grpc-utils/pkg/conversions"
 )
@@ -184,3 +185,109 @@ func (h * Authx) GetUserRole(ctx context.Context, userID * grpc_user_go.UserId) 
 	}
 	return retrieved.ToGRPC(), nil
 }
+
+
+// -- Device Credentials -- //
+func (h * Authx) AddDeviceCredentials(ctx context.Context, request * pbAuthx.AddDeviceCredentialsRequest) (*pbAuthx.DeviceCredentials, error) {
+	vErr := entities.ValidAddDeviceCredentials(request)
+	if vErr != nil {
+		return nil, conversions.ToGRPCError(vErr)
+	}
+
+	added, err := h.Manager.AddDeviceCredentials(request)
+	if err != nil {
+		return nil, conversions.ToGRPCError(err)
+	}
+
+	return added.ToGRPC(), nil
+
+}
+// UpdateDeviceCredentials enable /disable the device
+func (h * Authx) UpdateDeviceCredentials(ctx context.Context, request *pbAuthx.UpdateDeviceCredentialsRequest) (*pbCommon.Success, error) {
+
+	vErr := entities.ValidUpdateDeviceCredentialsRequest(request)
+	if vErr != nil {
+		return nil, conversions.ToDerror(vErr)
+	}
+
+	err := h.Manager.UpdateDeviceCredentials(request)
+
+	if err != nil {
+		return nil, conversions.ToGRPCError(err)
+	}
+
+	return &pbCommon.Success{}, nil
+}
+// RemoveDeviceCredentials removes a credential
+func (h * Authx) RemoveDeviceCredentials(ctx context.Context, credentials * grpc_device_go.DeviceId) (*pbCommon.Success, error) {
+
+	vErr :=  entities.ValidDeviceID(credentials)
+	if vErr != nil {
+		return nil, conversions.ToDerror(vErr)
+	}
+
+	err := h.Manager.RemoveDeviceCredentials(credentials)
+	if err != nil {
+		return nil, conversions.ToGRPCError(err)
+	}
+	return &pbCommon.Success{}, nil
+
+}
+// DeviceLogin checks if the device credentials are valid and returns a token
+func (h * Authx) DeviceLogin(ctx context.Context, loginRequest *pbAuthx.DeviceLoginRequest) (*pbAuthx.LoginResponse, error){
+
+	vErr := entities.ValidDeviceLoginRequest(loginRequest)
+	if vErr != nil {
+		return nil, conversions.ToGRPCError(vErr)
+	}
+
+	h.Manager.LoginDeviceCredentials(loginRequest)
+
+	return nil, nil
+}
+
+// AddDeviceGroupCredentials adds a device in the system
+func (h * Authx) AddDeviceGroupCredentials(ctx context.Context, request *pbAuthx.AddDeviceGroupCredentialsRequest) (*pbAuthx.DeviceGroupCredentials, error){
+	vErr := entities.ValidAddDeviceGroupCredentials(request)
+	if vErr != nil {
+		return nil, conversions.ToGRPCError(vErr)
+	}
+
+	added, err := h.Manager.AddDeviceGroupCredentials(request)
+	if err != nil {
+		return nil, conversions.ToGRPCError(err)
+	}
+
+	return added.ToGRPC(), nil
+}
+// UpdateDeviceGroupCredentials enable /disable the device
+func (h * Authx) UpdateDeviceGroupCredentials(ctx context.Context, request *pbAuthx.UpdateDeviceGroupCredentialsRequest) (*pbCommon.Success, error){
+	vErr := entities.ValidUpdateDeviceGroupCredentialsRequest(request)
+	if vErr != nil {
+		return nil, conversions.ToDerror(vErr)
+	}
+
+	err := h.Manager.UpdateDeviceGroupCredentials(request)
+	if err != nil {
+		return nil, conversions.ToGRPCError(err)
+	}
+
+	return &pbCommon.Success{}, nil
+}
+// RemoveDeviceGroupCredentials removes a group credentials
+func (h * Authx) RemoveDeviceGroupCredentials(ctx context.Context, credentials *grpc_device_go.DeviceGroupId) (*pbCommon.Success, error){
+	vErr :=  entities.ValidDeviceGroupID(credentials)
+	if vErr != nil {
+		return nil, conversions.ToDerror(vErr)
+	}
+
+	err := h.Manager.RemoveDeviceGroupCredentials(credentials)
+	if err != nil {
+		return nil, conversions.ToGRPCError(err)
+	}
+	return &pbCommon.Success{}, nil
+
+}
+// DeviceGroupLogin checks if the device group credentials are valid
+func (h * Authx) DeviceGroupLogin(ctx context.Context, in *grpc_authx_go.DeviceGroupLoginRequest) (*pbCommon.Success, error){return nil, nil}
+

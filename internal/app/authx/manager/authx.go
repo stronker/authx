@@ -7,10 +7,12 @@ package manager
 import (
 	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/nalej/authx/internal/app/authx/providers/credentials"
+	"github.com/nalej/authx/internal/app/authx/providers/device"
 	"github.com/nalej/authx/internal/app/authx/providers/role"
 	"github.com/nalej/authx/pkg/token"
 	"github.com/nalej/derrors"
 	pbAuthx "github.com/nalej/grpc-authx-go"
+	"github.com/nalej/grpc-device-go"
 	"github.com/nalej/grpc-organization-go"
 	"github.com/nalej/grpc-user-go"
 	"time"
@@ -28,17 +30,17 @@ type Authx struct {
 	Token               Token
 	CredentialsProvider credentials.BasicCredentials
 	RoleProvider        role.Role
-
+	DeviceProvider      device.Provider
 	secret             string
 	expirationDuration time.Duration
 }
 
 // NewAuthx creates a new manager.
 func NewAuthx(password Password, tokenManager Token, credentialsProvider credentials.BasicCredentials,
-	roleProvide role.Role, secret string, expirationDuration time.Duration) *Authx {
+	roleProvide role.Role, deviceProvider device.Provider, secret string, expirationDuration time.Duration) *Authx {
 
 	return &Authx{Password: password, Token: tokenManager,
-		CredentialsProvider: credentialsProvider, RoleProvider: roleProvide,
+		CredentialsProvider: credentialsProvider, RoleProvider: roleProvide, DeviceProvider:deviceProvider,
 		secret: secret, expirationDuration: expirationDuration}
 
 }
@@ -48,7 +50,7 @@ func NewAuthxMockup() *Authx {
 	d, _ := time.ParseDuration(DefaultExpirationDuration)
 	return NewAuthx(NewBCryptPassword(), NewJWTTokenMockup(),
 		credentials.NewBasicCredentialMockup(), role.NewRoleMockup(),
-		DefaultSecret, d)
+		device.NewMockupDeviceCredentialsProvider(),DefaultSecret, d)
 }
 
 // DeleteCredentials deletes the credential for a specific username.
@@ -182,6 +184,11 @@ func (m *Authx) Clean() derrors.Error {
 	if err != nil {
 		return err
 	}
+	err = m.DeviceProvider.Clear()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -192,4 +199,158 @@ func PrimitivesToString(primitives [] pbAuthx.AccessPrimitive) [] string {
 		strPrimitives = append(strPrimitives, p.String())
 	}
 	return strPrimitives
+}
+
+// -- Device Credentials -- //
+func (m * Authx) AddDeviceCredentials(deviceCredentials * pbAuthx.AddDeviceCredentialsRequest) (*entities.DeviceCredentials, derrors.Error) {
+
+	exists, err := m.DeviceProvider.ExistsDeviceGroup(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId)
+	if err != nil {
+		return nil, err
+	}
+	if ! exists{
+		return nil, derrors.NewNotFoundError("deviceGroupID").WithParams(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId)
+	}
+	toAdd := entities.NewDeviceCredentialsFromGRPC(deviceCredentials)
+	err =  m.DeviceProvider.AddDeviceCredentials(toAdd)
+	if err != nil{
+		return nil, err
+	}
+	return toAdd, nil
+}
+
+func (m * Authx) UpdateDeviceCredentials (deviceCredentials * pbAuthx.UpdateDeviceCredentialsRequest) derrors.Error {
+	// Check if the credentials exists
+	exists, err := m.DeviceProvider.ExistsDevice(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId, deviceCredentials.DeviceId)
+	if err != nil {
+		return err
+	}
+	if !exists{
+		return derrors.NewNotFoundError("device credentials").WithParams(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId, deviceCredentials.DeviceId)
+	}
+
+	toUpdate, err := m.DeviceProvider.GetDevice(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId, deviceCredentials.DeviceId)
+	if err != nil {
+		return err
+	}
+
+	toUpdate.Enabled = deviceCredentials.Enabled
+
+	err = m.DeviceProvider.UpdateDeviceCredentials(toUpdate)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m * Authx) RemoveDeviceCredentials (deviceCredentials * grpc_device_go.DeviceId) derrors.Error {
+
+	exists, err := m.DeviceProvider.ExistsDevice(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId, deviceCredentials.DeviceId)
+	if err != nil {
+		return err
+	}
+	if !exists{
+		return derrors.NewNotFoundError("device credentials").WithParams(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId, deviceCredentials.DeviceId)
+	}
+
+	err = m.DeviceProvider.RemoveDevice(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId, deviceCredentials.DeviceId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// TODO: implement this method
+func (m * Authx) LoginDeviceCredentials (loginRequest * pbAuthx.DeviceLoginRequest) (*pbAuthx.LoginResponse, derrors.Error) {
+
+	/*credentials, err := m.CredentialsProvider.Get(username)
+	if err != nil {
+		return nil, err
+	}
+	err = m.Password.CompareHashAndPassword(credentials.Password, password)
+	if err != nil {
+		return nil, err
+	}
+	role, err := m.RoleProvider.Get(credentials.OrganizationID, credentials.RoleID)
+	if err != nil {
+		return nil, err
+	}
+	personalClaim := token.NewPersonalClaim(username, role.Name, role.Primitives, credentials.OrganizationID)
+	gToken, err := m.Token.Generate(personalClaim, m.expirationDuration, m.secret)
+	if err != nil {
+
+		return nil, err
+	}
+	response := &pbAuthx.LoginResponse{Token: gToken.Token, RefreshToken: gToken.RefreshToken}
+	*/
+
+	credentials, err := m.DeviceProvider.GetDeviceByApiKey(loginRequest.DeviceApiKey)
+	if err != nil {
+		return nil, err
+	}
+
+	if credentials.OrganizationID != loginRequest.OrganizationId {
+		return nil, derrors.NewUnauthenticatedError("Invalid credentials")
+	}
+
+	return nil, nil
+}
+
+func (m * Authx) AddDeviceGroupCredentials(groupCredentials *pbAuthx.AddDeviceGroupCredentialsRequest) (*entities.DeviceGroupCredentials, derrors.Error){
+
+	toAdd := entities.NewDeviceGroupCredentialsFromGRPC(groupCredentials)
+	err := m.DeviceProvider.AddDeviceGroupCredentials(toAdd)
+	if err != nil{
+		return nil, err
+	}
+	return toAdd, nil
+}
+
+func (m * Authx) UpdateDeviceGroupCredentials(groupCredentials * pbAuthx.UpdateDeviceGroupCredentialsRequest) derrors.Error {
+	// Check if the credentials exists
+	exists, err := m.DeviceProvider.ExistsDeviceGroup(groupCredentials.OrganizationId, groupCredentials.DeviceGroupId)
+	if err != nil {
+		return err
+	}
+	if !exists{
+		return derrors.NewNotFoundError("device group credentials").WithParams(groupCredentials.OrganizationId, groupCredentials.DeviceGroupId)
+	}
+
+	toUpdate, err := m.DeviceProvider.GetDeviceGroup(groupCredentials.OrganizationId, groupCredentials.DeviceGroupId)
+	if err != nil {
+		return err
+	}
+	if groupCredentials.UpdateEnabled {
+		toUpdate.Enabled = groupCredentials.Enabled
+	}
+	if groupCredentials.UpdateDeviceConnectivity {
+		toUpdate.DefaultDeviceConnectivity = groupCredentials.DefaultDeviceConnectivity
+	}
+
+	err = m.DeviceProvider.UpdateDeviceGroupCredentials(toUpdate)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m * Authx) RemoveDeviceGroupCredentials(groupCredentials * grpc_device_go.DeviceGroupId) derrors.Error {
+
+	exists, err := m.DeviceProvider.ExistsDeviceGroup(groupCredentials.OrganizationId, groupCredentials.DeviceGroupId)
+	if err != nil {
+		return err
+	}
+	if !exists{
+		return derrors.NewNotFoundError("device group credentials").WithParams(groupCredentials.OrganizationId, groupCredentials.DeviceGroupId)
+	}
+
+	err = m.DeviceProvider.RemoveDeviceGroup(groupCredentials.OrganizationId, groupCredentials.DeviceGroupId)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
