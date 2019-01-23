@@ -465,12 +465,26 @@ func (sp * ScyllaDeviceCredentialsProvider) RemoveDevice (organizationId string,
 	return nil
 }
 func (sp * ScyllaDeviceCredentialsProvider) ClearDevice() derrors.Error {
+	sp.Lock()
+	defer sp.Unlock()
+
+	// check connection
+	if err := sp.checkConnectionAndConnect(); err != nil {
+		return err
+	}
+
+	// delete clusters table
+	err := sp.Session.Query(fmt.Sprintf("TRUNCATE TABLE %s", deviceCredentialsTable)).Exec()
+	if err != nil {
+		log.Error().Str("trace", conversions.ToDerror(err).DebugReport()).Msg("failed to truncate the device credentials table")
+		return derrors.AsError(err, "cannot truncate device table")
+	}
 	return nil
 }
 
 func (sp * ScyllaDeviceCredentialsProvider) Clear()  derrors.Error{
 
-	/*err := sp.ClearDeviceGroup()
+	err := sp.ClearDeviceGroup()
 	if err != nil {
 		return err
 	}
@@ -479,7 +493,7 @@ func (sp * ScyllaDeviceCredentialsProvider) Clear()  derrors.Error{
 	if err != nil {
 		return err
 	}
-	*/
+
 	return nil
 }
 

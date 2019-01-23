@@ -38,6 +38,13 @@ func TokenContexts(provider Token) {
 			gomega.Expect(t).To(gomega.BeNil())
 
 		})
+		ginkgo.It("should be able to update the token", func() {
+			token.ExpirationDate = time.Now().Add(time.Second*2).Unix()
+			token.RefreshToken = []byte("r2")
+			err := provider.Update(token)
+			gomega.Expect(err).To(gomega.Succeed())
+		})
+
 
 	})
 	ginkgo.Context("empty data store", func() {

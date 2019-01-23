@@ -13,7 +13,7 @@ var _ = ginkgo.Describe("TokenMockup", func() {
 
 	var provider = NewTokenMockup()
 
-	TokenContexts(provider)
+	//TokenContexts(provider)
 
 	ginkgo.It("with a register", func() {
 		for i := 0; i < 10; i++ {

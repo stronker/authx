@@ -11,6 +11,11 @@ data:
     create table IF NOT EXISTS authx.credentials (username text, password blob, role_id text, organization_id text, PRIMARY KEY (username));
     create table IF NOT EXISTS authx.roles (organization_id text, role_id text, name text, internal boolean, primitives list<text>, PRIMARY KEY (organization_id, role_id));
     create table IF NOT EXISTS authx.tokens (username text, token_id text, refresh_token blob, expiration_date bigint, PRIMARY KEY (username, token_id));
+    create table IF NOT EXISTS authx.deviceCredentials (organization_id text, device_group_id text, device_id text, device_api_key text, enabled boolean, PRIMARY KEY ((organization_id, device_group_id), device_id));
+    create table IF NOT EXISTS authx.deviceGroupCredentials (organization_id text, device_group_id text,  device_group_api_key text, enabled boolean, default_device_connectivity boolean, PRIMARY KEY (organization_id, device_group_id));
+    create INDEX IF NOT EXISTS device_group_api ON authx.devicegroupcredentials ( device_group_api_key);
+    create INDEX IF NOT EXISTS device_api ON authx.devicecredentials ( device_api_key);
+
   node_alive.sh: |
     #!/bin/bash
     echo 'executing script...'

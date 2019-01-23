@@ -8,7 +8,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/nalej/authx/internal/app/authx/entities"
 	nalejToken "github.com/nalej/authx/internal/app/authx/providers/token"
-	 "github.com/nalej/authx/pkg/token"
+	"github.com/nalej/authx/pkg/token"
 	"github.com/nalej/derrors"
 	"github.com/rs/zerolog/log"
 	"time"
@@ -33,7 +33,7 @@ func NewGeneratedToken(token string, refreshToken string) *GeneratedToken {
 type Token interface {
 	// Generate a new token with the personal claim.
 	Generate(personalClaim *token.PersonalClaim, expirationPeriod time.Duration,
-		secret string) (*GeneratedToken, derrors.Error)
+		secret string, update bool) (*GeneratedToken, derrors.Error)
 	// Refresh renew an old token.
 	Refresh(oldToken string, refreshToken string,
 		expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error)
@@ -60,7 +60,7 @@ func NewJWTTokenMockup() Token {
 
 // Generate a new JWT token with the personal claim.
 func (m *JWTToken) Generate(personalClaim *token.PersonalClaim, expirationPeriod time.Duration,
-	secret string) (*GeneratedToken, derrors.Error) {
+	secret string, update bool) (*GeneratedToken, derrors.Error) {
 
 	claim := token.NewClaim(*personalClaim, Issuer, time.Now(), expirationPeriod)
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
@@ -76,6 +76,8 @@ func (m *JWTToken) Generate(personalClaim *token.PersonalClaim, expirationPeriod
 	}
 	tokenData := entities.NewTokenData(claim.UserID, claim.Id, hashedRefreshToken, claim.ExpiresAt)
 	err = m.TokenProvider.Add(tokenData)
+	err = m.TokenProvider.Update(tokenData)
+
 	if err != nil {
 		return nil, derrors.NewInternalError("impossible store RefreshToken", err)
 	}
@@ -115,7 +117,7 @@ func (m *JWTToken) Refresh(oldToken string, refreshToken string,
 		return nil, derrors.NewUnauthenticatedError("the refresh token is not valid", err)
 	}
 
-	gt, err := m.Generate(&cl.PersonalClaim, expirationPeriod, secret)
+	gt, err := m.Generate(&cl.PersonalClaim, expirationPeriod, secret, true)
 	if err != nil {
 		return nil, derrors.NewInternalError("impossible create new token", err)
 	}
@@ -124,6 +126,7 @@ func (m *JWTToken) Refresh(oldToken string, refreshToken string,
 	if err != nil {
 		log.Warn().Err(err).Msg("impossible delete refresh token")
 	}
+
 	return gt, nil
 }
 

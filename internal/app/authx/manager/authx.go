@@ -20,6 +20,7 @@ import (
 
 // DefaultExpirationDuration is the default duration used in the mockup.
 const DefaultExpirationDuration = "10h"
+const DefaultDeviceExpirationDuration = "10m"
 
 // DefaultSecret is the default secret used in the mockup.
 const DefaultSecret = "MyLittleSecret"
@@ -33,24 +34,36 @@ type Authx struct {
 	DeviceProvider      device.Provider
 	secret             string
 	expirationDuration time.Duration
+	DeviceToken			DeviceToken
+	DeviceExpiration    time.Duration
 }
 
 // NewAuthx creates a new manager.
-func NewAuthx(password Password, tokenManager Token, credentialsProvider credentials.BasicCredentials,
-	roleProvide role.Role, deviceProvider device.Provider, secret string, expirationDuration time.Duration) *Authx {
+func NewAuthx(password Password, tokenManager Token, deviceToken DeviceToken, credentialsProvider credentials.BasicCredentials,
+	roleProvide role.Role, deviceProvider device.Provider, secret string, expirationDuration time.Duration, deviceExpiration time.Duration) *Authx {
 
-	return &Authx{Password: password, Token: tokenManager,
-		CredentialsProvider: credentialsProvider, RoleProvider: roleProvide, DeviceProvider:deviceProvider,
-		secret: secret, expirationDuration: expirationDuration}
+	return &Authx{
+		Password: password,
+		Token: tokenManager,
+		CredentialsProvider: credentialsProvider,
+		RoleProvider: roleProvide,
+		DeviceProvider:deviceProvider,
+		secret: secret,
+		expirationDuration: expirationDuration,
+		DeviceToken: deviceToken,
+		DeviceExpiration: deviceExpiration,
+
+	}
 
 }
 
 // NewAuthxMockup create a new mockup manager.
 func NewAuthxMockup() *Authx {
 	d, _ := time.ParseDuration(DefaultExpirationDuration)
-	return NewAuthx(NewBCryptPassword(), NewJWTTokenMockup(),
+	e, _ := time.ParseDuration(DefaultDeviceExpirationDuration)
+	return NewAuthx(NewBCryptPassword(), NewJWTTokenMockup(), NewJWTDeviceTokenMockup(),
 		credentials.NewBasicCredentialMockup(), role.NewRoleMockup(),
-		device.NewMockupDeviceCredentialsProvider(),DefaultSecret, d)
+		device.NewMockupDeviceCredentialsProvider(),DefaultSecret, d, e)
 }
 
 // DeleteCredentials deletes the credential for a specific username.
@@ -97,7 +110,7 @@ func (m *Authx) LoginWithBasicCredentials(username string, password string) (*pb
 		return nil, err
 	}
 	personalClaim := token.NewPersonalClaim(username, role.Name, role.Primitives, credentials.OrganizationID)
-	gToken, err := m.Token.Generate(personalClaim, m.expirationDuration, m.secret)
+	gToken, err := m.Token.Generate(personalClaim, m.expirationDuration, m.secret, false)
 	if err != nil {
 
 		return nil, err
@@ -262,29 +275,7 @@ func (m * Authx) RemoveDeviceCredentials (deviceCredentials * grpc_device_go.Dev
 	return nil
 }
 
-// TODO: implement this method
 func (m * Authx) LoginDeviceCredentials (loginRequest * pbAuthx.DeviceLoginRequest) (*pbAuthx.LoginResponse, derrors.Error) {
-
-	/*credentials, err := m.CredentialsProvider.Get(username)
-	if err != nil {
-		return nil, err
-	}
-	err = m.Password.CompareHashAndPassword(credentials.Password, password)
-	if err != nil {
-		return nil, err
-	}
-	role, err := m.RoleProvider.Get(credentials.OrganizationID, credentials.RoleID)
-	if err != nil {
-		return nil, err
-	}
-	personalClaim := token.NewPersonalClaim(username, role.Name, role.Primitives, credentials.OrganizationID)
-	gToken, err := m.Token.Generate(personalClaim, m.expirationDuration, m.secret)
-	if err != nil {
-
-		return nil, err
-	}
-	response := &pbAuthx.LoginResponse{Token: gToken.Token, RefreshToken: gToken.RefreshToken}
-	*/
 
 	credentials, err := m.DeviceProvider.GetDeviceByApiKey(loginRequest.DeviceApiKey)
 	if err != nil {
@@ -295,7 +286,17 @@ func (m * Authx) LoginDeviceCredentials (loginRequest * pbAuthx.DeviceLoginReque
 		return nil, derrors.NewUnauthenticatedError("Invalid credentials")
 	}
 
-	return nil, nil
+	deviceClaim := token.NewDeviceClaim(credentials.OrganizationID, credentials.DeviceGroupID, credentials.DeviceGroupID)
+
+	gToken, err := m.DeviceToken.Generate(deviceClaim, m.DeviceExpiration, m.secret, false)
+	if err != nil {
+
+		return nil, err
+	}
+	response := &pbAuthx.LoginResponse{Token: gToken.Token, RefreshToken: gToken.RefreshToken}
+
+	return response, nil
+
 }
 
 func (m * Authx) AddDeviceGroupCredentials(groupCredentials *pbAuthx.AddDeviceGroupCredentialsRequest) (*entities.DeviceGroupCredentials, derrors.Error){
@@ -353,4 +354,17 @@ func (m * Authx) RemoveDeviceGroupCredentials(groupCredentials * grpc_device_go.
 	}
 
 	return nil
+}
+
+func (m * Authx) LoginDeviceGroup (credentials *pbAuthx.DeviceGroupLoginRequest) derrors.Error  {
+
+	group, err := m.DeviceProvider.GetDeviceGroupByApiKey(credentials.DeviceGroupApiKey)
+	if err != nil {
+		return err
+	}
+	if group.OrganizationID != credentials.OrganizationId{
+		return derrors.NewUnauthenticatedError("Invalid credentials")
+	}
+	return nil
+
 }

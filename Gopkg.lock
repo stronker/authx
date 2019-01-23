@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1a5f28249f1a5b118994359a1c7b8c53ee1ff47aa7fe65884fbd20cd237001f4"
+  digest = "1:fca839d5e4677fafc9b15b4b3e3b3df0cd9c5f1b255f02f4e4ce611d48ab89c3"
   name = "github.com/gocql/gocql"
   packages = [
     ".",
@@ -20,7 +20,7 @@
     "internal/streams",
   ]
   pruneopts = "UT"
-  revision = "70385f88b28b43805bd83d212169ab2d38810b15"
+  revision = "30de9a1866a84c5cf21c2722b09ee6acac943084"
 
 [[projects]]
   digest = "1:5d1b5a25486fc7d4e133646d834f6fca7ba1cef9903d40e7aa786c41b89e9e91"
@@ -92,12 +92,12 @@
   version = "v2.0.0"
 
 [[projects]]
-  digest = "1:a80a818741d7fafa0d56baddb85077cd8ee85913b65aec8a4e756963193e0175"
+  digest = "1:d39128b9ec67bc2760a5d9b588744c34865560ad49859cb3082d4e21243f56f5"
   name = "github.com/nalej/grpc-authx-go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "31320613d12fb6f511a5bf44f5f56610d305daed"
-  version = "v0.0.36"
+  revision = "c9ccebe6eb9665663dbd94d0b4bae3d51a000c95"
+  version = "v0.0.37"
 
 [[projects]]
   digest = "1:44dfeb321f4866e9e786f9e8a4c6c95af0216065f013273e06a10ca54aa9d1d2"
@@ -240,7 +240,7 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "64072686203f69e3fd20143576b27200f18ab0fa"
+  revision = "057139ce5d2bdbe6fe73c53679e24e9cf007f637"
 
 [[projects]]
   branch = "master"
@@ -263,11 +263,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:64ec1e1de5cec5e1579df2ff7ac10b20e3bf1cb4393846f631fb204dd9cb44f6"
+  digest = "1:db12953ac7a80656b159265fe13146959beaada45938a532f484a3aeb289462e"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "054c452bb702e465e95ce8e7a3d9a6cf0cd1188d"
+  revision = "c6b37f3e92850b723493d63fd35aad34e19e048d"
 
 [[projects]]
   digest = "1:436b24586f8fee329e0dd65fd67c817681420cda1d7f934345c13fe78c212a73"
@@ -313,7 +313,7 @@
     "googleapis/rpc/status",
   ]
   pruneopts = "UT"
-  revision = "db91494dd46c1fdcbbde05e5ff5eb56df8f7d79a"
+  revision = "8819c946db4494a2259bf100a377f51aa585d893"
 
 [[projects]]
   digest = "1:61ea4e024f5a9353eb1f012e260dd57e17bf20c33a3f86857f457ce7f7a559a8"

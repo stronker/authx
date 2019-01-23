@@ -80,7 +80,9 @@ func (s *Service) Run() {
 	//credProvider := credentials.NewBasicCredentialMockup()
 	passwordMgr := manager.NewBCryptPassword()
 	tokenMgr := manager.NewJWTTokenMockup()
-	authxMgr := manager.NewAuthx(passwordMgr, tokenMgr, p.credProvider, p.roleProvider, p.devProvider, s.Secret, s.ExpirationTime)
+	deviceMgr := manager.NewJWTDeviceTokenMockup()
+	authxMgr := manager.NewAuthx(passwordMgr, tokenMgr,deviceMgr, p.credProvider, p.roleProvider, p.devProvider,
+		s.Secret, s.ExpirationTime, s.DeviceExpirationTime)
 
 	h := handler.NewAuthx(authxMgr)
 

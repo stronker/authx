@@ -401,12 +401,66 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(success).To(gomega.BeNil())
 
 		})
+		ginkgo.It("Should be able to login a device", func() {
+			toAdd := pbAuthx.AddDeviceCredentialsRequest{
+				OrganizationId:  targetDeviceGroup.OrganizationId,
+				DeviceGroupId:  targetDeviceGroup.DeviceGroupId,
+				DeviceId: uuid.New().String(),
+			}
+			added, err := client.AddDeviceCredentials(context.Background(), &toAdd)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(added.DeviceApiKey).NotTo(gomega.BeEmpty())
 
+			toLogin := pbAuthx.DeviceLoginRequest{
+				OrganizationId: toAdd.OrganizationId,
+				DeviceApiKey: added.DeviceApiKey,
+			}
+			loginReponse, err := client.DeviceLogin(context.Background(),&toLogin)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(loginReponse).NotTo(gomega.BeNil())
+
+		})
+		ginkgo.It("Should not be able to login a device in a wrong organization", func() {
+			toAdd := pbAuthx.AddDeviceCredentialsRequest{
+				OrganizationId:  targetDeviceGroup.OrganizationId,
+				DeviceGroupId:  targetDeviceGroup.DeviceGroupId,
+				DeviceId: uuid.New().String(),
+			}
+			added, err := client.AddDeviceCredentials(context.Background(), &toAdd)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(added.DeviceApiKey).NotTo(gomega.BeEmpty())
+
+			toLogin := pbAuthx.DeviceLoginRequest{
+				OrganizationId: uuid.New().String(),
+				DeviceApiKey: added.DeviceApiKey,
+			}
+			_, err = client.DeviceLogin(context.Background(),&toLogin)
+			gomega.Expect(err).NotTo(gomega.Succeed())
+
+		})
+		ginkgo.It("Should not be able to login a device in a wrong group", func() {
+			toAdd := pbAuthx.AddDeviceCredentialsRequest{
+				OrganizationId:  targetDeviceGroup.OrganizationId,
+				DeviceGroupId:  targetDeviceGroup.DeviceGroupId,
+				DeviceId: uuid.New().String(),
+			}
+			added, err := client.AddDeviceCredentials(context.Background(), &toAdd)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(added.DeviceApiKey).NotTo(gomega.BeEmpty())
+
+			toLogin := pbAuthx.DeviceLoginRequest{
+				OrganizationId: targetDeviceGroup.OrganizationId,
+				DeviceApiKey: uuid.New().String(),
+			}
+			_, err = client.DeviceLogin(context.Background(),&toLogin)
+			gomega.Expect(err).NotTo(gomega.Succeed())
+
+		})
 
 	})
 
 	ginkgo.Context("with device group credentials", func(){
-		ginkgo.FIt("should be able to add a device group credentials", func() {
+		ginkgo.It("should be able to add a device group credentials", func() {
 			toAdd := pbAuthx.AddDeviceGroupCredentialsRequest{
 				OrganizationId:  uuid.New().String(),
 				DeviceGroupId:  uuid.New().String(),
@@ -415,7 +469,7 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(added.DeviceGroupApiKey).NotTo(gomega.BeEmpty())
 		})
-		ginkgo.FIt("should not be able to add a device group credentials without organization_id", func() {
+		ginkgo.It("should not be able to add a device group credentials without organization_id", func() {
 			toAdd := pbAuthx.AddDeviceGroupCredentialsRequest{
 				DeviceGroupId:  uuid.New().String(),
 			}
@@ -423,7 +477,7 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(err).NotTo(gomega.Succeed())
 		})
 
-		ginkgo.FIt("should be able to update a device group credentials", func() {
+		ginkgo.It("should be able to update a device group credentials", func() {
 			toAdd := pbAuthx.AddDeviceGroupCredentialsRequest{
 				OrganizationId:  uuid.New().String(),
 				DeviceGroupId:  uuid.New().String(),
@@ -442,7 +496,7 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(success).NotTo(gomega.BeNil())
 		})
-		ginkgo.FIt("should not be able to update a device group credentials with all flags to false", func() {
+		ginkgo.It("should not be able to update a device group credentials with all flags to false", func() {
 			toAdd := pbAuthx.AddDeviceGroupCredentialsRequest{
 				OrganizationId:  uuid.New().String(),
 				DeviceGroupId:  uuid.New().String(),
@@ -461,7 +515,7 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(err).NotTo(gomega.Succeed())
 			gomega.Expect(success).To(gomega.BeNil())
 		})
-		ginkgo.FIt("should not be able to update a non existing device group credentials", func() {
+		ginkgo.It("should not be able to update a non existing device group credentials", func() {
 
 			toUpdate := pbAuthx.UpdateDeviceGroupCredentialsRequest{
 				OrganizationId:  uuid.New().String(),
@@ -474,7 +528,7 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(success).To(gomega.BeNil())
 		})
 
-		ginkgo.FIt("should be able to remove a device group credentials", func() {
+		ginkgo.It("should be able to remove a device group credentials", func() {
 			toAdd := pbAuthx.AddDeviceGroupCredentialsRequest{
 				OrganizationId:  uuid.New().String(),
 				DeviceGroupId:  uuid.New().String(),
@@ -491,7 +545,7 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(success).NotTo(gomega.BeNil())
 		})
-		ginkgo.FIt("should not be able to remove a non existing device group credentials", func() {
+		ginkgo.It("should not be able to remove a non existing device group credentials", func() {
 
 			toRemove := grpc_device_go.DeviceGroupId{
 				OrganizationId:   uuid.New().String(),
@@ -502,6 +556,41 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(success).To(gomega.BeNil())
 		})
 
+		ginkgo.It("Should be able to login a device group", func() {
+			toAdd := pbAuthx.AddDeviceGroupCredentialsRequest{
+				OrganizationId:  uuid.New().String(),
+				DeviceGroupId:  uuid.New().String(),
+			}
+			added, err := client.AddDeviceGroupCredentials(context.Background(), &toAdd)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(added.DeviceGroupApiKey).NotTo(gomega.BeEmpty())
+
+			toLogin := pbAuthx.DeviceGroupLoginRequest{
+				OrganizationId: toAdd.OrganizationId,
+				DeviceGroupApiKey: added.DeviceGroupApiKey,
+			}
+			success, err := client.DeviceGroupLogin(context.Background(),&toLogin)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(success).NotTo(gomega.BeNil())
+
+		})
+		ginkgo.It("Should be able to login a device group in other organization", func() {
+			toAdd := pbAuthx.AddDeviceGroupCredentialsRequest{
+				OrganizationId:  uuid.New().String(),
+				DeviceGroupId:  uuid.New().String(),
+			}
+			added, err := client.AddDeviceGroupCredentials(context.Background(), &toAdd)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(added.DeviceGroupApiKey).NotTo(gomega.BeEmpty())
+
+			toLogin := pbAuthx.DeviceGroupLoginRequest{
+				OrganizationId: uuid.New().String(),
+				DeviceGroupApiKey: added.DeviceGroupApiKey,
+			}
+			_, err = client.DeviceGroupLogin(context.Background(),&toLogin)
+			gomega.Expect(err).NotTo(gomega.Succeed())
+
+		})
 	})
 
 	ginkgo.AfterEach(func() {

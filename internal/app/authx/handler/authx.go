@@ -241,9 +241,11 @@ func (h * Authx) DeviceLogin(ctx context.Context, loginRequest *pbAuthx.DeviceLo
 		return nil, conversions.ToGRPCError(vErr)
 	}
 
-	h.Manager.LoginDeviceCredentials(loginRequest)
-
-	return nil, nil
+	response, err := h.Manager.LoginDeviceCredentials(loginRequest)
+	if err != nil {
+		return nil, conversions.ToGRPCError(err)
+	}
+	return response, nil
 }
 
 // AddDeviceGroupCredentials adds a device in the system
@@ -289,5 +291,17 @@ func (h * Authx) RemoveDeviceGroupCredentials(ctx context.Context, credentials *
 
 }
 // DeviceGroupLogin checks if the device group credentials are valid
-func (h * Authx) DeviceGroupLogin(ctx context.Context, in *grpc_authx_go.DeviceGroupLoginRequest) (*pbCommon.Success, error){return nil, nil}
+func (h * Authx) DeviceGroupLogin(ctx context.Context, credentials *grpc_authx_go.DeviceGroupLoginRequest) (*pbCommon.Success, error){
+	vErr := entities.ValidDeviceGroupLoginRequest(credentials)
+	if vErr != nil {
+		return nil, conversions.ToDerror(vErr)
+	}
+	err := h.Manager.LoginDeviceGroup(credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pbCommon.Success{}, nil
+
+}
 
