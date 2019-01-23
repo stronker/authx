@@ -45,10 +45,6 @@ func NewJWTDeviceTokenMockup() DeviceToken {
 func (m *JWTDeviceToken) Generate(deviceClaim *token.DeviceClaim, expirationPeriod time.Duration,
 	secret string, update bool) (*GeneratedToken, derrors.Error) {
 
-	//claim := token.NewDeviceClaim(deviceClaim.OrganizationID, deviceClaim.DeviceGroupID,
-	//	deviceClaim.DeviceID, deviceClaim.Primitives,
-	//	Issuer, time.Now(), expirationPeriod)
-
 	deviceClaim.ExpiresAt = time.Now().Add(expirationPeriod).Unix()
 
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, deviceClaim)
