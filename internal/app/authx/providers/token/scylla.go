@@ -249,6 +249,36 @@ func (sp *ScyllaTokenProvider) Exist(username string, tokenID string) (*bool, de
 	return &ok, nil
 }
 
+func (sp *ScyllaTokenProvider) Update(token *entities.TokenData) derrors.Error{
+	sp.Lock()
+	defer sp.Unlock()
+
+	if err := sp.checkConnectionAndConnect(); err != nil {
+		return err
+	}
+
+	exists, err := sp.unsafeExist(token.Username, token.TokenID)
+	if err != nil {
+		return err
+	}
+	if !*exists {
+		return  derrors.NewNotFoundError("token").WithParams(token.Username, token.TokenID)
+	}
+
+	// add new basic credential
+	stmt, names := qb.Update(table).Set("expiration_date", "refresh_token").
+		Where(qb.Eq(tablePK_1)).Where(qb.Eq(tablePK_2)).TTL(ttlExpired).
+		ToCql()
+	q := gocqlx.Query(sp.Session.Query(stmt), names).BindStruct(token)
+	cqlErr := q.ExecRelease()
+
+	if cqlErr != nil {
+		return derrors.AsError(cqlErr, "cannot update token")
+	}
+
+	return  nil
+}
+
 // Truncate cleans all data.
 func (sp *ScyllaTokenProvider) Truncate() derrors.Error{
 

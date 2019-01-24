@@ -20,6 +20,8 @@ type Token interface {
 	Get(username string, tokenID string) (*entities.TokenData, derrors.Error)
 	// Exist checks if the token was added.
 	Exist(username string, tokenID string) (*bool, derrors.Error)
+	// Update an existing token
+	Update(token *entities.TokenData) derrors.Error
 	// Truncate cleans all data.
 	Truncate() derrors.Error
 

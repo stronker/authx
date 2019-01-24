@@ -23,6 +23,11 @@ func NewTokenMockup() Token {
 	return &TokenMockup{data: make(map[string]entities.TokenData,0)}
 }
 
+func (p *TokenMockup) unsafeExists (username string, tokenID string) bool {
+	_, ok := p.data[p.generateID(tokenID, username)]
+	return ok
+}
+
 func (p *TokenMockup) unsafeGet(username string, tokenID string) (*entities.TokenData, derrors.Error) {
 
 	data, ok := p.data[p.generateID(tokenID, username)]
@@ -52,6 +57,9 @@ func (p *TokenMockup) Delete(username string, tokenID string) derrors.Error {
 func (p *TokenMockup) Add(token *entities.TokenData) derrors.Error {
 	p.Lock()
 	defer p.Unlock()
+	if p.unsafeExists(token.Username, token.TokenID){
+		return derrors.NewAlreadyExistsError("token").WithParams(token.Username, token.TokenID)
+	}
 	p.data[p.generateID(token.TokenID, token.Username)] = *token
 	return nil
 }
@@ -73,6 +81,18 @@ func (p *TokenMockup) Exist(username string, tokenID string) (*bool, derrors.Err
 	defer p.Unlock()
 	_, ok := p.data[p.generateID(tokenID, username)]
 	return &ok, nil
+}
+
+func (p *TokenMockup) Update(token *entities.TokenData) derrors.Error{
+
+	p.Lock()
+	defer p.Unlock()
+
+	if ! p.unsafeExists(token.Username, token.TokenID){
+		return  derrors.NewNotFoundError("token").WithParams(token.Username, token.TokenID)
+	}
+	p.data[p.generateID(token.TokenID, token.Username)] = *token
+	return nil
 }
 
 // Truncate cleans all data.
