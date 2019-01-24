@@ -121,7 +121,7 @@ func (m * MockupDeviceCredentialsProvider) RemoveDeviceGroup (organizationId str
 
 	return nil
 }
-func (m * MockupDeviceCredentialsProvider) ClearDeviceGroup() derrors.Error {
+func (m * MockupDeviceCredentialsProvider) TruncateDeviceGroup() derrors.Error {
 	m.groupCredentials = make(map[string] entities.DeviceGroupCredentials, 0)
 	m.groupByApyKey = make(map[string] entities.DeviceGroupCredentials, 0)
 	return nil
@@ -220,15 +220,15 @@ func (m * MockupDeviceCredentialsProvider) RemoveDevice (organizationId string, 
 	delete (m.deviceByApiKey, device.DeviceApiKey)
 	return nil
 }
-func (m * MockupDeviceCredentialsProvider) ClearDevice() {
+func (m * MockupDeviceCredentialsProvider) TruncateDevice() {
 	m.deviceCredentials = make(map[string]entities.DeviceCredentials, 0)
 	m.deviceByApiKey = make(map[string]entities.DeviceCredentials, 0)
 }
 
 // -------------
 
-func (m * MockupDeviceCredentialsProvider) Clear() derrors.Error  {
-	m.ClearDevice()
-	m.ClearDeviceGroup()
+func (m * MockupDeviceCredentialsProvider) Truncate() derrors.Error  {
+	m.TruncateDevice()
+	m.TruncateDeviceGroup()
 	return nil
 }

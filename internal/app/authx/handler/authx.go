@@ -305,3 +305,17 @@ func (h * Authx) DeviceGroupLogin(ctx context.Context, credentials *grpc_authx_g
 
 }
 
+// RefreshDeviceToken renews an existing token.
+func (h *Authx) RefreshDeviceToken(_ context.Context, request *pbAuthx.RefreshTokenRequest) (*pbAuthx.LoginResponse, error) {
+
+	vErr := entities.ValidRefreshToken(request)
+	if vErr != nil {
+		return nil, conversions.ToDerror(vErr)
+	}
+
+	response, err := h.Manager.RefreshDeviceToken(request.Token, request.RefreshToken)
+	if err != nil {
+		return nil, conversions.ToGRPCError(err)
+	}
+	return response, nil
+}

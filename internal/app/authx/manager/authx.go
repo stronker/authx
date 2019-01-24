@@ -197,7 +197,7 @@ func (m *Authx) Clean() derrors.Error {
 	if err != nil {
 		return err
 	}
-	err = m.DeviceProvider.Clear()
+	err = m.DeviceProvider.Truncate()
 	if err != nil {
 		return err
 	}
@@ -217,6 +217,7 @@ func PrimitivesToString(primitives [] pbAuthx.AccessPrimitive) [] string {
 // -- Device Credentials -- //
 func (m * Authx) AddDeviceCredentials(deviceCredentials * pbAuthx.AddDeviceCredentialsRequest) (*entities.DeviceCredentials, derrors.Error) {
 
+	// Check if the group exists
 	exists, err := m.DeviceProvider.ExistsDeviceGroup(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId)
 	if err != nil {
 		return nil, err
@@ -224,6 +225,16 @@ func (m * Authx) AddDeviceCredentials(deviceCredentials * pbAuthx.AddDeviceCrede
 	if ! exists{
 		return nil, derrors.NewNotFoundError("deviceGroupID").WithParams(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId)
 	}
+
+	// Get the group to review if it is enable
+	group, err := m.DeviceProvider.GetDeviceGroup(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId)
+	if err != nil {
+		return nil, err
+	}
+	if ! group.Enabled {
+		return nil, derrors.NewPermissionDeniedError("the group is temporarily disabled").WithParams(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId)
+	}
+
 	toAdd := entities.NewDeviceCredentialsFromGRPC(deviceCredentials)
 	err =  m.DeviceProvider.AddDeviceCredentials(toAdd)
 	if err != nil{
@@ -284,6 +295,16 @@ func (m * Authx) LoginDeviceCredentials (loginRequest * pbAuthx.DeviceLoginReque
 
 	if credentials.OrganizationID != loginRequest.OrganizationId {
 		return nil, derrors.NewUnauthenticatedError("Invalid credentials")
+	}
+
+	// Get the group to review if it is enable
+	group, err := m.DeviceProvider.GetDeviceGroup(credentials.OrganizationID, credentials.DeviceGroupID)
+	if err != nil {
+		return nil, err
+	}
+	// if the group is disabled, the login is not allowed
+	if ! group.Enabled {
+		return nil, derrors.NewPermissionDeniedError("the group is temporarily disabled").WithParams(credentials.OrganizationID, credentials.DeviceGroupID)
 	}
 
 	deviceClaim := token.NewDeviceClaim(credentials.OrganizationID, credentials.DeviceGroupID, credentials.DeviceGroupID)
@@ -365,6 +386,33 @@ func (m * Authx) LoginDeviceGroup (credentials *pbAuthx.DeviceGroupLoginRequest)
 	if group.OrganizationID != credentials.OrganizationId{
 		return derrors.NewUnauthenticatedError("Invalid credentials")
 	}
+	// if the group is disabled, the login is not allowed
+	if ! group.Enabled {
+		return derrors.NewPermissionDeniedError("the group is temporarily disabled").WithParams(group.OrganizationID, group.DeviceGroupID)
+	}
 	return nil
 
+}
+
+// RefreshDeviceToken renew an old token.
+func (m *Authx) RefreshDeviceToken(oldToken string, refreshToken string) (*pbAuthx.LoginResponse, derrors.Error) {
+
+	claim, err := m.DeviceToken.GetTokenInfo(oldToken, m.secret)
+
+	// get the group to check if it is enabled
+	group, err := m.DeviceProvider.GetDeviceGroup(claim.OrganizationID, claim.DeviceGroupID)
+	if err != nil {
+		return nil, err
+	}
+	if ! group.Enabled {
+		return nil, derrors.NewPermissionDeniedError("the group is temporarily disabled").WithParams(group.OrganizationID, group.DeviceGroupID)
+	}
+
+
+	gToken, err := m.DeviceToken.Refresh(oldToken, refreshToken, m.expirationDuration, m.secret)
+	if err != nil {
+		return nil, err
+	}
+	response := &pbAuthx.LoginResponse{Token: gToken.Token, RefreshToken: gToken.RefreshToken}
+	return response, nil
 }

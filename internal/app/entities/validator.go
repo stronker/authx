@@ -18,6 +18,8 @@ const emptyName = "name cannot be empty"
 const emptyRoleID = "role_id cannot be empty"
 const emptyDeviceGroupId = "device_group_id cannot be empty"
 const emptyDeviceId = "device_id cannot be empty"
+const emptyRefreshToken = "refreshToken is mandatory"
+const emptyToken = "token is mandatory"
 
 
 func ValidOrganizationID(organizationID *grpc_organization_go.OrganizationId) derrors.Error {
@@ -58,7 +60,7 @@ func ValidUpdateDeviceGroupCredentialsRequest (request * grpc_authx_go.UpdateDev
 		return derrors.NewInvalidArgumentError(emptyDeviceGroupId)
 	}
 	if !request.UpdateEnabled && !request.UpdateDeviceConnectivity {
-		return derrors.NewInvalidArgumentError("enabled or default_device_connectivity flags mus change")
+		return derrors.NewInvalidArgumentError("enabled or default_device_connectivity flags must change")
 	}
 	return nil
 }
@@ -135,6 +137,17 @@ func ValidDeviceGroupID (request * grpc_device_go.DeviceGroupId) derrors.Error {
 	}
 	if request.DeviceGroupId == "" {
 		return derrors.NewInvalidArgumentError(emptyDeviceGroupId)
+	}
+	return nil
+}
+
+func ValidRefreshToken (request * grpc_authx_go.RefreshTokenRequest) derrors.Error {
+	if request.RefreshToken == "" {
+		return derrors.NewInvalidArgumentError(emptyRefreshToken)
+	}
+
+	if request.Token == "" {
+		return derrors.NewInvalidArgumentError(emptyToken)
 	}
 	return nil
 }

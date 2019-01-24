@@ -11,20 +11,22 @@ import (
 func RunTest (provider Provider) {
 
 	ginkgo.AfterEach(func() {
-		provider.Clear()
+		provider.Truncate()
 	})
+
+	testHelper := utils.NewDeviceTestHepler()
 
 	ginkgo.Context("device group credential tests", func() {
 		ginkgo.It("Should be able to add device group", func() {
 
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceGroupCredentials()
+			toAdd := testHelper.CreateDeviceGroupCredentials()
 
 			err := provider.AddDeviceGroupCredentials(toAdd)
 			gomega.Expect(err).To(gomega.Succeed())
 		})
 		ginkgo.It("Should not be able to add device group twice", func() {
 
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceGroupCredentials()
+			toAdd := testHelper.CreateDeviceGroupCredentials()
 
 			err := provider.AddDeviceGroupCredentials(toAdd)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -34,7 +36,7 @@ func RunTest (provider Provider) {
 		})
 		ginkgo.It("Should be able to update device group", func() {
 
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceGroupCredentials()
+			toAdd := testHelper.CreateDeviceGroupCredentials()
 
 			err := provider.AddDeviceGroupCredentials(toAdd)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -55,14 +57,14 @@ func RunTest (provider Provider) {
 		})
 		ginkgo.It("Should not be able to update non existing device group", func() {
 
-			toUpdate := utils.NewDeviceTestHepler().CreateDeviceGroupCredentials()
+			toUpdate := testHelper.CreateDeviceGroupCredentials()
 
 			err := provider.UpdateDeviceGroupCredentials(toUpdate)
 			gomega.Expect(err).NotTo(gomega.Succeed())
 
 		})
 		ginkgo.It("Should be able to find a device group", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceGroupCredentials()
+			toAdd := testHelper.CreateDeviceGroupCredentials()
 
 			err := provider.AddDeviceGroupCredentials(toAdd)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -73,7 +75,7 @@ func RunTest (provider Provider) {
 
 		})
 		ginkgo.It("Should not be able to find a non existing device group", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceGroupCredentials()
+			toAdd := testHelper.CreateDeviceGroupCredentials()
 
 			exists, err := provider.ExistsDeviceGroup(toAdd.OrganizationID, toAdd.DeviceGroupID)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -81,7 +83,7 @@ func RunTest (provider Provider) {
 
 		})
 		ginkgo.It("Should be able to get a device group", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceGroupCredentials()
+			toAdd := testHelper.CreateDeviceGroupCredentials()
 
 			err := provider.AddDeviceGroupCredentials(toAdd)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -93,13 +95,13 @@ func RunTest (provider Provider) {
 
 		})
 		ginkgo.It("Should not be able to get a non existing device group", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceGroupCredentials()
+			toAdd := testHelper.CreateDeviceGroupCredentials()
 
 			_, err := provider.GetDeviceGroup(toAdd.OrganizationID, toAdd.DeviceGroupID)
 			gomega.Expect(err).NotTo(gomega.Succeed())
 		})
 		ginkgo.It("Should be able to get a device group by group_api_key", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceGroupCredentials()
+			toAdd := testHelper.CreateDeviceGroupCredentials()
 
 			err := provider.AddDeviceGroupCredentials(toAdd)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -112,7 +114,7 @@ func RunTest (provider Provider) {
 
 		})
 		ginkgo.It("Should be able to remove a device group", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceGroupCredentials()
+			toAdd := testHelper.CreateDeviceGroupCredentials()
 
 			err := provider.AddDeviceGroupCredentials(toAdd)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -127,7 +129,7 @@ func RunTest (provider Provider) {
 
 		})
 		ginkgo.It("Should not be able to remove a non existing device group", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceGroupCredentials()
+			toAdd := testHelper.CreateDeviceGroupCredentials()
 
 			err := provider.RemoveDeviceGroup(toAdd.OrganizationID, toAdd.DeviceGroupID)
 			gomega.Expect(err).NotTo(gomega.Succeed())
@@ -137,24 +139,24 @@ func RunTest (provider Provider) {
 	ginkgo.Context("device credential tests", func() {
 		var targetDeviceGroup * entities.DeviceGroupCredentials
 		ginkgo.BeforeEach(func() {
-			targetDeviceGroup = utils.NewDeviceTestHepler().CreateDeviceGroupCredentials()
+			targetDeviceGroup = testHelper.CreateDeviceGroupCredentials()
 			err := provider.AddDeviceGroupCredentials(targetDeviceGroup)
 			gomega.Expect(err).To(gomega.Succeed())
 		})
 		ginkgo.It("Should be able to add device credentials ", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceCredentials(*targetDeviceGroup)
+			toAdd := testHelper.CreateDeviceCredentials(*targetDeviceGroup)
 			err := provider.AddDeviceCredentials(toAdd)
 			gomega.Expect(err).To(gomega.Succeed())
 		})
 		ginkgo.It("Should not be able to add device credentials of a non existing group", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceCredentials(*targetDeviceGroup)
+			toAdd := testHelper.CreateDeviceCredentials(*targetDeviceGroup)
 			toAdd.DeviceGroupID = uuid.New().String()
 
 			err := provider.AddDeviceCredentials(toAdd)
 			gomega.Expect(err).NotTo(gomega.Succeed())
 		})
 		ginkgo.It("Should be able to update device credentials ", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceCredentials(*targetDeviceGroup)
+			toAdd := testHelper.CreateDeviceCredentials(*targetDeviceGroup)
 			err := provider.AddDeviceCredentials(toAdd)
 			gomega.Expect(err).To(gomega.Succeed())
 
@@ -169,14 +171,14 @@ func RunTest (provider Provider) {
 
 		})
 		ginkgo.It("Should not be able to update device credentials ", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceCredentials(*targetDeviceGroup)
+			toAdd := testHelper.CreateDeviceCredentials(*targetDeviceGroup)
 
 			err := provider.UpdateDeviceCredentials(toAdd)
 			gomega.Expect(err).NotTo(gomega.Succeed())
 
 		})
 		ginkgo.It("Should be able to find device credentials ", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceCredentials(*targetDeviceGroup)
+			toAdd := testHelper.CreateDeviceCredentials(*targetDeviceGroup)
 			err := provider.AddDeviceCredentials(toAdd)
 			gomega.Expect(err).To(gomega.Succeed())
 
@@ -185,13 +187,13 @@ func RunTest (provider Provider) {
 			gomega.Expect(exists).To(gomega.BeTrue())
 		})
 		ginkgo.It("Should not be able to find device credentials ", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceCredentials(*targetDeviceGroup)
+			toAdd := testHelper.CreateDeviceCredentials(*targetDeviceGroup)
 			exists, err := provider.ExistsDevice(toAdd.OrganizationID, toAdd.DeviceGroupID, toAdd.DeviceID)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(exists).NotTo(gomega.BeTrue())
 		})
 		ginkgo.It("Should be able to return a device credentials ", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceCredentials(*targetDeviceGroup)
+			toAdd := testHelper.CreateDeviceCredentials(*targetDeviceGroup)
 			err := provider.AddDeviceCredentials(toAdd)
 			gomega.Expect(err).To(gomega.Succeed())
 
@@ -200,13 +202,13 @@ func RunTest (provider Provider) {
 			gomega.Expect(retrieved.DeviceApiKey).Should(gomega.Equal(toAdd.DeviceApiKey))
 		})
 		ginkgo.It("Should not be able to return a device credentials ", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceCredentials(*targetDeviceGroup)
+			toAdd := testHelper.CreateDeviceCredentials(*targetDeviceGroup)
 
 			_, err := provider.GetDevice(toAdd.OrganizationID, toAdd.DeviceGroupID, toAdd.DeviceID)
 			gomega.Expect(err).NotTo(gomega.Succeed())
 		})
 		ginkgo.It("Should be able to remove a device credentials ", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceCredentials(*targetDeviceGroup)
+			toAdd := testHelper.CreateDeviceCredentials(*targetDeviceGroup)
 			err := provider.AddDeviceCredentials(toAdd)
 			gomega.Expect(err).To(gomega.Succeed())
 
@@ -214,7 +216,7 @@ func RunTest (provider Provider) {
 			gomega.Expect(err).To(gomega.Succeed())
 		})
 		ginkgo.It("Should not be able to remove a device credentials ", func() {
-			toAdd := utils.NewDeviceTestHepler().CreateDeviceCredentials(*targetDeviceGroup)
+			toAdd := testHelper.CreateDeviceCredentials(*targetDeviceGroup)
 
 			err := provider.RemoveDevice(toAdd.OrganizationID, toAdd.DeviceGroupID, toAdd.DeviceID)
 			gomega.Expect(err).NotTo(gomega.Succeed())

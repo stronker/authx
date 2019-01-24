@@ -12,9 +12,6 @@ import (
 var _ = ginkgo.Describe("BCryptPassword", func() {
 	var devTokenManager = NewJWTDeviceTokenMockup()
 
-	//provider := tokenProvider.NewScyllaTokenProvider("127.0.0.1", 9042, "authx")
-	//var devTokenManager = NewJWTDeviceToken(provider, NewBCryptPassword())
-
 	expirationPeriod, _ := time.ParseDuration("10m")
 	secret := "myLittleSecret12345"
 

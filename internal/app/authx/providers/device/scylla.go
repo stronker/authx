@@ -259,7 +259,7 @@ func (sp * ScyllaDeviceCredentialsProvider) RemoveDeviceGroup (organizationId st
 
 	return nil
 }
-func (sp * ScyllaDeviceCredentialsProvider) ClearDeviceGroup() derrors.Error {
+func (sp * ScyllaDeviceCredentialsProvider) TruncateDeviceGroup() derrors.Error {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -464,7 +464,7 @@ func (sp * ScyllaDeviceCredentialsProvider) RemoveDevice (organizationId string,
 
 	return nil
 }
-func (sp * ScyllaDeviceCredentialsProvider) ClearDevice() derrors.Error {
+func (sp * ScyllaDeviceCredentialsProvider) TruncateDevice() derrors.Error {
 	sp.Lock()
 	defer sp.Unlock()
 
@@ -482,14 +482,14 @@ func (sp * ScyllaDeviceCredentialsProvider) ClearDevice() derrors.Error {
 	return nil
 }
 
-func (sp * ScyllaDeviceCredentialsProvider) Clear()  derrors.Error{
+func (sp * ScyllaDeviceCredentialsProvider) Truncate()  derrors.Error{
 
-	err := sp.ClearDeviceGroup()
+	err := sp.TruncateDeviceGroup()
 	if err != nil {
 		return err
 	}
 
-	err = sp.ClearDevice()
+	err = sp.TruncateDevice()
 	if err != nil {
 		return err
 	}

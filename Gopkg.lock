@@ -92,12 +92,12 @@
   version = "v2.0.0"
 
 [[projects]]
-  digest = "1:d39128b9ec67bc2760a5d9b588744c34865560ad49859cb3082d4e21243f56f5"
+  digest = "1:a2d5e346dba1b61035d40d1e617c5ffdb3e35b1665a98833c013a8235681d54c"
   name = "github.com/nalej/grpc-authx-go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "c9ccebe6eb9665663dbd94d0b4bae3d51a000c95"
-  version = "v0.0.37"
+  revision = "533f5f500e1a23280c5204887b17dd7614cfc591"
+  version = "v0.0.38"
 
 [[projects]]
   digest = "1:44dfeb321f4866e9e786f9e8a4c6c95af0216065f013273e06a10ca54aa9d1d2"
@@ -267,7 +267,7 @@
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "c6b37f3e92850b723493d63fd35aad34e19e048d"
+  revision = "b90733256f2e882e81d52f9126de08df5615afd9"
 
 [[projects]]
   digest = "1:436b24586f8fee329e0dd65fd67c817681420cda1d7f934345c13fe78c212a73"

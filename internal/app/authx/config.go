@@ -11,6 +11,9 @@ import (
 	"time"
 )
 
+// Scylla has an expiration time of 3 hours
+const ttlExpirationTime = 3
+
 // Config is the set of required configuration parameters.
 type Config struct {
 	Port       int
@@ -47,11 +50,11 @@ func (conf * Config) Validate() derrors.Error {
 		return derrors.NewInvalidArgumentError("a type of provider must be selected")
 	}
 
-	if conf.ExpirationTime.Hours() > 3 {
-		return derrors.NewInvalidArgumentError("currently the duration can not be longer than 3h.")
+	if conf.ExpirationTime.Hours() > ttlExpirationTime {
+		return derrors.NewInvalidArgumentError("currently the duration can not be longer than 3h. Scylla has a 3 hours TTL")
 	}
-	if conf.DeviceExpirationTime.Hours() > 3 {
-		return derrors.NewInvalidArgumentError("currently the duration of device tokens can not be longer than 3h.")
+	if conf.DeviceExpirationTime.Hours() > ttlExpirationTime {
+		return derrors.NewInvalidArgumentError("currently the duration of device tokens can not be longer than 3h. Scylla has a 3 hours TTL")
 	}
 
 	return nil

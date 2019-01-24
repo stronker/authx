@@ -76,7 +76,6 @@ func (m *JWTToken) Generate(personalClaim *token.PersonalClaim, expirationPeriod
 	}
 	tokenData := entities.NewTokenData(claim.UserID, claim.Id, hashedRefreshToken, claim.ExpiresAt)
 	err = m.TokenProvider.Add(tokenData)
-	err = m.TokenProvider.Update(tokenData)
 
 	if err != nil {
 		return nil, derrors.NewInternalError("impossible store RefreshToken", err)
