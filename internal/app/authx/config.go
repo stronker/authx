@@ -11,11 +11,15 @@ import (
 	"time"
 )
 
+// Scylla has an expiration time of 3 hours
+const ttlExpirationTime = 3
+
 // Config is the set of required configuration parameters.
 type Config struct {
 	Port       int
 	Secret     string
 	ExpirationTime time.Duration
+	DeviceExpirationTime time.Duration
 	// Use in-memory providers
 	UseInMemoryProviders bool
 	// Use scyllaDBProviders
@@ -45,6 +49,14 @@ func (conf * Config) Validate() derrors.Error {
 	if !conf.UseDBScyllaProviders && !conf.UseInMemoryProviders {
 		return derrors.NewInvalidArgumentError("a type of provider must be selected")
 	}
+
+	if conf.ExpirationTime.Hours() > ttlExpirationTime {
+		return derrors.NewInvalidArgumentError("currently the duration can not be longer than 3h. Scylla has a 3 hours TTL")
+	}
+	if conf.DeviceExpirationTime.Hours() > ttlExpirationTime {
+		return derrors.NewInvalidArgumentError("currently the duration of device tokens can not be longer than 3h. Scylla has a 3 hours TTL")
+	}
+
 	return nil
 }
 
@@ -53,6 +65,7 @@ func (conf * Config) Print() {
 	log.Info().Int("port", conf.Port).Msg("gRPC port")
 	log.Info().Str("secret", strings.Repeat("*", len(conf.Secret))).Msg("Token secret")
 	log.Info().Str("duration", conf.ExpirationTime.String()).Msg("Expiration time")
+	log.Info().Str("deviceExpiration", conf.DeviceExpirationTime.String()).Msg("Device expiration time")
 	if conf.UseInMemoryProviders {
 		log.Info().Bool("UseInMemoryProviders", conf.UseInMemoryProviders).Msg("Using in-memory providers")
 	}

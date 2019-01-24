@@ -13,6 +13,7 @@ import (
 
 // DefaultExpirationDuration is the default token expiration duration
 const DefaultExpirationDuration = "3h"
+const DefaultDeviceExpiration = "10m"
 
 // DefaultPort is the default port where the service is deployed
 const DefaultPort = 8810
@@ -49,11 +50,13 @@ var runCmd = &cobra.Command{
 func init() {
 
 	d, _ := time.ParseDuration(DefaultExpirationDuration)
+	e, _ := time.ParseDuration(DefaultDeviceExpiration)
 
 	rootCmd.AddCommand(runCmd)
 	runCmd.Flags().IntVar(&config.Port, "port", DefaultPort, "Port to launch Authx server")
 	runCmd.Flags().StringVar(&secretPath, "secret", "", "Path to internal secret to generate Tokens")
-	runCmd.Flags().DurationVar(&config.ExpirationTime, "expiration", d, "Expiration time of Tokens")
+	runCmd.Flags().DurationVar(&config.ExpirationTime, "expiration", d, "Expiration time of Tokens. No more than 3 hours allowed")
+	runCmd.Flags().DurationVar(&config.DeviceExpirationTime, "deviceExpiration", e, "Expiration time of devices Tokens")
 
 	runCmd.Flags().BoolVar(&config.UseInMemoryProviders, "userInMemoryProviders", false, "Whether in-memory providers should be used. ONLY for development")
 	runCmd.Flags().BoolVar(&config.UseDBScyllaProviders, "useDBScyllaProviders", true, "Whether dbscylla providers should be used")
