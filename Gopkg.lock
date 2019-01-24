@@ -100,20 +100,20 @@
   version = "v0.0.38"
 
 [[projects]]
-  digest = "1:44dfeb321f4866e9e786f9e8a4c6c95af0216065f013273e06a10ca54aa9d1d2"
+  digest = "1:41496e67504a2c5de20d1b003df34424ea413ad31993ad099a55b9cc8a9c8896"
   name = "github.com/nalej/grpc-common-go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "3a819d5336e7dcdd6b103eb0c78aafd48a01e70c"
-  version = "v0.0.29"
+  revision = "e1513decc4192934536180d456748a4c3dec0245"
+  version = "v0.0.30"
 
 [[projects]]
-  digest = "1:bd55645a90f6faa680b73a386de15d1336aed3f7c72c5859c918c039e6b36795"
+  digest = "1:297656ad30680526c222a0a00113d6fbf62311c3d1e9cc2bf4a1772c0151418d"
   name = "github.com/nalej/grpc-device-go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "6b2d7b8a39b83cf0426c4e2f0f73bdbdb7a5e23e"
-  version = "v0.0.29"
+  revision = "9132a86817133a1da357a35272bb8a711980ecf3"
+  version = "v0.0.30"
 
 [[projects]]
   digest = "1:5c0f5a204bb887b0d91ec6512ad4ece5ecc422675cbc834f89abdb22c8e0282c"
