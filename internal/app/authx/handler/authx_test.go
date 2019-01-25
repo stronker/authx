@@ -720,6 +720,35 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(err).NotTo(gomega.Succeed())
 
 		})
+		ginkgo.It("Should be able to get an existing device group", func() {
+			toAdd := pbAuthx.AddDeviceGroupCredentialsRequest{
+				OrganizationId:  uuid.New().String(),
+				DeviceGroupId:  uuid.New().String(),
+			}
+			added, err := client.AddDeviceGroupCredentials(context.Background(), &toAdd)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(added.DeviceGroupApiKey).NotTo(gomega.BeEmpty())
+
+			groupId := grpc_device_go.DeviceGroupId{
+				OrganizationId:  toAdd.OrganizationId,
+				DeviceGroupId: toAdd.DeviceGroupId,
+			}
+
+			recovered, err := client.GetDeviceGroupCredentials(context.Background(), &groupId)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(recovered.Enabled).Should(gomega.Equal(toAdd.Enabled))
+		})
+		ginkgo.It("Should not be able to get a no existing device group", func() {
+
+			groupId := grpc_device_go.DeviceGroupId{
+				OrganizationId:  uuid.New().String(),
+				DeviceGroupId: uuid.New().String(),
+			}
+
+			_, err := client.GetDeviceGroupCredentials(context.Background(), &groupId)
+			gomega.Expect(err).NotTo(gomega.Succeed())
+
+		})
 	})
 
 	ginkgo.AfterEach(func() {

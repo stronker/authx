@@ -276,6 +276,21 @@ func (h * Authx) UpdateDeviceGroupCredentials(ctx context.Context, request *pbAu
 
 	return &pbCommon.Success{}, nil
 }
+
+func (h * Authx) GetDeviceGroupCredentials(ctx context.Context, request *grpc_device_go.DeviceGroupId) (*pbAuthx.DeviceGroupCredentials, error){
+	vErr :=  entities.ValidDeviceGroupID(request)
+	if vErr != nil {
+		return nil, conversions.ToDerror(vErr)
+	}
+
+	credentials, err := h.Manager.GetDeviceGroupCredentials(request)
+	if err != nil {
+		return nil, conversions.ToGRPCError(err)
+	}
+	return credentials.ToGRPC(), nil
+
+}
+
 // RemoveDeviceGroupCredentials removes a group credentials
 func (h * Authx) RemoveDeviceGroupCredentials(ctx context.Context, credentials *grpc_device_go.DeviceGroupId) (*pbCommon.Success, error){
 	vErr :=  entities.ValidDeviceGroupID(credentials)

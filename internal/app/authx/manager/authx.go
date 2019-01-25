@@ -359,6 +359,23 @@ func (m * Authx) UpdateDeviceGroupCredentials(groupCredentials * pbAuthx.UpdateD
 	return nil
 }
 
+func (m * Authx) GetDeviceGroupCredentials(request *grpc_device_go.DeviceGroupId) (*entities.DeviceGroupCredentials, derrors.Error) {
+	// Check if the credentials exists
+	exists, err := m.DeviceProvider.ExistsDeviceGroup(request.OrganizationId, request.DeviceGroupId)
+	if err != nil {
+		return nil, err
+	}
+	if !exists{
+		return nil, derrors.NewNotFoundError("device group credentials").WithParams(request.OrganizationId, request.DeviceGroupId)
+	}
+
+	group, err := m.DeviceProvider.GetDeviceGroup(request.OrganizationId, request.DeviceGroupId)
+	if err != nil {
+		return nil, err
+	}
+	return group, nil
+}
+
 func (m * Authx) RemoveDeviceGroupCredentials(groupCredentials * grpc_device_go.DeviceGroupId) derrors.Error {
 
 	exists, err := m.DeviceProvider.ExistsDeviceGroup(groupCredentials.OrganizationId, groupCredentials.DeviceGroupId)
