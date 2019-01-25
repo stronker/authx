@@ -268,6 +268,31 @@ func (m * Authx) UpdateDeviceCredentials (deviceCredentials * pbAuthx.UpdateDevi
 	return nil
 }
 
+func (m * Authx) GetDeviceCredentials(request *grpc_device_go.DeviceId) (*entities.DeviceCredentials, derrors.Error) {
+	// Check if the credentials group exist
+	exists, err := m.DeviceProvider.ExistsDeviceGroup(request.OrganizationId, request.DeviceGroupId)
+	if err != nil {
+		return nil, err
+	}
+	if !exists{
+		return nil, derrors.NewNotFoundError("device group credentials").WithParams(request.OrganizationId, request.DeviceGroupId)
+	}
+	// Check if the credentials device exist
+	exists, err = m.DeviceProvider.ExistsDevice(request.OrganizationId, request.DeviceGroupId, request.DeviceId)
+	if err != nil {
+		return nil, err
+	}
+	if !exists{
+		return nil, derrors.NewNotFoundError("device credentials").WithParams(request.OrganizationId, request.DeviceGroupId, request.DeviceId)
+	}
+
+	credentials, err := m.DeviceProvider.GetDevice(request.OrganizationId, request.DeviceGroupId, request.DeviceId)
+	if err != nil {
+		return nil, err
+	}
+	return credentials, nil
+}
+
 func (m * Authx) RemoveDeviceCredentials (deviceCredentials * grpc_device_go.DeviceId) derrors.Error {
 
 	exists, err := m.DeviceProvider.ExistsDevice(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId, deviceCredentials.DeviceId)
@@ -357,6 +382,23 @@ func (m * Authx) UpdateDeviceGroupCredentials(groupCredentials * pbAuthx.UpdateD
 	}
 
 	return nil
+}
+
+func (m * Authx) GetDeviceGroupCredentials(request *grpc_device_go.DeviceGroupId) (*entities.DeviceGroupCredentials, derrors.Error) {
+	// Check if the credentials exists
+	exists, err := m.DeviceProvider.ExistsDeviceGroup(request.OrganizationId, request.DeviceGroupId)
+	if err != nil {
+		return nil, err
+	}
+	if !exists{
+		return nil, derrors.NewNotFoundError("device group credentials").WithParams(request.OrganizationId, request.DeviceGroupId)
+	}
+
+	group, err := m.DeviceProvider.GetDeviceGroup(request.OrganizationId, request.DeviceGroupId)
+	if err != nil {
+		return nil, err
+	}
+	return group, nil
 }
 
 func (m * Authx) RemoveDeviceGroupCredentials(groupCredentials * grpc_device_go.DeviceGroupId) derrors.Error {

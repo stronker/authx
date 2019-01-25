@@ -218,6 +218,20 @@ func (h * Authx) UpdateDeviceCredentials(ctx context.Context, request *pbAuthx.U
 
 	return &pbCommon.Success{}, nil
 }
+// GetDeviceCredentials retrieves the credentials associated with a device
+func (h * Authx) GetDeviceCredentials(ctx context.Context, request *grpc_device_go.DeviceId) (*pbAuthx.DeviceCredentials, error){
+	vErr :=  entities.ValidDeviceID(request)
+	if vErr != nil {
+		return nil, conversions.ToDerror(vErr)
+	}
+
+	credentials, err := h.Manager.GetDeviceCredentials(request)
+	if err != nil {
+		return nil, conversions.ToGRPCError(err)
+	}
+	return credentials.ToGRPC(), nil
+
+}
 // RemoveDeviceCredentials removes a credential
 func (h * Authx) RemoveDeviceCredentials(ctx context.Context, credentials * grpc_device_go.DeviceId) (*pbCommon.Success, error) {
 
@@ -275,6 +289,20 @@ func (h * Authx) UpdateDeviceGroupCredentials(ctx context.Context, request *pbAu
 	}
 
 	return &pbCommon.Success{}, nil
+}
+// GetDeviceGroupCredentials retrieves retrieves the credentials associated with a device group
+func (h * Authx) GetDeviceGroupCredentials(ctx context.Context, request *grpc_device_go.DeviceGroupId) (*pbAuthx.DeviceGroupCredentials, error){
+	vErr :=  entities.ValidDeviceGroupID(request)
+	if vErr != nil {
+		return nil, conversions.ToDerror(vErr)
+	}
+
+	credentials, err := h.Manager.GetDeviceGroupCredentials(request)
+	if err != nil {
+		return nil, conversions.ToGRPCError(err)
+	}
+	return credentials.ToGRPC(), nil
+
 }
 // RemoveDeviceGroupCredentials removes a group credentials
 func (h * Authx) RemoveDeviceGroupCredentials(ctx context.Context, credentials *grpc_device_go.DeviceGroupId) (*pbCommon.Success, error){
