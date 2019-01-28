@@ -613,6 +613,58 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(err).NotTo(gomega.Succeed())
 		})
 
+		ginkgo.It("Should be able to add a credentials with group default connectivity", func() {
+			// add a group
+			groupToAdd := &pbAuthx.AddDeviceGroupCredentialsRequest {
+				OrganizationId: uuid.New().String(),
+				DeviceGroupId: uuid.New().String(),
+				Enabled: true,
+				DefaultDeviceConnectivity: true,
+			}
+			group, err := client.AddDeviceGroupCredentials(context.Background(), groupToAdd)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(group).NotTo(gomega.BeNil())
+
+			// add a device
+			deviceToAdd := &pbAuthx.AddDeviceCredentialsRequest{
+				OrganizationId:group.OrganizationId,
+				DeviceGroupId: group.DeviceGroupId,
+				DeviceId: uuid.New().String(),
+			}
+
+			added, err := client.AddDeviceCredentials(context.Background(), deviceToAdd)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(added).NotTo(gomega.BeNil())
+			gomega.Expect(added.Enabled).Should(gomega.Equal(groupToAdd.DefaultDeviceConnectivity))
+
+		})
+
+		ginkgo.It("Should be able to add a disabled device credentials with group default connectivity", func() {
+			// add a group
+			groupToAdd := &pbAuthx.AddDeviceGroupCredentialsRequest {
+				OrganizationId: uuid.New().String(),
+				DeviceGroupId: uuid.New().String(),
+				Enabled: true,
+				DefaultDeviceConnectivity: false,
+			}
+			group, err := client.AddDeviceGroupCredentials(context.Background(), groupToAdd)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(group).NotTo(gomega.BeNil())
+
+			// add a device
+			deviceToAdd := &pbAuthx.AddDeviceCredentialsRequest{
+				OrganizationId:group.OrganizationId,
+				DeviceGroupId: group.DeviceGroupId,
+				DeviceId: uuid.New().String(),
+			}
+
+			added, err := client.AddDeviceCredentials(context.Background(), deviceToAdd)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(added).NotTo(gomega.BeNil())
+			gomega.Expect(added.Enabled).Should(gomega.Equal(groupToAdd.DefaultDeviceConnectivity))
+
+		})
+
 	})
 
 	ginkgo.Context("with device group credentials", func(){
