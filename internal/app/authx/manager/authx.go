@@ -236,6 +236,9 @@ func (m * Authx) AddDeviceCredentials(deviceCredentials * pbAuthx.AddDeviceCrede
 	}
 
 	toAdd := entities.NewDeviceCredentialsFromGRPC(deviceCredentials)
+	// the device will be enable or disabled depending at group default value
+	toAdd.Enabled = group.DefaultDeviceConnectivity
+
 	err =  m.DeviceProvider.AddDeviceCredentials(toAdd)
 	if err != nil{
 		return nil, err
