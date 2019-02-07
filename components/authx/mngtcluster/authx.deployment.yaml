@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - name: authx
-        image: nalejregistry.azurecr.io/nalej/authx:__NPH_VERSION
+        image: __NPH_REGISTRY.azurecr.io/__NPH_REGISTRY_NAMESPACE/authx:__NPH_VERSION
         imagePullPolicy: IfNotPresent
         args:
         - "run"
