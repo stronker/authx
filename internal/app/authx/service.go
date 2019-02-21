@@ -10,6 +10,8 @@ import (
 	"github.com/nalej/authx/internal/app/authx/manager"
 	"github.com/nalej/authx/internal/app/authx/providers/credentials"
 	"github.com/nalej/authx/internal/app/authx/providers/device"
+	"github.com/nalej/authx/internal/app/authx/providers/device_token"
+	"github.com/nalej/authx/internal/app/authx/providers/token"
 	"github.com/nalej/authx/internal/app/authx/providers/role"
 	pbAuthx "github.com/nalej/grpc-authx-go"
 	"github.com/rs/zerolog/log"
@@ -28,6 +30,13 @@ type Providers struct {
 	roleProvider role.Role
 	credProvider credentials.BasicCredentials
 	devProvider device.Provider
+	tokenProvider token.Token
+	devTokenProvider device_token.Provider
+}
+
+type TokenManagers struct {
+	tokenManager manager.Token
+	deviceTokenManager manager.DeviceToken
 }
 
 // NewService create a new service instance.
@@ -40,6 +49,8 @@ func (s *Service) CreateInMemoryProviders() * Providers {
 		roleProvider: role.NewRoleMockup(),
 		credProvider: credentials.NewBasicCredentialMockup(),
 		devProvider: device.NewMockupDeviceCredentialsProvider(),
+		tokenProvider: token.NewTokenMockup(),
+		devTokenProvider: device_token.NewDeviceTokenMockup(),
 	}
 }
 
@@ -50,6 +61,10 @@ func (s *Service) CreateDBScyllaProviders() * Providers {
 		credProvider: credentials.NewScyllaCredentialsProvider(
 			s.Config.ScyllaDBAddress, s.Config.ScyllaDBPort, s.Config.KeySpace),
 		devProvider: device.NewScyllaDeviceCredentialsProvider(
+			s.Config.ScyllaDBAddress, s.Config.ScyllaDBPort, s.Config.KeySpace),
+		tokenProvider: token.NewScyllaTokenProvider(
+			s.Config.ScyllaDBAddress, s.Config.ScyllaDBPort, s.Config.KeySpace),
+		devTokenProvider:device_token.NewScyllaDeviceTokenProvider(
 			s.Config.ScyllaDBAddress, s.Config.ScyllaDBPort, s.Config.KeySpace),
 	}
 }
@@ -65,6 +80,31 @@ func (s *Service) GetProviders() * Providers {
 	return nil
 }
 
+func (s *Service) createInMemoryManagers() * TokenManagers {
+	return &TokenManagers{
+		tokenManager: manager.NewJWTTokenMockup(),
+		deviceTokenManager: manager.NewJWTDeviceTokenMockup(),
+	}
+}
+func (s *Service) createDBScyllaManagers(tokenProvider token.Token, password manager.Password) * TokenManagers {
+	return &TokenManagers{
+		tokenManager: manager.NewJWTToken(tokenProvider, password),
+		deviceTokenManager: manager.NewJWTDeviceTokenMockup(),
+	}
+}
+
+
+func (s *Service) getTokenManager(tokenProvider token.Token, password manager.Password) * TokenManagers {
+	if s.Config.UseInMemoryProviders {
+		return s.createInMemoryManagers()
+	} else if s.Config.UseDBScyllaProviders {
+		return s.createDBScyllaManagers(tokenProvider, password)
+	}
+	log.Fatal().Msg("unsupported type of provider")
+	return nil
+}
+
+
 //Run launch the Authx service.
 func (s *Service) Run() {
 	s.Config.Print()
@@ -76,13 +116,15 @@ func (s *Service) Run() {
 		return
 	}
 
-	//roleProvider := role.NewRoleMockup()
-	//credProvider := credentials.NewBasicCredentialMockup()
 	passwordMgr := manager.NewBCryptPassword()
-	tokenMgr := manager.NewJWTTokenMockup()
-	deviceMgr := manager.NewJWTDeviceTokenMockup()
+
+	// Create the token manager (memory/scylla)
+	t := s.getTokenManager(p.tokenProvider, passwordMgr)
+	tokenMgr := t.tokenManager
+	deviceMgr := t.deviceTokenManager
+
 	authxMgr := manager.NewAuthx(passwordMgr, tokenMgr,deviceMgr, p.credProvider, p.roleProvider, p.devProvider,
-		s.Secret, s.ExpirationTime, s.DeviceExpirationTime)
+		s.Secret, s.ExpirationTime, s.DeviceExpirationTime, p.devTokenProvider)
 
 	h := handler.NewAuthx(authxMgr)
 

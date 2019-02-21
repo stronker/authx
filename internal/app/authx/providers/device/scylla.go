@@ -124,7 +124,7 @@ func (sp * ScyllaDeviceCredentialsProvider) AddDeviceGroupCredentials (groupCred
 
 	// add new basic credential
 	stmt, names := qb.Insert(deviceGroupCredentialsTable).Columns("organization_id", "device_group_id",
-		"device_group_api_key","enabled","default_device_connectivity").ToCql()
+		"device_group_api_key","enabled","default_device_connectivity", "secret").ToCql()
 	q := gocqlx.Query(sp.Session.Query(stmt), names).BindStruct(groupCredentials)
 	cqlErr := q.ExecRelease()
 
