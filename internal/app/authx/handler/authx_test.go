@@ -845,7 +845,7 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(err).NotTo(gomega.Succeed())
 
 		})
-		ginkgo.FIt("Should be able get the secret of the device group", func() {
+		ginkgo.It("Should be able get the secret of the device group", func() {
 			toAdd := pbAuthx.AddDeviceGroupCredentialsRequest{
 				OrganizationId:  uuid.New().String(),
 				DeviceGroupId:  uuid.New().String(),

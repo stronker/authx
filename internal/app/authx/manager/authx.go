@@ -61,13 +61,15 @@ func NewAuthx(password Password, tokenManager Token, deviceToken DeviceToken, cr
 }
 
 // NewAuthxMockup create a new mockup manager.
-func NewAuthxMockup() *Authx {
+func 	NewAuthxMockup() *Authx {
 	d, _ := time.ParseDuration(DefaultExpirationDuration)
 	e, _ := time.ParseDuration(DefaultDeviceExpirationDuration)
-	return NewAuthx(NewBCryptPassword(), NewJWTTokenMockup(), NewJWTDeviceTokenMockup(),
+	dcProvider := device.NewMockupDeviceCredentialsProvider()
+	dtMockup := device_token.NewDeviceTokenMockup()
+	return NewAuthx(NewBCryptPassword(), NewJWTTokenMockup(), NewJWTDeviceToken(dcProvider, dtMockup),
 		credentials.NewBasicCredentialMockup(), role.NewRoleMockup(),
-		device.NewMockupDeviceCredentialsProvider(),DefaultSecret, d, e,
-		device_token.NewDeviceTokenMockup())
+		dcProvider,DefaultSecret, d, e,
+		dtMockup)
 }
 
 // DeleteCredentials deletes the credential for a specific username.

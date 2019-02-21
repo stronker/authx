@@ -42,7 +42,7 @@ func NewJWTDeviceToken(deviceProvider device.Provider, tokenProvider device_toke
 }
 
 // NewJWTTokenMockup create a new mockup of JWTToken
-func NewJWTDeviceTokenMockup() DeviceToken {
+	func NewJWTDeviceTokenMockup() DeviceToken {
 	return NewJWTDeviceToken(device.NewMockupDeviceCredentialsProvider(),
 		device_token.NewDeviceTokenMockup())
 }
