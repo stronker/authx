@@ -54,6 +54,10 @@
     name="github.com/nalej/grpc-ping-go"
     version="v0.0.30"
 
+[[constraint]]
+    name="github.com/nalej/grpc-login-api-go"
+    version="v0.0.3"
+
 [prune]
   go-tests = true
   unused-packages = true

@@ -185,6 +185,14 @@
   version = "v0.0.32"
 
 [[projects]]
+  digest = "1:05ff6c5822390dd6b413c72bbc4ce2c21e27c530e0a805d9c9adc5eeb05f730c"
+  name = "github.com/nalej/grpc-login-api-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "f9b38bbf198bc518f7906c8d7e16dd4e5c8ee3b0"
+  version = "v0.0.21"
+
+[[projects]]
   digest = "1:0782f29cd89fdbb298cd040934995e4db441dc590eac60037e0c5ff096a1caf2"
   name = "github.com/nalej/grpc-network-go"
   packages = ["."]
@@ -355,11 +363,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:8207c052fb873f83c61a5aa16f6add5feb9881eda2112b56f69fd3b9e7f55c3f"
+  digest = "1:75e12c5cb2efb2da5d7f7054e973f09bd3e28c7da6b76dd7412b8f0151b23605"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "b4e8571b14e03cc164df06f72b640ebce3899579"
+  revision = "ec7b60b042fd2c54ad5ceaac0c891bd88843f4a2"
 
 [[projects]]
   digest = "1:436b24586f8fee329e0dd65fd67c817681420cda1d7f934345c13fe78c212a73"
@@ -497,6 +505,7 @@
     "github.com/nalej/grpc-cluster-api-go",
     "github.com/nalej/grpc-common-go",
     "github.com/nalej/grpc-device-go",
+    "github.com/nalej/grpc-login-api-go",
     "github.com/nalej/grpc-organization-go",
     "github.com/nalej/grpc-ping-go",
     "github.com/nalej/grpc-user-go",
@@ -512,6 +521,7 @@
     "golang.org/x/crypto/bcrypt",
     "google.golang.org/grpc",
     "google.golang.org/grpc/codes",
+    "google.golang.org/grpc/credentials",
     "google.golang.org/grpc/metadata",
     "google.golang.org/grpc/reflection",
     "google.golang.org/grpc/status",

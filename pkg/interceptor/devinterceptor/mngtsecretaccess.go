@@ -17,6 +17,9 @@ import (
 
 const DefaultCacheEntries = 100
 
+// MngtSecretAccess structure that provides a cache over the group secrets using a client that connects
+// directly with the Authx component. This implementation is intended to be used from within the management
+// cluster.
 type MngtSecretAccess struct{
 	Connection
 	cache lru.Cache
