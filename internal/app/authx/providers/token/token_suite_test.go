@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestCredentialsPackage(t *testing.T) {
+func TestTokensPackage(t *testing.T) {
 	gomega.RegisterFailHandler(ginkgo.Fail)
 	ginkgo.RunSpecs(t, "token providers package suite")
 }
