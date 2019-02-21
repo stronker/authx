@@ -27,6 +27,7 @@ func (d * DeviceTestHelper) CreateDeviceGroupCredentials() * entities.DeviceGrou
 		DeviceGroupApiKey: uuid.New().String(),
 		Enabled: true,
 		DefaultDeviceConnectivity: false,
+		Secret: uuid.New().String(),
 	}
 }
 

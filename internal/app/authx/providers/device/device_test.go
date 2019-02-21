@@ -11,7 +11,7 @@ import (
 func RunTest (provider Provider) {
 
 	ginkgo.AfterEach(func() {
-		provider.Truncate()
+		//provider.Truncate()
 	})
 
 	testHelper := utils.NewDeviceTestHepler()

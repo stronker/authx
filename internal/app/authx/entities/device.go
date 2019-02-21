@@ -11,6 +11,7 @@ type DeviceGroupCredentials struct {
 	DeviceGroupApiKey string
 	Enabled bool
 	DefaultDeviceConnectivity bool
+	Secret string
 }
 
 func NewDeviceGroupCredentials (organizationId string, deviceGroupId string, deviceGroupApiKey string,
