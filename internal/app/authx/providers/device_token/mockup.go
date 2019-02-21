@@ -12,12 +12,14 @@ import (
 type DeviceTokenMockup struct {
 	sync.Mutex
 	data map[string]entities.DeviceTokenData
+	dataByRefreshToken map[string]entities.DeviceTokenData
 }
 
 // NewTokenMockup create a new instance of TokenMockup.
 func NewDeviceTokenMockup() Provider {
 	return &DeviceTokenMockup{
 		data: make(map[string]entities.DeviceTokenData,0),
+		dataByRefreshToken: make(map[string]entities.DeviceTokenData,0),
 	}
 }
 func (m *DeviceTokenMockup) unsafeExists (deviceID string, tokenID string) bool {
@@ -44,12 +46,13 @@ func (m *DeviceTokenMockup) Delete(deviceID string, tokenID string) derrors.Erro
 	defer m.Unlock()
 
 	id := m.generateID(deviceID, tokenID)
-	_, err := m.unsafeGet(deviceID, tokenID)
+	token, err := m.unsafeGet(deviceID, tokenID)
 	if err != nil {
 		return derrors.NewNotFoundError("device not found").WithParams(deviceID)
 	}
 
 	delete(m.data, id)
+	delete(m.dataByRefreshToken, token.RefreshToken)
 	return nil
 }
 // Add a token.
@@ -61,6 +64,7 @@ func (m *DeviceTokenMockup) Add(token *entities.DeviceTokenData) derrors.Error {
 		return derrors.NewAlreadyExistsError("device token").WithParams(token.DeviceId, token.TokenID)
 	}
 	m.data[m.generateID(token.DeviceId, token.TokenID)] = *token
+	m.dataByRefreshToken[token.RefreshToken] = *token
 	return nil
 }
 // Get an existing token.
@@ -86,10 +90,13 @@ func (m *DeviceTokenMockup) Update(token *entities.DeviceTokenData) derrors.Erro
 	m.Lock()
 	defer m.Unlock()
 
-	if ! m.unsafeExists(token.DeviceId, token.TokenID){
+	oldToken, err := m.unsafeGet(token.DeviceId, token.TokenID)
+	if err != nil {
 		return  derrors.NewNotFoundError("device token").WithParams(token.DeviceId, token.TokenID)
 	}
+	delete(m.dataByRefreshToken, oldToken.RefreshToken)
 	m.data[m.generateID(token.DeviceId, token.TokenID)] = *token
+	m.dataByRefreshToken[token.RefreshToken] = *token
 	return nil
 }
 // Truncate cleans all data.
@@ -98,6 +105,7 @@ func (m *DeviceTokenMockup) Truncate() derrors.Error{
 	defer m.Unlock()
 
 	m.data = make(map[string]entities.DeviceTokenData,0)
+	m.dataByRefreshToken = make(map[string]entities.DeviceTokenData,0)
 	return nil
 }
 
@@ -111,6 +119,7 @@ func (m *DeviceTokenMockup) DeleteExpiredTokens() derrors.Error{
 		if token.ExpirationDate < time.Now().Unix() {
 			id := m.generateID(token.DeviceId, token.TokenID)
 			idBorrow = append(idBorrow, id)
+			delete(m.dataByRefreshToken, token.RefreshToken)
 		}
 
 	}
@@ -118,4 +127,15 @@ func (m *DeviceTokenMockup) DeleteExpiredTokens() derrors.Error{
 		delete(m.data, id)
 	}
 	return nil
+}
+
+func (m *DeviceTokenMockup)  GetByRefreshToken(refreshToken string) (*entities.DeviceTokenData, derrors.Error){
+	m.Lock()
+	defer m.Unlock()
+
+	data, ok := m.dataByRefreshToken[refreshToken]
+	if !ok {
+		return nil, derrors.NewNotFoundError("device token not found").WithParams(refreshToken)
+	}
+	return &data, nil
 }

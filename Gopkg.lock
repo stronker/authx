@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:fca839d5e4677fafc9b15b4b3e3b3df0cd9c5f1b255f02f4e4ce611d48ab89c3"
+  digest = "1:5c9dc6cfa571ce91199f939012eae56f5d70fe86f28e2e14994bde27f0605a23"
   name = "github.com/gocql/gocql"
   packages = [
     ".",
@@ -20,7 +20,7 @@
     "internal/streams",
   ]
   pruneopts = "UT"
-  revision = "30de9a1866a84c5cf21c2722b09ee6acac943084"
+  revision = "ec4793573d1447b6f92a1b359a0594566fad9d0e"
 
 [[projects]]
   digest = "1:5d1b5a25486fc7d4e133646d834f6fca7ba1cef9903d40e7aa786c41b89e9e91"
@@ -38,12 +38,12 @@
   version = "v1.2.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:4a0c6bb4805508a6287675fac876be2ac1182539ca8a32468d8128882e9d5009"
+  digest = "1:e4f5819333ac698d294fe04dbf640f84719658d5c7ce195b10060cc37292ce79"
   name = "github.com/golang/snappy"
   packages = ["."]
   pruneopts = "UT"
-  revision = "2e65f85255dbc3072edf28d6b5b8efc472979f5a"
+  revision = "2a8bb927dd31d8daada140a5d09578521ce5c36a"
+  version = "v0.0.1"
 
 [[projects]]
   digest = "1:236d7e1bdb50d8f68559af37dbcf9d142d56b431c9b2176d41e2a009b664cda8"
@@ -92,12 +92,12 @@
   version = "v2.0.0"
 
 [[projects]]
-  digest = "1:545608326a4a68784b26fa5e92ec43811ac8eb4a8e85f53eb9483bab20f21246"
+  digest = "1:3cc3e14bdc13501434085ecbc9d62d29fe0b5aee1d4119be5c02fce1ac9686b4"
   name = "github.com/nalej/grpc-authx-go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "13d9c3d7b551a5a85e72c850a03b449cd6cada20"
-  version = "v0.0.40"
+  revision = "3982becdfade5f6fe16da9a585747850b61eefa3"
+  version = "v0.0.42"
 
 [[projects]]
   digest = "1:41496e67504a2c5de20d1b003df34424ea413ad31993ad099a55b9cc8a9c8896"
@@ -204,16 +204,23 @@
   version = "v1.11.0"
 
 [[projects]]
-  digest = "1:eea178dedce9c9cb061ad269ed1332f92109fa4af51ce296e6eb0ed20f3b6f35"
+  digest = "1:73964279c2fc01ba0d05bcdbfa2df12708fc56427d9d921fcc531394ac71106b"
+  name = "github.com/scylladb/go-reflectx"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "8e28c7b74629f55b19259fcd798953ee195ec4a4"
+  version = "v1.0.0"
+
+[[projects]]
+  digest = "1:f3d534ff980e95f944fe17f2eb73e0ae466f21b7fb8090d6d3d5d0f69325bdc3"
   name = "github.com/scylladb/gocqlx"
   packages = [
     ".",
     "qb",
-    "reflectx",
   ]
   pruneopts = "UT"
-  revision = "dcec9d031fb594a4bc470473d1c98d33656f93e6"
-  version = "v1.1.0"
+  revision = "2265c3fdbb459cd8bd014fbd074b54810955e301"
+  version = "v1.2.1"
 
 [[projects]]
   digest = "1:645cabccbb4fa8aab25a956cbcbdf6a6845ca736b2c64e197ca7cbb9d210b939"
@@ -240,11 +247,11 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "057139ce5d2bdbe6fe73c53679e24e9cf007f637"
+  revision = "a4c6cb3142f211c99e4bf4cd769535b29a9b616f"
 
 [[projects]]
   branch = "master"
-  digest = "1:e4cb09624f31f9e33fce26702314da5a1383962d7e0861bfe39dfdc00a848fa3"
+  digest = "1:13d98d4a123176d59926946c44709a930054a7034d466cbbdbb92dd149790bcf"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -259,15 +266,15 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "d26f9f9a57f3fab6a695bec0d84433c2c50f8bbf"
+  revision = "3a22650c66bd7f4fb6d1e8072ffd7b75c8a27898"
 
 [[projects]]
   branch = "master"
-  digest = "1:db12953ac7a80656b159265fe13146959beaada45938a532f484a3aeb289462e"
+  digest = "1:8207c052fb873f83c61a5aa16f6add5feb9881eda2112b56f69fd3b9e7f55c3f"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "b90733256f2e882e81d52f9126de08df5615afd9"
+  revision = "b4e8571b14e03cc164df06f72b640ebce3899579"
 
 [[projects]]
   digest = "1:436b24586f8fee329e0dd65fd67c817681420cda1d7f934345c13fe78c212a73"
@@ -313,7 +320,7 @@
     "googleapis/rpc/status",
   ]
   pruneopts = "UT"
-  revision = "8819c946db4494a2259bf100a377f51aa585d893"
+  revision = "082222b4a5c572e33e82ee9162d1352c7cf38682"
 
 [[projects]]
   digest = "1:61ea4e024f5a9353eb1f012e260dd57e17bf20c33a3f86857f457ce7f7a559a8"

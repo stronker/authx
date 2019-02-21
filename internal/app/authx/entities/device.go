@@ -32,6 +32,7 @@ func NewDeviceGroupCredentialsFromGRPC (addRequest * grpc_authx_go.AddDeviceGrou
 		DeviceGroupApiKey: uuid.New().String(),
 		Enabled: addRequest.Enabled,
 		DefaultDeviceConnectivity: addRequest.DefaultDeviceConnectivity,
+		Secret: uuid.New().String(), // secret of the device_group
 	}
 }
 

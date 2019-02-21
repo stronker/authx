@@ -19,6 +19,9 @@ type Provider interface {
 	// Truncate cleans all data.
 	Truncate() derrors.Error
 
+	// Get an existing token.
+	GetByRefreshToken(refreshToken string) (*entities.DeviceTokenData, derrors.Error)
+
 	DeleteExpiredTokens() derrors.Error
 
 }

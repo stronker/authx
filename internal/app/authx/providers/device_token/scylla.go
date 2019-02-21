@@ -275,3 +275,7 @@ func (sp *ScyllaDeviceTokenProvider)  DeleteExpiredTokens() derrors.Error{
 	// nothing to do, ttl used to delete expired tokens
 	return nil
 }
+
+func (m *ScyllaDeviceTokenProvider)  GetByRefreshToken(refreshToken string) (*entities.DeviceTokenData, derrors.Error){
+	return nil, nil
+}

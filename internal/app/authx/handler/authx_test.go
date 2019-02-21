@@ -799,7 +799,7 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(success).To(gomega.BeNil())
 
 		})
-		ginkgo.It("Should be able to log a device group in other organization", func() {
+		ginkgo.It("Should not be able to log a device group in other organization", func() {
 			toAdd := pbAuthx.AddDeviceGroupCredentialsRequest{
 				OrganizationId:  uuid.New().String(),
 				DeviceGroupId:  uuid.New().String(),
@@ -845,6 +845,27 @@ var _ = ginkgo.Describe("Applications", func() {
 			gomega.Expect(err).NotTo(gomega.Succeed())
 
 		})
+		ginkgo.FIt("Should be able get the secret of the device group", func() {
+			toAdd := pbAuthx.AddDeviceGroupCredentialsRequest{
+				OrganizationId:  uuid.New().String(),
+				DeviceGroupId:  uuid.New().String(),
+			}
+			added, err := client.AddDeviceGroupCredentials(context.Background(), &toAdd)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(added.DeviceGroupApiKey).NotTo(gomega.BeEmpty())
+
+			toRecover := grpc_device_go.DeviceGroupId{
+				OrganizationId: toAdd.OrganizationId,
+				DeviceGroupId:  toAdd.DeviceGroupId,
+			}
+			recovered, err := client.GetDeviceGroupSecret(context.Background(),&toRecover)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(recovered).NotTo(gomega.BeNil())
+			gomega.Expect(recovered.Secret).NotTo(gomega.BeNil())
+			gomega.Expect(recovered.DeviceGroupId).Should(gomega.Equal(toRecover.DeviceGroupId))
+
+		})
+
 	})
 
 	ginkgo.AfterEach(func() {

@@ -16,7 +16,7 @@ func DeviceTokenContexts(provider Provider) {
 			deviceToken := entities.DeviceTokenData{
 				DeviceId: uuid.New().String(),
 				TokenID: uuid.New().String(),
-				RefreshToken: []byte("r1"),
+				RefreshToken: uuid.New().String(),
 				ExpirationDate:time.Now().Unix(),
 				OrganizationId: uuid.New().String(),
 				DeviceGroupId: uuid.New().String(),
@@ -32,7 +32,7 @@ func DeviceTokenContexts(provider Provider) {
 			deviceToken := entities.DeviceTokenData{
 				DeviceId: uuid.New().String(),
 				TokenID: uuid.New().String(),
-				RefreshToken: []byte("r1"),
+				RefreshToken: uuid.New().String(),
 				ExpirationDate:time.Now().Unix(),
 				OrganizationId: uuid.New().String(),
 				DeviceGroupId: uuid.New().String(),
@@ -56,7 +56,7 @@ func DeviceTokenContexts(provider Provider) {
 			deviceToken := entities.DeviceTokenData{
 				DeviceId: uuid.New().String(),
 				TokenID: uuid.New().String(),
-				RefreshToken: []byte("r1"),
+				RefreshToken: uuid.New().String(),
 				ExpirationDate:time.Now().Unix(),
 				OrganizationId: uuid.New().String(),
 				DeviceGroupId: uuid.New().String(),
@@ -83,7 +83,7 @@ func DeviceTokenContexts(provider Provider) {
 			deviceToken := entities.DeviceTokenData{
 				DeviceId: uuid.New().String(),
 				TokenID: uuid.New().String(),
-				RefreshToken: []byte("r1"),
+				RefreshToken: uuid.New().String(),
 				ExpirationDate:time.Now().Unix(),
 				OrganizationId: uuid.New().String(),
 				DeviceGroupId: uuid.New().String(),
@@ -109,7 +109,7 @@ func DeviceTokenContexts(provider Provider) {
 			deviceToken := entities.DeviceTokenData{
 				DeviceId: uuid.New().String(),
 				TokenID: uuid.New().String(),
-				RefreshToken: []byte("r1"),
+				RefreshToken: uuid.New().String(),
 				ExpirationDate:time.Now().Unix(),
 				OrganizationId: uuid.New().String(),
 				DeviceGroupId: uuid.New().String(),
@@ -118,7 +118,7 @@ func DeviceTokenContexts(provider Provider) {
 			err := provider.Add(&deviceToken)
 			gomega.Expect(err).To(gomega.Succeed())
 
-			deviceToken.RefreshToken = []byte("r2")
+			deviceToken.RefreshToken = uuid.New().String()
 
 			err = provider.Update(&deviceToken)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -128,7 +128,7 @@ func DeviceTokenContexts(provider Provider) {
 			deviceToken := entities.DeviceTokenData{
 				DeviceId: uuid.New().String(),
 				TokenID: uuid.New().String(),
-				RefreshToken: []byte("r1"),
+				RefreshToken: uuid.New().String(),
 				ExpirationDate:time.Now().Unix(),
 				OrganizationId: uuid.New().String(),
 				DeviceGroupId: uuid.New().String(),
