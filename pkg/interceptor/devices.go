@@ -9,20 +9,29 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/nalej/authx/pkg/token"
 	"github.com/nalej/derrors"
+	"github.com/nalej/grpc-authx-go"
 	"github.com/nalej/grpc-utils/pkg/conversions"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"github.com/hashicorp/golang-lru"
 )
+
+// TODO, two interceptors are required, a local one with grpc_authx_go Clients and another with grpc_app_cluster...
 
 // WithServerDeviceAuthxInterceptor is a gRPC option. If this option is included, the interceptor verifies that the device
 // is authorized to use the method, using the JWT token.
-func WithServerDeviceAuthxInterceptor(config *Config) grpc.ServerOption {
-	return grpc.UnaryInterceptor(deviceInterceptor(config))
+func WithServerDeviceAuthxInterceptor(client grpc_authx_go.AuthxClient, config *Config) grpc.ServerOption {
+	return grpc.UnaryInterceptor(deviceInterceptor(client, config))
 }
 
 // deviceInterceptor to create metadata entries for device users.
-func deviceInterceptor(config *Config) grpc.UnaryServerInterceptor {
+func deviceInterceptor(client grpc_authx_go.AuthxClient, config *Config) grpc.UnaryServerInterceptor {
+
+	groupSecretCache, err := lru.New(config.NumCacheEntries)
+	if err != nil{
+		log.Fatal().Err(err).Msg("cannot create LRU cache for devicegroup secrets")
+	}
 
 	return func(ctx context.Context,
 		req interface{},
@@ -32,7 +41,8 @@ func deviceInterceptor(config *Config) grpc.UnaryServerInterceptor {
 		_, ok := config.Authorization.Permissions[info.FullMethod]
 
 		if ok {
-			claim, dErr := checkDeviceJWT(ctx, config)
+			//deviceGroupId := extractDeviceGroupId(ctx)
+			claim, dErr := checkDeviceJWT(ctx, groupSecretCache, config)
 			if dErr != nil {
 				return nil, conversions.ToGRPCError(dErr)
 			}
@@ -68,8 +78,34 @@ func deviceInterceptor(config *Config) grpc.UnaryServerInterceptor {
 
 }
 
+type RawDeviceToken struct {
+	RawToken string
+	DeviceClaim token.DeviceClaim
+}
+
+func extractDeviceRawToken(ctx context.Context, config *Config) (*RawDeviceToken, derrors.Error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, derrors.NewInternalError("impossible to extract metadata")
+	}
+	authHeader, ok := md[config.Header]
+	if !ok {
+		return nil, derrors.NewUnauthenticatedError("token is not supplied")
+	}
+	rawToken := authHeader[0]
+	parser := new(jwt.Parser)
+	tk, _, err := parser.ParseUnverified(rawToken, &token.DeviceClaim{})
+	if err != nil{
+		return nil, derrors.NewUnauthenticatedError("token is not valid", err)
+	}
+	return &RawDeviceToken{
+		RawToken:      rawToken,
+		DeviceClaim:   *tk.Claims.(*token.DeviceClaim),
+	}, nil
+}
+
 // CheckDeviceJWT checks the validity of the device JWT token and returns the DeviceClaim
-func checkDeviceJWT(ctx context.Context, config *Config) (*token.DeviceClaim, derrors.Error) {
+func checkDeviceJWT(ctx context.Context, cache *lru.Cache, config *Config) (*token.DeviceClaim, derrors.Error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, derrors.NewInternalError("impossible to extract metadata")

@@ -42,6 +42,13 @@
   source = "https://github.com/fsnotify/fsnotify/archive/v1.4.7.tar.gz"
   name = "gopkg.in/fsnotify.v1"
 
+[[constraint]]
+    name="github.com/hashicorp/golang-lru"
+    version="v0.5.0"
+
+[[constraint]]
+    name="github.com/nalej/grpc-ping-go"
+    version="v0.0.29"
 
 [prune]
   go-tests = true
