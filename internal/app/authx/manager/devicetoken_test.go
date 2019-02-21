@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-var _ = ginkgo.Describe("BCryptPassword", func() {
+var _ = ginkgo.Describe("Device Token tests", func() {
 	var devProvider = device.NewMockupDeviceCredentialsProvider()
 	var devTokenManager = NewJWTDeviceToken(devProvider, device_token.NewDeviceTokenMockup() )
 
@@ -60,7 +60,7 @@ var _ = ginkgo.Describe("BCryptPassword", func() {
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
 
-			/*
+
 			tk, jwtErr := jwt.ParseWithClaims(gT.Token, &token.DeviceClaim{}, func(token *jwt.Token) (interface{}, error) {
 				return []byte(group.Secret), nil
 			})
@@ -69,7 +69,7 @@ var _ = ginkgo.Describe("BCryptPassword", func() {
 			cl, ok := tk.Claims.(*token.DeviceClaim)
 			gomega.Expect(ok).To(gomega.BeTrue())
 			gomega.Expect(cl).NotTo(gomega.BeNil())
-			*/
+
 
 			gTNew, err := devTokenManager.Refresh(gT.Token, gT.RefreshToken, expirationPeriod, group.Secret)
 			gomega.Expect(err).To(gomega.Succeed())
