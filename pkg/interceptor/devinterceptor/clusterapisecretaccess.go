@@ -103,6 +103,9 @@ func (sa *ClusterApiSecretAccess) RetrieveSecret(id *grpc_device_go.DeviceGroupI
 			ctx2, cancel2 := sa.GetContext()
 			defer cancel2()
 			deviceGroupSecret, err = sa.DeviceManagerClient.GetDeviceGroupSecret(ctx2, id)
+			if err != nil{
+				return "", conversions.ToDerror(err)
+			}
 		} else {
 			log.Error().Str("trace", conversions.ToDerror(err).DebugReport()).Msg("error obtaining device group secret")
 			return "", conversions.ToDerror(err)
