@@ -33,7 +33,7 @@ func NewGeneratedToken(token string, refreshToken string) *GeneratedToken {
 type Token interface {
 	// Generate a new token with the personal claim.
 	Generate(personalClaim *token.PersonalClaim, expirationPeriod time.Duration,
-		secret string, update bool) (*GeneratedToken, derrors.Error)
+		secret string) (*GeneratedToken, derrors.Error)
 	// Refresh renew an old token.
 	Refresh(oldToken string, refreshToken string,
 		expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error)
@@ -60,7 +60,7 @@ func NewJWTTokenMockup() Token {
 
 // Generate a new JWT token with the personal claim.
 func (m *JWTToken) Generate(personalClaim *token.PersonalClaim, expirationPeriod time.Duration,
-	secret string, update bool) (*GeneratedToken, derrors.Error) {
+	secret string) (*GeneratedToken, derrors.Error) {
 
 	claim := token.NewClaim(*personalClaim, Issuer, time.Now(), expirationPeriod)
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
@@ -116,7 +116,7 @@ func (m *JWTToken) Refresh(oldToken string, refreshToken string,
 		return nil, derrors.NewUnauthenticatedError("the refresh token is not valid", err)
 	}
 
-	gt, err := m.Generate(&cl.PersonalClaim, expirationPeriod, secret, true)
+	gt, err := m.Generate(&cl.PersonalClaim, expirationPeriod, secret)
 	if err != nil {
 		return nil, derrors.NewInternalError("impossible create new token", err)
 	}

@@ -26,7 +26,7 @@ func DeviceTokenContexts(provider Provider) {
 			gomega.Expect(err).To(gomega.Succeed())
 		})
 	})
-	ginkgo.Context("deleting device token...", func(){
+	ginkgo.Context("deleting device token", func(){
 		ginkgo.It("should be able to delete", func(){
 
 			deviceToken := entities.DeviceTokenData{
@@ -50,7 +50,7 @@ func DeviceTokenContexts(provider Provider) {
 			gomega.Expect(err).NotTo(gomega.Succeed())
 		})
 	})
-	ginkgo.Context("getting device token...", func(){
+	ginkgo.Context("getting device token", func(){
 		ginkgo.It("should be able to get a device token", func(){
 
 			deviceToken := entities.DeviceTokenData{
@@ -77,7 +77,7 @@ func DeviceTokenContexts(provider Provider) {
 			gomega.Expect(err).NotTo(gomega.Succeed())
 		})
 	})
-	ginkgo.Context("finding device token...", func(){
+	ginkgo.Context("finding device token", func(){
 		ginkgo.It("should be able to find a device token", func(){
 
 			deviceToken := entities.DeviceTokenData{
@@ -103,7 +103,7 @@ func DeviceTokenContexts(provider Provider) {
 			gomega.Expect(*exists).NotTo(gomega.BeTrue())
 		})
 	})
-	ginkgo.Context("updating device token...", func(){
+	ginkgo.Context("updating device token", func(){
 		ginkgo.It("should be able to update a device token", func(){
 
 			deviceToken := entities.DeviceTokenData{

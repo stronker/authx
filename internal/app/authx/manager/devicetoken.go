@@ -11,13 +11,14 @@ import (
 	"github.com/nalej/authx/internal/app/authx/providers/device_token"
 	"github.com/nalej/authx/pkg/token"
 	"github.com/nalej/derrors"
+	"github.com/rs/zerolog/log"
 	"time"
 )
 
 // Token is a interface manages the business logic of tokens.
 type DeviceToken interface {
 	// Generate a new token with the device claim.
-	Generate(deviceClaim *token.DeviceClaim, expirationPeriod time.Duration, secret string, update bool) (*GeneratedToken, derrors.Error)
+	Generate(deviceClaim *token.DeviceClaim, expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error)
 	// Refresh renew an old token.
 	Refresh(oldToken string, refreshToken string,
 		expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error)
@@ -49,11 +50,11 @@ func NewJWTDeviceToken(deviceProvider device.Provider, tokenProvider device_toke
 
 // Generate a new JWT token with the personal claim.
 func (m *JWTDeviceToken) Generate(deviceClaim *token.DeviceClaim, expirationPeriod time.Duration,
-	secret string, update bool) (*GeneratedToken, derrors.Error) {
+	secret string) (*GeneratedToken, derrors.Error) {
 
-	deviceClaim.ExpiresAt = time.Now().Add(expirationPeriod).Unix()
+	newClaim := token.NewDeviceClaim(deviceClaim.OrganizationID, deviceClaim.DeviceGroupID, deviceClaim.DeviceID, expirationPeriod)
 
-	t := jwt.NewWithClaims(jwt.SigningMethodHS256, deviceClaim)
+	t := jwt.NewWithClaims(jwt.SigningMethodHS256, newClaim)
 	tokenString, err := t.SignedString([]byte(secret))
 	if err != nil {
 		return nil, derrors.NewInternalError("impossible generate JWT Device token", err)
@@ -61,13 +62,10 @@ func (m *JWTDeviceToken) Generate(deviceClaim *token.DeviceClaim, expirationPeri
 
 	refreshToken := token.GenerateUUID()
 
-	tokenData := entities.NewDeviceTokenData(deviceClaim.DeviceID, deviceClaim.Id, refreshToken,
-		deviceClaim.ExpiresAt, deviceClaim.OrganizationID, deviceClaim.DeviceGroupID)
-	if ! update {
-		err = m.DeviceTokenProvider.Add(tokenData)
-	}else{
-		err = m.DeviceTokenProvider.Update(tokenData)
-	}
+	tokenData := entities.NewDeviceTokenData(newClaim.DeviceID, newClaim.Id, refreshToken,
+		newClaim.ExpiresAt, newClaim.OrganizationID, newClaim.DeviceGroupID)
+
+	err = m.DeviceTokenProvider.Add(tokenData)
 	if err != nil {
 		return nil, derrors.NewInternalError("impossible store RefreshToken", err)
 	}
@@ -131,9 +129,14 @@ func (m *JWTDeviceToken) Refresh(oldToken string, refreshToken string,
 		return nil, derrors.NewUnauthenticatedError("the refresh token is expired")
 	}
 
-	gt, err := m.Generate(cl, expirationPeriod, secret, true)
+	gt, err := m.Generate(cl, expirationPeriod, secret)
 	if err != nil {
 		return nil, derrors.NewInternalError("impossible create new token", err)
+	}
+
+	err = m.DeviceTokenProvider.Delete(deviceID, tokenID)
+	if err != nil {
+		log.Warn().Err(err).Msg("impossible delete refresh token")
 	}
 
 	return gt, nil
