@@ -11,6 +11,7 @@ type DeviceGroupCredentials struct {
 	DeviceGroupApiKey string
 	Enabled bool
 	DefaultDeviceConnectivity bool
+	Secret string
 }
 
 func NewDeviceGroupCredentials (organizationId string, deviceGroupId string, deviceGroupApiKey string,
@@ -31,6 +32,7 @@ func NewDeviceGroupCredentialsFromGRPC (addRequest * grpc_authx_go.AddDeviceGrou
 		DeviceGroupApiKey: uuid.New().String(),
 		Enabled: addRequest.Enabled,
 		DefaultDeviceConnectivity: addRequest.DefaultDeviceConnectivity,
+		Secret: uuid.New().String(), // secret of the device_group
 	}
 }
 

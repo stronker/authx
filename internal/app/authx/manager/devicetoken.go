@@ -7,7 +7,8 @@ package manager
 import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/nalej/authx/internal/app/authx/entities"
-	tokenProvider "github.com/nalej/authx/internal/app/authx/providers/token"
+	"github.com/nalej/authx/internal/app/authx/providers/device"
+	"github.com/nalej/authx/internal/app/authx/providers/device_token"
 	"github.com/nalej/authx/pkg/token"
 	"github.com/nalej/derrors"
 	"time"
@@ -28,19 +29,22 @@ type DeviceToken interface {
 
 
 type JWTDeviceToken struct {
-	TokenProvider tokenProvider.Token
-	Password      Password
+	DeviceProvider      device.Provider // device Provider
+	DeviceTokenProvider device_token.Provider
 }
 
 // NewJWTToken create a new instance of JWTToken
-func NewJWTDeviceToken(tokenProvider tokenProvider.Token, password Password) DeviceToken {
-	return &JWTDeviceToken{TokenProvider: tokenProvider, Password: password}
+func NewJWTDeviceToken(deviceProvider device.Provider, tokenProvider device_token.Provider) DeviceToken {
+	return &JWTDeviceToken{
+		DeviceProvider:deviceProvider,
+		DeviceTokenProvider: tokenProvider}
 
 }
 
 // NewJWTTokenMockup create a new mockup of JWTToken
-func NewJWTDeviceTokenMockup() DeviceToken {
-	return &JWTDeviceToken{TokenProvider: tokenProvider.NewTokenMockup(), Password: NewBCryptPassword()}
+	func NewJWTDeviceTokenMockup() DeviceToken {
+	return NewJWTDeviceToken(device.NewMockupDeviceCredentialsProvider(),
+		device_token.NewDeviceTokenMockup())
 }
 
 // Generate a new JWT token with the personal claim.
@@ -56,15 +60,13 @@ func (m *JWTDeviceToken) Generate(deviceClaim *token.DeviceClaim, expirationPeri
 	}
 
 	refreshToken := token.GenerateUUID()
-	hashedRefreshToken, err := m.Password.GenerateHashedPassword(refreshToken)
-	if err != nil {
-		return nil, derrors.NewInternalError("impossible generate RefreshToken", err)
-	}
-	tokenData := entities.NewTokenData(deviceClaim.DeviceID, deviceClaim.Id, hashedRefreshToken, deviceClaim.ExpiresAt)
+
+	tokenData := entities.NewDeviceTokenData(deviceClaim.DeviceID, deviceClaim.Id, refreshToken,
+		deviceClaim.ExpiresAt, deviceClaim.OrganizationID, deviceClaim.DeviceGroupID)
 	if ! update {
-		err = m.TokenProvider.Add(tokenData)
+		err = m.DeviceTokenProvider.Add(tokenData)
 	}else{
-		err = m.TokenProvider.Update(tokenData)
+		err = m.DeviceTokenProvider.Update(tokenData)
 	}
 	if err != nil {
 		return nil, derrors.NewInternalError("impossible store RefreshToken", err)
@@ -94,8 +96,19 @@ func (m *JWTDeviceToken) GetTokenInfo (tokenInfo string, secret string) (*token.
 func (m *JWTDeviceToken) Refresh(oldToken string, refreshToken string,
 	expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error) {
 
+	dToken, err := m.DeviceTokenProvider.GetByRefreshToken(refreshToken)
+	if err != nil {
+		return nil, derrors.NewInternalError("error getting token info", err)
+	}
+
+	group, err := m.DeviceProvider.GetDeviceGroup(dToken.OrganizationId, dToken.DeviceGroupId)
+	if err != nil {
+		return nil, err
+	}
+
+
 	tk, jwtErr := jwt.ParseWithClaims(oldToken, &token.DeviceClaim{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(secret), nil
+		return []byte(group.Secret), nil
 	})
 	if jwtErr != nil {
 		return nil, derrors.NewUnauthenticatedError("impossible recover RefreshToken", jwtErr)
@@ -109,18 +122,13 @@ func (m *JWTDeviceToken) Refresh(oldToken string, refreshToken string,
 	deviceID := cl.DeviceID
 	tokenID:= cl.Id
 
-	tokenData, err := m.TokenProvider.Get(deviceID, tokenID)
+	tokenData, err := m.DeviceTokenProvider.Get(deviceID, tokenID)
 	if err != nil {
 		return nil, derrors.NewUnauthenticatedError("impossible recover RefreshToken", err)
 	}
 	ts := time.Now().Unix()
 	if tokenData == nil || ts > tokenData.ExpirationDate {
 		return nil, derrors.NewUnauthenticatedError("the refresh token is expired")
-	}
-
-	err = m.Password.CompareHashAndPassword(tokenData.RefreshToken, refreshToken)
-	if err != nil {
-		return nil, derrors.NewUnauthenticatedError("the refresh token is not valid", err)
 	}
 
 	gt, err := m.Generate(cl, expirationPeriod, secret, true)
@@ -133,6 +141,6 @@ func (m *JWTDeviceToken) Refresh(oldToken string, refreshToken string,
 
 // Clean remove all the data from the providers.
 func (m *JWTDeviceToken) Clean() derrors.Error {
-	return m.TokenProvider.Truncate()
+	return m.DeviceTokenProvider.Truncate()
 }
 

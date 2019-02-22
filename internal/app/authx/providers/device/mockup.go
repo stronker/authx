@@ -18,7 +18,7 @@ type MockupDeviceCredentialsProvider struct {
 	groupByApyKey map[string] entities.DeviceGroupCredentials
 }
 
-func NewMockupDeviceCredentialsProvider () * MockupDeviceCredentialsProvider {
+func NewMockupDeviceCredentialsProvider () Provider {
 	return  &MockupDeviceCredentialsProvider{
 		deviceCredentials: make (map[string] entities.DeviceCredentials, 0),
 		deviceByApiKey: make (map[string] entities.DeviceCredentials, 0),
