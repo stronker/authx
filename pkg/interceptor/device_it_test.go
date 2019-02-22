@@ -15,7 +15,6 @@ import (
 	"github.com/nalej/grpc-utils/pkg/test"
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
-	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/test/bufconn"
@@ -40,7 +39,6 @@ func getContextFromDeviceLogin(device grpc_authx_go.DeviceCredentials, authxClie
 	response, err := authxClient.DeviceLogin(context.Background(), loginRequest)
 	gomega.Expect(err).To(gomega.Succeed())
 	md := metadata.New(map[string]string{header: response.Token})
-	log.Debug().Str("token", response.Token).Msg("Device token")
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 	return ctx
 }
@@ -122,7 +120,6 @@ var _ = ginkgo.Describe("Device Interceptor", func() {
 		request := &grpc_ping_go.PingRequest{
 			RequestNumber: 1,
 		}
-		log.Debug().Interface("manager", mgr).Msg("Manager")
 		response, err := pingClient.Ping(ctx, request)
 		gomega.Expect(err).To(gomega.Succeed())
 		gomega.Expect(response.RequestNumber).Should(gomega.Equal(request.RequestNumber))
