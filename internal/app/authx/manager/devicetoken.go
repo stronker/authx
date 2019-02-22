@@ -60,10 +60,7 @@ func (m *JWTDeviceToken) Generate(deviceClaim *token.DeviceClaim, expirationPeri
 	}
 
 	refreshToken := token.GenerateUUID()
-	//hashedRefreshToken, err := m.Password.GenerateHashedPassword(refreshToken)
-	//if err != nil {
-	//	return nil, derrors.NewInternalError("impossible generate RefreshToken", err)
-	//}
+
 	tokenData := entities.NewDeviceTokenData(deviceClaim.DeviceID, deviceClaim.Id, refreshToken,
 		deviceClaim.ExpiresAt, deviceClaim.OrganizationID, deviceClaim.DeviceGroupID)
 	if ! update {
@@ -99,10 +96,6 @@ func (m *JWTDeviceToken) GetTokenInfo (tokenInfo string, secret string) (*token.
 func (m *JWTDeviceToken) Refresh(oldToken string, refreshToken string,
 	expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error) {
 
-	//hash, err := m.Password.GenerateHashedPassword(refreshToken)
-	//if err != nil {
-	//	return nil, derrors.NewInternalError("impossible generate hash", err)
-	//}
 	dToken, err := m.DeviceTokenProvider.GetByRefreshToken(refreshToken)
 	if err != nil {
 		return nil, derrors.NewInternalError("error getting token info", err)
@@ -137,11 +130,6 @@ func (m *JWTDeviceToken) Refresh(oldToken string, refreshToken string,
 	if tokenData == nil || ts > tokenData.ExpirationDate {
 		return nil, derrors.NewUnauthenticatedError("the refresh token is expired")
 	}
-
-	//err = m.Password.CompareHashAndPassword(tokenData.RefreshToken, refreshToken)
-	//if err != nil {
-//		return nil, derrors.NewUnauthenticatedError("the refresh token is not valid", err)
-//	}
 
 	gt, err := m.Generate(cl, expirationPeriod, secret, true)
 	if err != nil {
