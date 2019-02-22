@@ -7,8 +7,10 @@ package interceptor
 import (
 	"context"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/nalej/authx/pkg/interceptor/devinterceptor"
 	"github.com/nalej/authx/pkg/token"
 	"github.com/nalej/derrors"
+	"github.com/nalej/grpc-device-go"
 	"github.com/nalej/grpc-utils/pkg/conversions"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
@@ -17,12 +19,12 @@ import (
 
 // WithServerDeviceAuthxInterceptor is a gRPC option. If this option is included, the interceptor verifies that the device
 // is authorized to use the method, using the JWT token.
-func WithServerDeviceAuthxInterceptor(config *Config) grpc.ServerOption {
-	return grpc.UnaryInterceptor(deviceInterceptor(config))
+func WithDeviceAuthxInterceptor(secretAccess devinterceptor.SecretAccess, config *Config) grpc.ServerOption {
+	return grpc.UnaryInterceptor(managementDeviceInterceptor(secretAccess, config))
 }
 
 // deviceInterceptor to create metadata entries for device users.
-func deviceInterceptor(config *Config) grpc.UnaryServerInterceptor {
+func managementDeviceInterceptor(secretAccess devinterceptor.SecretAccess, config *Config) grpc.UnaryServerInterceptor {
 
 	return func(ctx context.Context,
 		req interface{},
@@ -32,7 +34,13 @@ func deviceInterceptor(config *Config) grpc.UnaryServerInterceptor {
 		_, ok := config.Authorization.Permissions[info.FullMethod]
 
 		if ok {
-			claim, dErr := checkDeviceJWT(ctx, config)
+			// Extract the raw token to be able to obtain the device group id required to retrieve the secret.
+			tk, err := extractDeviceRawToken(ctx, config)
+			if err != nil{
+				return nil, conversions.ToGRPCError(derrors.NewUnauthenticatedError("token is not supplied"))
+			}
+			// Check the claim using the extracted device group id.
+			claim, dErr := checkDeviceJWT(*tk, secretAccess, config)
 			if dErr != nil {
 				return nil, conversions.ToGRPCError(dErr)
 			}
@@ -41,7 +49,7 @@ func deviceInterceptor(config *Config) grpc.UnaryServerInterceptor {
 			if dErr != nil {
 				return nil, conversions.ToGRPCError(dErr)
 			}
-
+			// Add the new metadata to the context.
 			values := make([]string, 0)
 			values = append(values, "organization_id", claim.OrganizationID, "device_id", claim.DeviceID, "device_group_id", claim.DeviceGroupID)
 			for _, p := range claim.Primitives {
@@ -68,21 +76,51 @@ func deviceInterceptor(config *Config) grpc.UnaryServerInterceptor {
 
 }
 
-// CheckDeviceJWT checks the validity of the device JWT token and returns the DeviceClaim
-func checkDeviceJWT(ctx context.Context, config *Config) (*token.DeviceClaim, derrors.Error) {
+// RawDeviceToken is a structure that permits to store the raw token as well as the parsed one before checking for
+// the signature.
+type RawDeviceToken struct {
+	RawToken string
+	DeviceClaim token.DeviceClaim
+}
+
+func (rdt * RawDeviceToken) GetDeviceGroupId() *grpc_device_go.DeviceGroupId{
+	return &grpc_device_go.DeviceGroupId{
+		OrganizationId:       rdt.DeviceClaim.OrganizationID,
+		DeviceGroupId:        rdt.DeviceClaim.DeviceGroupID,
+	}
+}
+
+// extractDeviceRawToken extracts the claim without checking the secret.
+func extractDeviceRawToken(ctx context.Context, config *Config) (*RawDeviceToken, derrors.Error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, derrors.NewInternalError("impossible to extract metadata")
 	}
-
 	authHeader, ok := md[config.Header]
 	if !ok {
 		return nil, derrors.NewUnauthenticatedError("token is not supplied")
 	}
-	t := authHeader[0]
+	rawToken := authHeader[0]
+	parser := new(jwt.Parser)
+	tk, _, err := parser.ParseUnverified(rawToken, &token.DeviceClaim{})
+	if err != nil{
+		return nil, derrors.NewUnauthenticatedError("token is not valid", err)
+	}
+	return &RawDeviceToken{
+		RawToken:      rawToken,
+		DeviceClaim:   *tk.Claims.(*token.DeviceClaim),
+	}, nil
+}
+
+// CheckDeviceJWT checks the validity of the device JWT token and returns the DeviceClaim
+func checkDeviceJWT(rawToken RawDeviceToken, secretAccess devinterceptor.SecretAccess, config *Config) (*token.DeviceClaim, derrors.Error) {
+	secret, rErr := secretAccess.RetrieveSecret(rawToken.GetDeviceGroupId())
+	if rErr != nil{
+		return nil, rErr
+	}
 	// validateToken function validates the token
-	tk, err := jwt.ParseWithClaims(t, &token.DeviceClaim{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(config.Secret), nil
+	tk, err := jwt.ParseWithClaims(rawToken.RawToken, &token.DeviceClaim{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
 	})
 
 	if err != nil {
