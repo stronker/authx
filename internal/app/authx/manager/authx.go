@@ -116,7 +116,7 @@ func (m *Authx) LoginWithBasicCredentials(username string, password string) (*pb
 		return nil, err
 	}
 	personalClaim := token.NewPersonalClaim(username, role.Name, role.Primitives, credentials.OrganizationID)
-	gToken, err := m.Token.Generate(personalClaim, m.expirationDuration, m.secret, false)
+	gToken, err := m.Token.Generate(personalClaim, m.expirationDuration, m.secret)
 	if err != nil {
 
 		return nil, err
@@ -341,9 +341,9 @@ func (m * Authx) LoginDeviceCredentials (loginRequest * pbAuthx.DeviceLoginReque
 		return nil, derrors.NewPermissionDeniedError("the group is temporarily disabled").WithParams(credentials.OrganizationID, credentials.DeviceGroupID)
 	}
 
-	deviceClaim := token.NewDeviceClaim(credentials.OrganizationID, credentials.DeviceGroupID, credentials.DeviceGroupID)
+	deviceClaim := token.NewDeviceClaim(credentials.OrganizationID, credentials.DeviceGroupID, credentials.DeviceGroupID, m.DeviceExpiration)
 
-	gToken, err := m.DeviceToken.Generate(deviceClaim, m.DeviceExpiration, group.Secret, false)
+	gToken, err := m.DeviceToken.Generate(deviceClaim, m.DeviceExpiration, group.Secret)
 	if err != nil {
 
 		return nil, err

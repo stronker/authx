@@ -19,12 +19,13 @@ type DeviceClaim struct {
 	Primitives     [] string `json:"access,omitempty"`
 }
 
-func NewDeviceClaim(organizationId string, deviceGroupId string, deviceId string) *DeviceClaim {
+func NewDeviceClaim(organizationId string, deviceGroupId string, deviceId string, expirationPeriod time.Duration) *DeviceClaim {
 		stdClaim := jwt.StandardClaims{
 			Issuer:    "authx",
 			Id:        GenerateUUID(),
 			NotBefore: time.Now().Unix(),
 			IssuedAt:  time.Now().Unix(),
+			ExpiresAt: time.Now().Add(expirationPeriod).Unix(),
 		}
 
 		return &DeviceClaim{

@@ -23,25 +23,25 @@ func TokenContexts(manager Token) {
 		expirationPeriod, _ := time.ParseDuration("10m")
 		secret := "myLittleSecret112131"
 		ginkgo.It("can generate a token", func() {
-			gT, err := manager.Generate(claim, expirationPeriod, secret, false)
+			gT, err := manager.Generate(claim, expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
 
 		})
 
 		ginkgo.It("can generated two tokens for the same user", func() {
-			gT, err := manager.Generate(claim, expirationPeriod, secret, false)
+			gT, err := manager.Generate(claim, expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
 
-			gTNew, err := manager.Generate(claim, expirationPeriod, secret, false)
+			gTNew, err := manager.Generate(claim, expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gTNew).NotTo(gomega.BeNil())
 			gomega.Expect(gTNew).NotTo(gomega.Equal(gT))
 		})
 
 		ginkgo.It("can refresh a token", func() {
-			gT, err := manager.Generate(claim, expirationPeriod, secret, false)
+			gT, err := manager.Generate(claim, expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
 
@@ -64,7 +64,7 @@ func TokenContexts(manager Token) {
 
 			d, _ := time.ParseDuration("-1s")
 
-			gT, err := manager.Generate(claim, d, secret, false)
+			gT, err := manager.Generate(claim, d, secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
 
@@ -86,7 +86,7 @@ func TokenContexts(manager Token) {
 
 		ginkgo.It("must be able to reject the refresh token is incorrect", func() {
 
-			gT, err := manager.Generate(claim, expirationPeriod, secret, false)
+			gT, err := manager.Generate(claim, expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
 
@@ -108,7 +108,7 @@ func TokenContexts(manager Token) {
 
 		ginkgo.It("must be able to reject the token is incorrect", func() {
 
-			gT, err := manager.Generate(claim, expirationPeriod, secret, false)
+			gT, err := manager.Generate(claim, expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
 
@@ -130,7 +130,7 @@ func TokenContexts(manager Token) {
 
 		ginkgo.It("can't use two times the same refresh token", func() {
 
-			gT, err := manager.Generate(claim, expirationPeriod, secret, false)
+			gT, err := manager.Generate(claim, expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
 

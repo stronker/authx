@@ -20,7 +20,7 @@ var _ = ginkgo.Describe("Device Token tests", func() {
 	expirationPeriod, _ := time.ParseDuration("10m")
 	secret := "myLittleSecret12345"
 
-	deviceClaim := token.NewDeviceClaim(uuid.New().String(), uuid.New().String(), uuid.New().String())
+	deviceClaim := token.NewDeviceClaim(uuid.New().String(), uuid.New().String(), uuid.New().String(), expirationPeriod)
 
 	ginkgo.Context("Device Token tests", func() {
 		var group entities.DeviceGroupCredentials
@@ -39,24 +39,26 @@ var _ = ginkgo.Describe("Device Token tests", func() {
 
 
 		ginkgo.It("Can generate a token", func() {
-			gT, err := devTokenManager.Generate(deviceClaim, expirationPeriod, secret, false)
+			gT, err := devTokenManager.Generate(deviceClaim, expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
 
 		})
-		ginkgo.It("can not add a device token twice", func() {
-			gT, err := devTokenManager.Generate(deviceClaim, expirationPeriod, secret, false)
+		ginkgo.It("can add a device token twice", func() {
+			gT, err := devTokenManager.Generate(deviceClaim, expirationPeriod, secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
 
-			_, err = devTokenManager.Generate(deviceClaim, expirationPeriod, secret, false)
-			gomega.Expect(err).NotTo(gomega.Succeed())
+			gT2, err := devTokenManager.Generate(deviceClaim, expirationPeriod, secret)
+			gomega.Expect(err).To(gomega.Succeed())
+			gomega.Expect(gT2).NotTo(gomega.BeNil())
+
 		})
 		ginkgo.It("can refresh a device token", func() {
 
 
 
-			gT, err := devTokenManager.Generate(deviceClaim, expirationPeriod, group.Secret, false)
+			gT, err := devTokenManager.Generate(deviceClaim, expirationPeriod, group.Secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
 
@@ -80,7 +82,7 @@ var _ = ginkgo.Describe("Device Token tests", func() {
 
 			d, _ := time.ParseDuration("-1s")
 
-			gT, err := devTokenManager.Generate(deviceClaim, d, group.Secret, false)
+			gT, err := devTokenManager.Generate(deviceClaim, d, group.Secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
 
@@ -101,7 +103,7 @@ var _ = ginkgo.Describe("Device Token tests", func() {
 		})
 		ginkgo.It("must be able to reject the refresh token is incorrect", func() {
 
-			gT, err := devTokenManager.Generate(deviceClaim, expirationPeriod, group.Secret, false)
+			gT, err := devTokenManager.Generate(deviceClaim, expirationPeriod, group.Secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
 
@@ -123,7 +125,7 @@ var _ = ginkgo.Describe("Device Token tests", func() {
 
 		ginkgo.It("must be able to reject the token is incorrect", func() {
 
-			gT, err := devTokenManager.Generate(deviceClaim, expirationPeriod, group.Secret, false)
+			gT, err := devTokenManager.Generate(deviceClaim, expirationPeriod, group.Secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
 
@@ -145,7 +147,7 @@ var _ = ginkgo.Describe("Device Token tests", func() {
 
 		ginkgo.It("can't use two times the same refresh token", func() {
 
-			gT, err := devTokenManager.Generate(deviceClaim, expirationPeriod, group.Secret, false)
+			gT, err := devTokenManager.Generate(deviceClaim, expirationPeriod, group.Secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
 
