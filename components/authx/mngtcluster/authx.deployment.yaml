@@ -26,7 +26,7 @@ spec:
       containers:
       - name: authx
         image: __NPH_REGISTRY.azurecr.io/__NPH_REGISTRY_NAMESPACE/authx:__NPH_VERSION
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         args:
         - "run"
         - "--secret=/etc/authx/secret"
