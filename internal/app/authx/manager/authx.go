@@ -449,13 +449,10 @@ func (m * Authx) LoginDeviceGroup (credentials *pbAuthx.DeviceGroupLoginRequest)
 func (m *Authx) RefreshDeviceToken(oldToken string, refreshToken string) (*pbAuthx.LoginResponse, derrors.Error) {
 
 	// get the device info
-	// 1.- Generate the hash
-	// 2.- Get the token info
-	// 3.- Get the secret
-	//hash, err := m.Password.GenerateHashedPassword(refreshToken)
-	//if err != nil {
-	//	return nil, derrors.NewInternalError("impossible generate hash", err)
-	//}
+	// 1.- Get the token info
+	// 2.- Get the secret
+	// 3.- Validate
+
 	dToken, err := m.DeviceTokenProvider.GetByRefreshToken(refreshToken)
 	if err != nil {
 		return nil, derrors.NewInternalError("error getting token info", err)
@@ -466,20 +463,13 @@ func (m *Authx) RefreshDeviceToken(oldToken string, refreshToken string) (*pbAut
 		return nil, err
 	}
 
-	//
 	claim, err := m.DeviceToken.GetTokenInfo(oldToken, group.Secret)
-
-	// get the group to check if it is enabled
-	//group, err := m.DeviceProvider.GetDeviceGroup(claim.OrganizationID, claim.DeviceGroupID)
-	//if err != nil {
-    //		return nil, err
-	//}
 
 	// check if the token is correct
 	if claim.OrganizationID != dToken.OrganizationId || claim.DeviceGroupID != dToken.DeviceGroupId {
 		return nil, derrors.NewUnauthenticatedError("the refresh token is not valid", err)
 	}
-
+	// check if the group is enabled
 	if ! group.Enabled {
 		return nil, derrors.NewPermissionDeniedError("the group is temporarily disabled").WithParams(group.OrganizationID, group.DeviceGroupID)
 	}
