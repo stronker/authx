@@ -86,19 +86,21 @@ func (s *Service) createInMemoryManagers() * TokenManagers {
 		deviceTokenManager: manager.NewJWTDeviceTokenMockup(),
 	}
 }
-func (s *Service) createDBScyllaManagers(tokenProvider token.Token, password manager.Password) * TokenManagers {
+func (s *Service) createDBScyllaManagers(tokenProvider token.Token, password manager.Password,
+	deviceProvider device.Provider, deviceTokenProvider device_token.Provider) * TokenManagers {
 	return &TokenManagers{
 		tokenManager: manager.NewJWTToken(tokenProvider, password),
-		deviceTokenManager: manager.NewJWTDeviceTokenMockup(),
+		deviceTokenManager: manager.NewJWTDeviceToken(deviceProvider, deviceTokenProvider ),
 	}
 }
 
 
-func (s *Service) getTokenManager(tokenProvider token.Token, password manager.Password) * TokenManagers {
+func (s *Service) getTokenManager(tokenProvider token.Token, password manager.Password,
+	deviceProvider device.Provider, deviceTokenProvider device_token.Provider) * TokenManagers {
 	if s.Config.UseInMemoryProviders {
 		return s.createInMemoryManagers()
 	} else if s.Config.UseDBScyllaProviders {
-		return s.createDBScyllaManagers(tokenProvider, password)
+		return s.createDBScyllaManagers(tokenProvider, password, deviceProvider, deviceTokenProvider)
 	}
 	log.Fatal().Msg("unsupported type of provider")
 	return nil
@@ -119,7 +121,7 @@ func (s *Service) Run() {
 	passwordMgr := manager.NewBCryptPassword()
 
 	// Create the token manager (memory/scylla)
-	t := s.getTokenManager(p.tokenProvider, passwordMgr)
+	t := s.getTokenManager(p.tokenProvider, passwordMgr, p.devProvider, p.devTokenProvider)
 	tokenMgr := t.tokenManager
 	deviceMgr := t.deviceTokenManager
 
