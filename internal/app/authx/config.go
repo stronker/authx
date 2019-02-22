@@ -5,6 +5,7 @@
 package authx
 
 import (
+	"github.com/nalej/authx/version"
 	"github.com/nalej/derrors"
 	"github.com/rs/zerolog/log"
 	"strings"
@@ -62,6 +63,7 @@ func (conf * Config) Validate() derrors.Error {
 
 // Print information about the configuration of the application.
 func (conf * Config) Print() {
+	log.Info().Str("app", version.AppVersion).Str("commit", version.Commit).Msg("Version")
 	log.Info().Int("port", conf.Port).Msg("gRPC port")
 	log.Info().Str("secret", strings.Repeat("*", len(conf.Secret))).Msg("Token secret")
 	log.Info().Str("duration", conf.ExpirationTime.String()).Msg("Expiration time")
