@@ -38,8 +38,7 @@ type ClusterApiSecretAccess struct {
 }
 
 func NewClusterApiSecretAccess (loginAPIAddress string, clusterAPIAddress string, username string,
-	password string, numCachedEntries int, loginClient grpc_login_api_go.LoginClient,
-	deviceClient grpc_cluster_api_go.DeviceManagerClient)(SecretAccess, derrors.Error) {
+	password string, numCachedEntries int)(SecretAccess, derrors.Error) {
 	lruCache, err := lru.New(numCachedEntries)
 	if err != nil{
 		return nil, derrors.AsError(err, "cannot create cache")
@@ -50,11 +49,27 @@ func NewClusterApiSecretAccess (loginAPIAddress string, clusterAPIAddress string
 		Username: username,
 		Password:password,
 		cache:  *lruCache,
-		LoginClient: loginClient,
-		DeviceManagerClient: deviceClient,
 	}
 	return access, nil
 }
+
+func NewClusterApiSecretAccessWithClients(loginClient grpc_login_api_go.LoginClient, deviceManagerClient grpc_cluster_api_go.DeviceManagerClient,
+	username string, password string, numCachedEntries int) (SecretAccess, derrors.Error){
+	lruCache, err := lru.New(numCachedEntries)
+	if err != nil{
+		return nil, derrors.AsError(err, "cannot create cache")
+	}
+
+	var access SecretAccess = &ClusterApiSecretAccess{
+		LoginClient: loginClient,
+		DeviceManagerClient:deviceManagerClient,
+		Username: username,
+		Password:password,
+		cache:  *lruCache,
+	}
+	return access, nil
+}
+
 
 func (sa *ClusterApiSecretAccess) login() derrors.Error {
 	ctx, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
