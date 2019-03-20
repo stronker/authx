@@ -46,7 +46,6 @@ func authxInterceptor(config *Config) grpc.UnaryServerInterceptor {
 			for _, p := range claim.Primitives {
 				values = append(values, p, "true")
 			}
-			log.Debug().Strs("md", values).Msg("creating new context")
 			newMD := metadata.Pairs(values...)
 			oldMD, ok := metadata.FromIncomingContext(ctx)
 			if !ok {
