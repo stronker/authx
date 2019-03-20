@@ -1,4 +1,4 @@
-package token
+package device_token
 
 import (
 	"github.com/nalej/authx/internal/app/authx/utils"
@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-var _ = ginkgo.Describe("ScyllaTokenProvider", func(){
+var _ = ginkgo.Describe("ScyllaDeviceTokenProvider", func(){
 
 	if ! utils.RunIntegrationTests() {
 		log.Warn().Msg("Integration tests are skipped")
@@ -33,13 +33,13 @@ var _ = ginkgo.Describe("ScyllaTokenProvider", func(){
 	}
 
 	// create a provider and connect it
-	sp := NewScyllaTokenProvider(scyllaHost, scyllaPort, nalejKeySpace)
+	sp := NewScyllaDeviceTokenProvider(scyllaHost, scyllaPort, nalejKeySpace)
 
 	// disconnect
 	ginkgo.AfterSuite(func() {
 		sp.Disconnect()
 	})
 
-	TokenContexts(sp)
+	DeviceTokenContexts(sp)
 
 })

@@ -8,6 +8,7 @@ import (
 	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/nalej/authx/internal/app/authx/providers/credentials"
 	"github.com/nalej/authx/internal/app/authx/providers/device"
+	"github.com/nalej/authx/internal/app/authx/providers/device_token"
 	"github.com/nalej/authx/internal/app/authx/providers/role"
 	"github.com/nalej/authx/pkg/token"
 	"github.com/nalej/derrors"
@@ -28,19 +29,21 @@ const DefaultSecret = "MyLittleSecret"
 // Authx is the component that manages the business logic.
 type Authx struct {
 	Password            Password
-	Token               Token
-	CredentialsProvider credentials.BasicCredentials
-	RoleProvider        role.Role
-	DeviceProvider      device.Provider
-	secret             string
-	expirationDuration time.Duration
-	DeviceToken			DeviceToken
-	DeviceExpiration    time.Duration
+	Token               Token // user_token
+	CredentialsProvider credentials.BasicCredentials // user_credentials
+	RoleProvider        role.Role // role Provider
+	DeviceProvider      device.Provider // device Provider
+	secret             	string // Secret (for user login)
+	expirationDuration 	time.Duration // user token expiration
+	DeviceToken			DeviceToken // device_token
+	DeviceExpiration    time.Duration // device_token expiration
+	DeviceTokenProvider device_token.Provider
 }
 
 // NewAuthx creates a new manager.
 func NewAuthx(password Password, tokenManager Token, deviceToken DeviceToken, credentialsProvider credentials.BasicCredentials,
-	roleProvide role.Role, deviceProvider device.Provider, secret string, expirationDuration time.Duration, deviceExpiration time.Duration) *Authx {
+	roleProvide role.Role, deviceProvider device.Provider, secret string, expirationDuration time.Duration, deviceExpiration time.Duration,
+	deviceTokenProvider device_token.Provider) *Authx {
 
 	return &Authx{
 		Password: password,
@@ -52,18 +55,21 @@ func NewAuthx(password Password, tokenManager Token, deviceToken DeviceToken, cr
 		expirationDuration: expirationDuration,
 		DeviceToken: deviceToken,
 		DeviceExpiration: deviceExpiration,
-
+		DeviceTokenProvider:deviceTokenProvider,
 	}
 
 }
 
 // NewAuthxMockup create a new mockup manager.
-func NewAuthxMockup() *Authx {
+func 	NewAuthxMockup() *Authx {
 	d, _ := time.ParseDuration(DefaultExpirationDuration)
 	e, _ := time.ParseDuration(DefaultDeviceExpirationDuration)
-	return NewAuthx(NewBCryptPassword(), NewJWTTokenMockup(), NewJWTDeviceTokenMockup(),
+	dcProvider := device.NewMockupDeviceCredentialsProvider()
+	dtMockup := device_token.NewDeviceTokenMockup()
+	return NewAuthx(NewBCryptPassword(), NewJWTTokenMockup(), NewJWTDeviceToken(dcProvider, dtMockup),
 		credentials.NewBasicCredentialMockup(), role.NewRoleMockup(),
-		device.NewMockupDeviceCredentialsProvider(),DefaultSecret, d, e)
+		dcProvider,DefaultSecret, d, e,
+		dtMockup)
 }
 
 // DeleteCredentials deletes the credential for a specific username.
@@ -110,7 +116,7 @@ func (m *Authx) LoginWithBasicCredentials(username string, password string) (*pb
 		return nil, err
 	}
 	personalClaim := token.NewPersonalClaim(username, role.Name, role.Primitives, credentials.OrganizationID)
-	gToken, err := m.Token.Generate(personalClaim, m.expirationDuration, m.secret, false)
+	gToken, err := m.Token.Generate(personalClaim, m.expirationDuration, m.secret)
 	if err != nil {
 
 		return nil, err
@@ -335,9 +341,9 @@ func (m * Authx) LoginDeviceCredentials (loginRequest * pbAuthx.DeviceLoginReque
 		return nil, derrors.NewPermissionDeniedError("the group is temporarily disabled").WithParams(credentials.OrganizationID, credentials.DeviceGroupID)
 	}
 
-	deviceClaim := token.NewDeviceClaim(credentials.OrganizationID, credentials.DeviceGroupID, credentials.DeviceGroupID)
+	deviceClaim := token.NewDeviceClaim(credentials.OrganizationID, credentials.DeviceGroupID, credentials.DeviceGroupID, m.DeviceExpiration)
 
-	gToken, err := m.DeviceToken.Generate(deviceClaim, m.DeviceExpiration, m.secret, false)
+	gToken, err := m.DeviceToken.Generate(deviceClaim, m.DeviceExpiration, group.Secret)
 	if err != nil {
 
 		return nil, err
@@ -442,22 +448,53 @@ func (m * Authx) LoginDeviceGroup (credentials *pbAuthx.DeviceGroupLoginRequest)
 // RefreshDeviceToken renew an old token.
 func (m *Authx) RefreshDeviceToken(oldToken string, refreshToken string) (*pbAuthx.LoginResponse, derrors.Error) {
 
-	claim, err := m.DeviceToken.GetTokenInfo(oldToken, m.secret)
+	// get the device info
+	// 1.- Get the token info
+	// 2.- Get the secret
+	// 3.- Validate
 
-	// get the group to check if it is enabled
-	group, err := m.DeviceProvider.GetDeviceGroup(claim.OrganizationID, claim.DeviceGroupID)
+	dToken, err := m.DeviceTokenProvider.GetByRefreshToken(refreshToken)
+	if err != nil {
+		return nil, derrors.NewInternalError("error getting token info", err)
+	}
+
+	group, err := m.DeviceProvider.GetDeviceGroup(dToken.OrganizationId, dToken.DeviceGroupId)
 	if err != nil {
 		return nil, err
 	}
+
+	claim, err := m.DeviceToken.GetTokenInfo(oldToken, group.Secret)
+
+	// check if the token is correct
+	if claim.OrganizationID != dToken.OrganizationId || claim.DeviceGroupID != dToken.DeviceGroupId {
+		return nil, derrors.NewUnauthenticatedError("the refresh token is not valid", err)
+	}
+	// check if the group is enabled
 	if ! group.Enabled {
 		return nil, derrors.NewPermissionDeniedError("the group is temporarily disabled").WithParams(group.OrganizationID, group.DeviceGroupID)
 	}
 
 
-	gToken, err := m.DeviceToken.Refresh(oldToken, refreshToken, m.expirationDuration, m.secret)
+	gToken, err := m.DeviceToken.Refresh(oldToken, refreshToken, m.expirationDuration, group.Secret)
 	if err != nil {
 		return nil, err
 	}
 	response := &pbAuthx.LoginResponse{Token: gToken.Token, RefreshToken: gToken.RefreshToken}
 	return response, nil
+}
+// GetDeviceGroupSecret returns secret of the device group
+func (m *Authx) GetDeviceGroupSecret(request *grpc_device_go.DeviceGroupId) (*pbAuthx.DeviceGroupSecret, derrors.Error) {
+
+	// get the devicegroup info
+	group, err := m.DeviceProvider.GetDeviceGroup(request.OrganizationId, request.DeviceGroupId)
+	if err != nil {
+		return nil, err
+	}
+	// returns the secret
+	return &pbAuthx.DeviceGroupSecret{
+		OrganizationId: group.OrganizationID,
+		DeviceGroupId: group.DeviceGroupID,
+		Secret: group.Secret,
+	}, nil
+
 }

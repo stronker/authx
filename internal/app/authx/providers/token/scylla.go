@@ -148,7 +148,7 @@ func (sp *ScyllaTokenProvider) Delete(username string, tokenID string) derrors.E
 		return err
 	}
 	if ! *exists {
-		return derrors.NewNotFoundError("role").WithParams(username, tokenID)
+		return derrors.NewNotFoundError("token").WithParams(username, tokenID)
 	}
 
 	stmt, _ := qb.Delete(table).Where(qb.Eq(tablePK_1)).Where(qb.Eq(tablePK_2)).ToCql()
