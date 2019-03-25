@@ -52,7 +52,7 @@ jobs:
       buildVersionToDownload: 'latestFromBranch'
       branchName: 'refs/heads/master'
       artifactName: testing-k8sYAMLfiles
-      downloadPath: dist/yaml/$(stagingDockerRegistry)
+      downloadPath: $(system.defaultWorkingDirectory)/dist/yaml/$(stagingDockerRegistry)
   
   - script: |
       cd dist
