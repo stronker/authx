@@ -44,9 +44,13 @@ jobs:
       componentList: $(componentList)
       dockerRegistry: $(stagingDockerRegistry)
 
-  - task: DownloadPipelineArtifact@0
+  - task: DownloadPipelineArtifact@1
     inputs:
-      pipelineId: 9
+      buildType: 'specific'
+      project: 'nalej'
+      buildVersionToDownload: 'latestFromBranch'
+      branchName: 'refs/heads/master'
+      pipeline: 'scylla-deploy - Deployment'
       artifactName: testing-k8sYAMLfiles
       targetPath: dist/yaml/$(stagingDockerRegistry)
 
