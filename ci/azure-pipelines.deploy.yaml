@@ -1,5 +1,5 @@
-trigger:
-  - master
+# trigger:
+#   - master
 
 variables:
   - group: common-vars
@@ -29,14 +29,14 @@ jobs:
   steps:
   - template: misc/variables.yaml@ci_templates
 
-  - template: slack/build/start.yaml@ci_templates
-    parameters:
-      author: $(authorName)
-      repository: $(Build.Repository.Name)
-      branch: $(Build.SourceBranch)
-      commit: $(Build.SourceVersionMessage)
-      buildUrl: $(buildUrl)$(Build.BuildId)
-      slackWebhook: $(slackBuilds)
+  # - template: slack/build/start.yaml@ci_templates
+  #   parameters:
+  #     author: $(authorName)
+  #     repository: $(Build.Repository.Name)
+  #     branch: $(Build.SourceBranch)
+  #     commit: $(Build.SourceVersionMessage)
+  #     buildUrl: $(buildUrl)$(Build.BuildId)
+  #     slackWebhook: $(slackBuilds)
 
   - template: k8s/render_yaml.yaml@ci_templates
     parameters:
@@ -48,11 +48,11 @@ jobs:
     inputs:
       buildType: 'specific'
       project: 'nalej'
+      pipeline: 'scylla-deploy - Deployment'
       buildVersionToDownload: 'latestFromBranch'
       branchName: 'refs/heads/master'
-      pipeline: 'scylla-deploy - Deployment'
       artifactName: testing-k8sYAMLfiles
-      targetPath: dist/yaml/$(stagingDockerRegistry)
+      downloadPath: dist/yaml/$(stagingDockerRegistry)
 
   - task: DownloadSecureFile@1
     inputs:
@@ -95,20 +95,20 @@ jobs:
       componentList: $(componentList)
       dockerRegistry: $(productionDockerRegistry)
   
-  - template: slack/build/finish.yaml@ci_templates
-    parameters:
-      author: $(authorName)
-      repository: $(Build.Repository.Name)
-      branch: $(Build.SourceBranch)
-      commit: $(Build.SourceVersionMessage)
-      buildUrl: $(buildUrl)$(Build.BuildId)
-      slackWebhook: $(slackBuilds)
+  # - template: slack/build/finish.yaml@ci_templates
+  #   parameters:
+  #     author: $(authorName)
+  #     repository: $(Build.Repository.Name)
+  #     branch: $(Build.SourceBranch)
+  #     commit: $(Build.SourceVersionMessage)
+  #     buildUrl: $(buildUrl)$(Build.BuildId)
+  #     slackWebhook: $(slackBuilds)
   
-  - template: slack/build/failed.yaml@ci_templates
-    parameters:
-      author: $(authorName)
-      repository: $(Build.Repository.Name)
-      branch: $(Build.SourceBranch)
-      commit: $(Build.SourceVersionMessage)
-      buildUrl: $(buildUrl)$(Build.BuildId)
-      slackWebhook: $(slackCIFailed)
+  # - template: slack/build/failed.yaml@ci_templates
+  #   parameters:
+  #     author: $(authorName)
+  #     repository: $(Build.Repository.Name)
+  #     branch: $(Build.SourceBranch)
+  #     commit: $(Build.SourceVersionMessage)
+  #     buildUrl: $(buildUrl)$(Build.BuildId)
+  #     slackWebhook: $(slackCIFailed)
