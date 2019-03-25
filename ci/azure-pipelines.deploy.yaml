@@ -48,7 +48,7 @@ jobs:
     inputs:
       buildType: 'specific'
       project: 'nalej'
-      pipeline: 11
+      pipeline: 9
       buildVersionToDownload: 'latestFromBranch'
       branchName: 'refs/heads/master'
       artifactName: testing-k8sYAMLfiles
