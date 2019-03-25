@@ -53,47 +53,65 @@ jobs:
       branchName: 'refs/heads/master'
       artifactName: testing-k8sYAMLfiles
       downloadPath: dist/yaml/$(stagingDockerRegistry)
-
-  - task: DownloadSecureFile@1
-    inputs:
-      secureFile: ci_kubeconfig.yaml
-    displayName: "Get K8S configuration file"
   
-  - template: k8s/ns/create.yaml@ci_templates
-    parameters:
-      kubeconfig: $(kubeconfig)
-      namespace: $(namespace)
+  - script: |
+      cd dist
+      echo "dist"
+      ls -la
+      echo ""
+      cd yaml
+      echo "yaml"
+      ls -la
+      echo ""
+      cd $(stagingDockerRegistry)
+      echo "$(stagingDockerRegistry)"
+      ls -la
+      echo ""
+      cd mngtcluster
+      echo "mngtcluster"
+      ls -la
+      echo ""
 
-  - template: k8s/resources/create.yaml@ci_templates
-    parameters:
-      kubeconfig: $(kubeconfig)
-      platform: mngtcluster
-      dockerRegistry: $(stagingDockerRegistry)
+  # - task: DownloadSecureFile@1
+  #   inputs:
+  #     secureFile: ci_kubeconfig.yaml
+  #   displayName: "Get K8S configuration file"
   
-  - template: k8s/resources/verify_creation.yaml@ci_templates
-    parameters:
-      kubeconfig: $(kubeconfig)
-      namespace: $(namespace)
-      resourceKind: statefulset
-      resourceName: scylladb
+  # - template: k8s/ns/create.yaml@ci_templates
+  #   parameters:
+  #     kubeconfig: $(kubeconfig)
+  #     namespace: $(namespace)
+
+  # - template: k8s/resources/create.yaml@ci_templates
+  #   parameters:
+  #     kubeconfig: $(kubeconfig)
+  #     platform: mngtcluster
+  #     dockerRegistry: $(stagingDockerRegistry)
   
-  - template: k8s/resources/verify_creation.yaml@ci_templates
-    parameters:
-      kubeconfig: $(kubeconfig)
-      namespace: $(namespace)
-      resourceKind: deployment
-      resourceName: authx
+  # - template: k8s/resources/verify_creation.yaml@ci_templates
+  #   parameters:
+  #     kubeconfig: $(kubeconfig)
+  #     namespace: $(namespace)
+  #     resourceKind: statefulset
+  #     resourceName: scylladb
+  
+  # - template: k8s/resources/verify_creation.yaml@ci_templates
+  #   parameters:
+  #     kubeconfig: $(kubeconfig)
+  #     namespace: $(namespace)
+  #     resourceKind: deployment
+  #     resourceName: authx
 
-  - template: k8s/ns/delete.yaml@ci_templates
-    parameters:
-      kubeconfig: $(kubeconfig)
-      namespace: $(namespace)
+  # - template: k8s/ns/delete.yaml@ci_templates
+  #   parameters:
+  #     kubeconfig: $(kubeconfig)
+  #     namespace: $(namespace)
 
-  - template: k8s/render_yaml.yaml@ci_templates
-    parameters:
-      namespace: $(namespace)
-      componentList: $(componentList)
-      dockerRegistry: $(productionDockerRegistry)
+  # - template: k8s/render_yaml.yaml@ci_templates
+  #   parameters:
+  #     namespace: $(namespace)
+  #     componentList: $(componentList)
+  #     dockerRegistry: $(productionDockerRegistry)
   
   # - template: slack/build/finish.yaml@ci_templates
   #   parameters:
