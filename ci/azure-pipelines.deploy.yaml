@@ -1,0 +1,110 @@
+trigger:
+  - master
+
+variables:
+  - group: common-vars
+  - group: slack-webhooks
+  - group: docker-registries
+  - name: componentList
+    value: "authx"
+  - name: namespace
+    value: $(Build.SourceVersion)-$(Build.BuildId)
+  - name: kubeconfig
+    value: $(Agent.TempDirectory)/ci_kubeconfig.yaml
+  - name: authorName
+    value: ""
+
+resources:
+  repositories:
+    - repository: ci_templates
+      type: github
+      name: nalej/ci-templates
+      endpoint: nalej
+
+jobs:
+- job: DeployComponent
+  pool:
+    vmImage: 'Ubuntu-16.04'
+  
+  steps:
+  - template: misc/variables.yaml@ci_templates
+
+  - template: slack/build/start.yaml@ci_templates
+    parameters:
+      author: $(authorName)
+      repository: $(Build.Repository.Name)
+      branch: $(Build.SourceBranch)
+      commit: $(Build.SourceVersionMessage)
+      buildUrl: $(buildUrl)$(Build.BuildId)
+      slackWebhook: $(slackBuilds)
+
+  - template: k8s/render_yaml.yaml@ci_templates
+    parameters:
+      namespace: $(namespace)
+      componentList: $(componentList)
+      dockerRegistry: $(stagingDockerRegistry)
+
+  - task: DownloadPipelineArtifact@0
+    inputs:
+      pipelineId: 9
+      artifactName: testing-k8sYAMLfiles
+      targetPath: dist/yaml/$(stagingDockerRegistry)
+
+  - task: DownloadSecureFile@1
+    inputs:
+      secureFile: ci_kubeconfig.yaml
+    displayName: "Get K8S configuration file"
+  
+  - template: k8s/ns/create.yaml@ci_templates
+    parameters:
+      kubeconfig: $(kubeconfig)
+      namespace: $(namespace)
+
+  - template: k8s/resources/create.yaml@ci_templates
+    parameters:
+      kubeconfig: $(kubeconfig)
+      platform: mngtcluster
+      dockerRegistry: $(stagingDockerRegistry)
+  
+  - template: k8s/resources/verify_creation.yaml@ci_templates
+    parameters:
+      kubeconfig: $(kubeconfig)
+      namespace: $(namespace)
+      resourceKind: statefulset
+      resourceName: scylladb
+  
+  - template: k8s/resources/verify_creation.yaml@ci_templates
+    parameters:
+      kubeconfig: $(kubeconfig)
+      namespace: $(namespace)
+      resourceKind: deployment
+      resourceName: authx
+
+  - template: k8s/ns/delete.yaml@ci_templates
+    parameters:
+      kubeconfig: $(kubeconfig)
+      namespace: $(namespace)
+
+  - template: k8s/render_yaml.yaml@ci_templates
+    parameters:
+      namespace: $(namespace)
+      componentList: $(componentList)
+      dockerRegistry: $(productionDockerRegistry)
+  
+  - template: slack/build/finish.yaml@ci_templates
+    parameters:
+      author: $(authorName)
+      repository: $(Build.Repository.Name)
+      branch: $(Build.SourceBranch)
+      commit: $(Build.SourceVersionMessage)
+      buildUrl: $(buildUrl)$(Build.BuildId)
+      slackWebhook: $(slackBuilds)
+  
+  - template: slack/build/failed.yaml@ci_templates
+    parameters:
+      author: $(authorName)
+      repository: $(Build.Repository.Name)
+      branch: $(Build.SourceBranch)
+      commit: $(Build.SourceVersionMessage)
+      buildUrl: $(buildUrl)$(Build.BuildId)
+      slackWebhook: $(slackCIFailed)
