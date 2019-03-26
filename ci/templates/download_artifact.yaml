@@ -6,7 +6,7 @@ steps:
     inputs:
       buildType: "specific"
       project: "nalej"
-      pipeline: 9
+      pipeline: 11 # authx - Deployment
       buildVersionToDownload: "latestFromBranch"
       branchName: "refs/heads/master"
       artifactName: testing-k8sYAMLfiles
