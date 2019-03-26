@@ -20,6 +20,10 @@ resources:
       type: github
       name: nalej/ci-templates
       endpoint: nalej
+    - repository: scylla_deploy
+      type: github
+      name: nalej/scylla-deploy
+      endpoint: nalej
 
 jobs:
 - job: DeployComponent
@@ -38,21 +42,32 @@ jobs:
   #     buildUrl: $(buildUrl)$(Build.BuildId)
   #     slackWebhook: $(slackBuilds)
 
-  - template: k8s/render_yaml.yaml@ci_templates
+  - template: k8s/yaml/render.yaml@ci_templates
     parameters:
-      namespace: $(namespace)
+      namespace: "__NPH_NAMESPACE"
       componentList: $(componentList)
       dockerRegistry: $(stagingDockerRegistry)
+    
+  - template: k8s/secrets/create.yaml@ci_templates
+    parameters:
+      name: authx-secret
+      namespace: "__NPH_NAMESPACE"
+      yamlPath: $(system.defaultWorkingDirectory)/dist/yaml/$(stagingDockerRegistry)/mngtcluster
+      yamlFile: authx.secret.yaml
+    
+  - template: k8s/yaml/publish.yaml@ci_templates
+    parameters:
+      yamlIdentifier: testing
+      yamlPath: dist/yaml/$(stagingDockerRegistry)
 
-  - task: DownloadPipelineArtifact@1
-    inputs:
-      buildType: 'specific'
-      project: 'nalej'
-      pipeline: 9
-      buildVersionToDownload: 'latestFromBranch'
-      branchName: 'refs/heads/master'
-      artifactName: testing-k8sYAMLfiles
+  - template: ci/templates/download_artifact.yaml@scylla_deploy
+    parameters:
       downloadPath: $(system.defaultWorkingDirectory)/dist/yaml/$(stagingDockerRegistry)
+  
+  - template: k8s/yaml/namespace.yaml@ci_templates
+    parameters:
+      namespace: $(namespace)
+      yamlPath: dist/yaml/$(stagingDockerRegistry)
   
   - task: DownloadSecureFile@1
     inputs:
@@ -70,12 +85,10 @@ jobs:
       platform: mngtcluster
       dockerRegistry: $(stagingDockerRegistry)
   
-  - template: k8s/resources/verify_creation.yaml@ci_templates
+  - template: ci/templates/verify_deploy.yaml@scylla_deploy
     parameters:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
-      resourceKind: statefulset
-      resourceName: scylladb
   
   - template: k8s/resources/verify_creation.yaml@ci_templates
     parameters:
@@ -89,11 +102,27 @@ jobs:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
 
-  - template: k8s/render_yaml.yaml@ci_templates
+  - template: k8s/yaml/render.yaml@ci_templates
+    parameters:
+      namespace: $(namespace)
+      componentList: $(componentList)
+      dockerRegistry: $(stagingDockerRegistry)
+  
+  - template: k8s/yaml/publish.yaml@ci_templates
+    parameters:
+      yamlIdentifier: staging
+      yamlPath: dist/yaml/$(stagingDockerRegistry)
+
+  - template: k8s/yaml/render.yaml@ci_templates
     parameters:
       namespace: $(namespace)
       componentList: $(componentList)
       dockerRegistry: $(productionDockerRegistry)
+  
+  - template: k8s/yaml/publish.yaml@ci_templates
+    parameters:
+      yamlIdentifier: production
+      yamlPath: dist/yaml/$(productionDockerRegistry)
   
   - template: slack/build/finish.yaml@ci_templates
     parameters:
