@@ -93,12 +93,10 @@ jobs:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
   
-  - template: k8s/resources/verify_creation.yaml@ci_templates
+  - template: templates/verify_deploy.yaml
     parameters:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
-      resourceKind: deployment
-      resourceName: authx
 
   - template: k8s/ns/delete.yaml@ci_templates
     parameters:
