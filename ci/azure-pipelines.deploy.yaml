@@ -56,7 +56,7 @@ jobs:
       namespace: "__NPH_NAMESPACE"
       yamlPath: $(system.defaultWorkingDirectory)/dist/yaml/$(stagingDockerRegistry)/mngtcluster
       yamlFile: authx.secret.yaml
-      contents: '{''secret'': ''$(authxSecret)''}'
+      contents: "{'secret': '$(authxSecret)'}"
     
   - template: k8s/yaml/publish.yaml@ci_templates
     parameters:
