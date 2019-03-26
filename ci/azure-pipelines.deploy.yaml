@@ -1,5 +1,5 @@
-# trigger:
-#   - master
+trigger:
+  - master
 
 variables:
   - group: common-vars
@@ -35,14 +35,14 @@ jobs:
   steps:
   - template: misc/variables.yaml@ci_templates
 
-  # - template: slack/build/start.yaml@ci_templates
-  #   parameters:
-  #     author: $(authorName)
-  #     repository: $(Build.Repository.Name)
-  #     branch: $(Build.SourceBranch)
-  #     commit: $(Build.SourceVersionMessage)
-  #     buildUrl: $(buildUrl)$(Build.BuildId)
-  #     slackWebhook: $(slackBuilds)
+  - template: slack/build/start.yaml@ci_templates
+    parameters:
+      author: $(authorName)
+      repository: $(Build.Repository.Name)
+      branch: $(Build.SourceBranch)
+      commit: $(Build.SourceVersionMessage)
+      buildUrl: $(buildUrl)$(Build.BuildId)
+      slackWebhook: $(slackBuilds)
 
   - template: k8s/yaml/render.yaml@ci_templates
     parameters:
@@ -136,11 +136,11 @@ jobs:
       buildUrl: $(buildUrl)$(Build.BuildId)
       slackWebhook: $(slackBuilds)
   
-  # - template: slack/build/failed.yaml@ci_templates
-  #   parameters:
-  #     author: $(authorName)
-  #     repository: $(Build.Repository.Name)
-  #     branch: $(Build.SourceBranch)
-  #     commit: $(Build.SourceVersionMessage)
-  #     buildUrl: $(buildUrl)$(Build.BuildId)
-  #     slackWebhook: $(slackCIFailed)
+  - template: slack/build/failed.yaml@ci_templates
+    parameters:
+      author: $(authorName)
+      repository: $(Build.Repository.Name)
+      branch: $(Build.SourceBranch)
+      commit: $(Build.SourceVersionMessage)
+      buildUrl: $(buildUrl)$(Build.BuildId)
+      slackWebhook: $(slackCIFailed)
