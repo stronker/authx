@@ -73,7 +73,7 @@ jobs:
       namespace: $(namespace)
       yamlPath: dist/yaml/$(stagingDockerRegistry)
     
-  - template: placeholders/replace.yaml@ci_templates
+  - template: placeholders/replace_secrets.yaml@ci_templates
     parameters:
       yamlPath: dist/yaml/$(stagingDockerRegistry)
       placeholders: "$(placeholderAuthxSecret)"
