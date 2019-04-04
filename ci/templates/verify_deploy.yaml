@@ -27,4 +27,4 @@ steps:
         fi
       done
       exit $isOk
-    displayName: Verify kubernetes resources are running
+    displayName: Verify authx deployment is ready
