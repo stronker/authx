@@ -30,6 +30,7 @@ spec:
           args:
             - "run"
             - "--secret=/etc/authx/secret"
+            - "--managementClusterCertPath=/etc/certs/tls.crt"
             - "--debug"
             - "--useDBScyllaProviders=true"
             - "--scyllaDBAddress=scylladb.__NPH_NAMESPACE"
@@ -39,6 +40,9 @@ spec:
             - name: authx-secret-volume
               mountPath: "/etc/authx"
               readOnly: true
+            - name: authx-cert-volume
+              mountPath: "/etc/certs"
+              readOnly: true
           securityContext:
             runAsUser: 2000
       imagePullSecrets:
@@ -47,3 +51,6 @@ spec:
         - name: authx-secret-volume
           secret:
             secretName: authx-secret
+        - name: authx-cert-volume
+          secret:
+            secretName: ingress-tls
