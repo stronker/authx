@@ -2,12 +2,15 @@
  * Copyright (C) 2018 Nalej - All Rights Reserved
  */
 
-package authx
+package config
 
 import (
+	"crypto/md5"
+	"fmt"
 	"github.com/nalej/authx/version"
 	"github.com/nalej/derrors"
 	"github.com/rs/zerolog/log"
+	"io/ioutil"
 	"strings"
 	"time"
 )
@@ -17,16 +20,29 @@ const ttlExpirationTime = 3
 
 // Config is the set of required configuration parameters.
 type Config struct {
+	// Debug level is active.
+	Debug bool
+	// Port where the Authx components listens for incoming connections.
 	Port       int
+	// Secret used to sign JWT tokens.
 	Secret     string
+	// ManagementClusterCertPath with the path of the management cluster certificate.
+	ManagementClusterCertPath string
+	// ManagementClusterCert with the Management cluster certificate.
+	ManagementClusterCert string
+	// ExpirationTime for JWT tokens.
 	ExpirationTime time.Duration
+	// DeviceExpirationTime for device JWT tokens.
 	DeviceExpirationTime time.Duration
+	// EdgeControllerExpTime with the expiration time for Edge Controller join tokens.
+	EdgeControllerExpTime time.Duration
 	// Use in-memory providers
 	UseInMemoryProviders bool
 	// Use scyllaDBProviders
 	UseDBScyllaProviders bool
-	// Database Address
+	// ScyllaDBAddress with the database URL
 	ScyllaDBAddress string
+	// ScyllaDBPort with the database port.
 	ScyllaDBPort int
 	// DataBase KeySpace
 	KeySpace string
@@ -57,7 +73,28 @@ func (conf * Config) Validate() derrors.Error {
 	if conf.DeviceExpirationTime.Hours() > ttlExpirationTime {
 		return derrors.NewInvalidArgumentError("currently the duration of device tokens can not be longer than 3h. Scylla has a 3 hours TTL")
 	}
+	if conf.EdgeControllerExpTime.Hours() > ttlExpirationTime {
+		return derrors.NewInvalidArgumentError("currently the duration of edge controller join tokens cannot be longer than 3h. Scylla has a 3 hours TTL")
+	}
 
+	// Load server certificate
+	if conf.ManagementClusterCertPath != ""{
+		err := conf.loadCert()
+		if err != nil{
+			return err
+		}
+	}
+
+	return nil
+}
+
+// LoadCert loads the management cluster certificate in memory.
+func (conf * Config) loadCert() derrors.Error{
+	content, err := ioutil.ReadFile(conf.ManagementClusterCertPath)
+	if err != nil{
+		return derrors.AsError(err, "cannot load management cluster certificate")
+	}
+	conf.ManagementClusterCert = string(content)
 	return nil
 }
 
@@ -65,9 +102,16 @@ func (conf * Config) Validate() derrors.Error {
 func (conf * Config) Print() {
 	log.Info().Str("app", version.AppVersion).Str("commit", version.Commit).Msg("Version")
 	log.Info().Int("port", conf.Port).Msg("gRPC port")
-	log.Info().Str("secret", strings.Repeat("*", len(conf.Secret))).Msg("Token secret")
-	log.Info().Str("duration", conf.ExpirationTime.String()).Msg("Expiration time")
-	log.Info().Str("deviceExpiration", conf.DeviceExpirationTime.String()).Msg("Device expiration time")
+	log.Info().Str("secret", strings.Repeat("*", len(conf.Secret))).Msg("JWT Token secret")
+	if conf.ManagementClusterCert != "" {
+		log.Info().Str("md5", fmt.Sprintf("%x",md5.Sum([]byte(conf.ManagementClusterCert)))).Msg("Management cluster server certificate")
+	}else{
+		log.Warn().Msg("Management cluster server certificate is not set")
+	}
+	log.Info().Str("duration", conf.ExpirationTime.String()).Msg("JWT Expiration time")
+	log.Info().Str("duration", conf.DeviceExpirationTime.String()).Msg("Device expiration time")
+	log.Info().Str("duration", conf.EdgeControllerExpTime.String()).Msg("Edge controller join token expiration time")
+
 	if conf.UseInMemoryProviders {
 		log.Info().Bool("UseInMemoryProviders", conf.UseInMemoryProviders).Msg("Using in-memory providers")
 	}

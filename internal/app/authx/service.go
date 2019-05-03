@@ -6,13 +6,16 @@ package authx
 
 import (
 	"fmt"
+	"github.com/nalej/authx/internal/app/authx/config"
 	"github.com/nalej/authx/internal/app/authx/handler"
+	"github.com/nalej/authx/internal/app/authx/inventory"
 	"github.com/nalej/authx/internal/app/authx/manager"
 	"github.com/nalej/authx/internal/app/authx/providers/credentials"
 	"github.com/nalej/authx/internal/app/authx/providers/device"
 	"github.com/nalej/authx/internal/app/authx/providers/device_token"
 	"github.com/nalej/authx/internal/app/authx/providers/token"
 	"github.com/nalej/authx/internal/app/authx/providers/role"
+	inventoryProv "github.com/nalej/authx/internal/app/authx/providers/inventory"
 	pbAuthx "github.com/nalej/grpc-authx-go"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
@@ -23,7 +26,7 @@ import (
 // Service is the Authx service instance.
 type Service struct {
 	// Config is the required parameters.
-	Config
+	config.Config
 }
 
 type Providers struct {
@@ -32,6 +35,7 @@ type Providers struct {
 	devProvider device.Provider
 	tokenProvider token.Token
 	devTokenProvider device_token.Provider
+	inventoryProvider inventoryProv.Provider
 }
 
 type TokenManagers struct {
@@ -40,7 +44,7 @@ type TokenManagers struct {
 }
 
 // NewService create a new service instance.
-func NewService(config Config) *Service {
+func NewService(config config.Config) *Service {
 	return &Service{Config: config}
 }
 
@@ -51,6 +55,7 @@ func (s *Service) CreateInMemoryProviders() * Providers {
 		devProvider: device.NewMockupDeviceCredentialsProvider(),
 		tokenProvider: token.NewTokenMockup(),
 		devTokenProvider: device_token.NewDeviceTokenMockup(),
+		inventoryProvider: inventoryProv.NewMockupInventoryProvider(),
 	}
 }
 
@@ -66,6 +71,8 @@ func (s *Service) CreateDBScyllaProviders() * Providers {
 			s.Config.ScyllaDBAddress, s.Config.ScyllaDBPort, s.Config.KeySpace),
 		devTokenProvider:device_token.NewScyllaDeviceTokenProvider(
 			s.Config.ScyllaDBAddress, s.Config.ScyllaDBPort, s.Config.KeySpace),
+		// TODO Use an scylladb provider
+		inventoryProvider: inventoryProv.NewMockupInventoryProvider(),
 	}
 }
 
@@ -131,12 +138,20 @@ func (s *Service) Run() {
 	h := handler.NewAuthx(authxMgr)
 
 
+	inventoryManager := inventory.NewManager(p.inventoryProvider, s.Config)
+	inventoryHandler := inventory.NewHandler(inventoryManager)
+
 	grpcServer := grpc.NewServer()
 
 	pbAuthx.RegisterAuthxServer(grpcServer, h)
+	pbAuthx.RegisterInventoryServer(grpcServer, inventoryHandler)
 
-	// Register reflection service on gRPC server.
-	reflection.Register(grpcServer)
+	if s.Config.Debug{
+		log.Info().Msg("Enabling gRPC server reflection")
+		// Register reflection service on gRPC server.
+		reflection.Register(grpcServer)
+	}
+
 	log.Info().Int("Port", s.Port).Msg("Launching gRPC server")
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatal().Errs("failed to serve: %v", []error{err})
