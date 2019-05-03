@@ -116,6 +116,10 @@ func (s *Service) getTokenManager(tokenProvider token.Token, password manager.Pa
 
 //Run launch the Authx service.
 func (s *Service) Run() {
+	vErr := s.Config.Validate()
+	if vErr != nil{
+		log.Fatal().Str("error", vErr.DebugReport()).Msg("Invalid configuration")
+	}
 	s.Config.Print()
 	p := s.GetProviders()
 
