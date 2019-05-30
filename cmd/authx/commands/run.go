@@ -70,4 +70,7 @@ func init() {
 	runCmd.Flags().StringVar(&cfg.KeySpace, "scyllaDBKeyspace", "", "keyspace of scylla database")
 
 	runCmd.Flags().StringVar(&cfg.ManagementClusterCertPath, "managementClusterCertPath", "", "Server certificate that joining entities can use for authentication")
+	runCmd.Flags().StringVar(&cfg.CACertPath, "caCertPath", "", "CA certificate path")
+	runCmd.Flags().StringVar(&cfg.CAPrivateKeyPath, "caPrivateKeyPath", "", "CA Private Key path")
+
 }
