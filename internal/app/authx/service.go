@@ -6,6 +6,7 @@ package authx
 
 import (
 	"fmt"
+	"github.com/nalej/authx/internal/app/authx/certificates"
 	"github.com/nalej/authx/internal/app/authx/config"
 	"github.com/nalej/authx/internal/app/authx/handler"
 	"github.com/nalej/authx/internal/app/authx/inventory"
@@ -145,10 +146,19 @@ func (s *Service) Run() {
 	inventoryManager := inventory.NewManager(p.inventoryProvider, s.Config)
 	inventoryHandler := inventory.NewHandler(inventoryManager)
 
+	helper, cErr := certificates.NewCertHelper(s.Config.CACertPath, s.Config.CAPrivateKeyPath)
+	if cErr != nil{
+		log.Fatal().Str("trace", cErr.DebugReport()).Msg("cannot create certificate helper")
+		return
+	}
+	certManager := certificates.NewManager(s.Config, helper)
+	certHandler := certificates.NewHandler(certManager)
+
 	grpcServer := grpc.NewServer()
 
 	pbAuthx.RegisterAuthxServer(grpcServer, h)
 	pbAuthx.RegisterInventoryServer(grpcServer, inventoryHandler)
+	pbAuthx.RegisterCertificatesServer(grpcServer, certHandler)
 
 	if s.Config.Debug{
 		log.Info().Msg("Enabling gRPC server reflection")

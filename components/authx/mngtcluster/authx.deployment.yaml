@@ -36,12 +36,17 @@ spec:
             - "--scyllaDBAddress=scylladb.__NPH_NAMESPACE"
             - "--scyllaDBKeyspace=authx"
             - "--scyllaDBPort=9042"
+            - "--caCertPath=/etc/cacert/tls.crt"
+            - "--caPrivateKeyPath=/etc/cacert/tls.key"
           volumeMounts:
             - name: authx-secret-volume
               mountPath: "/etc/authx"
               readOnly: true
             - name: authx-cert-volume
               mountPath: "/etc/certs"
+              readOnly: true
+            - name: mngt-ca-cert-volume
+              mountPath: "/etc/cacert"
               readOnly: true
           securityContext:
             runAsUser: 2000
@@ -54,3 +59,6 @@ spec:
         - name: authx-cert-volume
           secret:
             secretName: ingress-tls
+        - name: mngt-ca-cert-volume
+          secret:
+            secretName: mngt-ca-cert

@@ -46,6 +46,10 @@ type Config struct {
 	ScyllaDBPort int
 	// DataBase KeySpace
 	KeySpace string
+	// CACertPath with the path of the CA.
+	CACertPath string
+	// CAPrivateKeyPath with the path of the private key for the CA.
+	CAPrivateKeyPath string
 }
 
 func (conf * Config) Validate() derrors.Error {
@@ -85,6 +89,10 @@ func (conf * Config) Validate() derrors.Error {
 		}
 	}
 
+	if conf.CACertPath == "" || conf.CAPrivateKeyPath == "" {
+		return derrors.NewInvalidArgumentError("caCertPath and caPrivateKey cannot be empty")
+	}
+
 	return nil
 }
 
@@ -119,4 +127,5 @@ func (conf * Config) Print() {
 		log.Info().Bool("UseDBScyllaProviders", conf.UseDBScyllaProviders).Msg("using dbScylla providers")
 		log.Info().Str("URL", conf.ScyllaDBAddress).Str("KeySpace", conf.KeySpace).Int("Port", conf.ScyllaDBPort).Msg("ScyllaDB")
 	}
+	log.Info().Str("CA Path", conf.CACertPath).Str("CA PK Path", conf.CAPrivateKeyPath).Msg("CA files")
 }
