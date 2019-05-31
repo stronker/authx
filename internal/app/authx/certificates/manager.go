@@ -12,6 +12,7 @@ import (
 	"github.com/nalej/grpc-authx-go"
 	"math/big"
 	"math/rand"
+	"net"
 	"time"
 )
 
@@ -32,6 +33,10 @@ func NewManager(config config.Config, certHelper * CertHelper) Manager{
 
 // certFromEdgeControllerRequest creates a x509 certificate with the information of the request.
 func (m * Manager) certFromEdgeControllerRequest(request *grpc_authx_go.EdgeControllerCertRequest) *x509.Certificate{
+	ipAddresses := make([]net.IP, 0)
+	for _, ip := range request.Ips{
+		ipAddresses = append(ipAddresses, net.ParseIP(ip))
+	}
 	x509 := &x509.Certificate{
 		// TODO Use another serial number generator
 		SerialNumber:                big.NewInt(rand.Int63()),
@@ -49,6 +54,7 @@ func (m * Manager) certFromEdgeControllerRequest(request *grpc_authx_go.EdgeCont
 		MaxPathLen:                  0,
 		MaxPathLenZero:              false,
 		IssuingCertificateURL:       m.helper.CACert.DNSNames,
+		IPAddresses: ipAddresses,
 	}
 	return x509
 }

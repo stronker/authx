@@ -74,6 +74,7 @@ var _ = ginkgo.Describe("With a manager", func() {
 			OrganizationId:       "organization_id",
 			EdgeControllerId:     "edge_controller_id",
 			Name:                 "Fake EC",
+			Ips: []string{"10.0.0.10", "192.168.250.10"},
 		}
 	    ecCert, err := testManager.CreateControllerCert(request)
 	    gomega.Expect(err).To(gomega.Succeed())
