@@ -5,7 +5,7 @@ type TokenData struct {
 	Username       string `cql:"user_name"`
 	TokenID        string `cql:"token_id"`
 	RefreshToken   []byte `cql:"refresh_token"`
-	ExpirationDate int64 `cql:"expiration_date"`
+	ExpirationDate int64  `cql:"expiration_date"`
 }
 
 // NewTokenData creates an instance of the structure

@@ -14,5 +14,5 @@ type SecretAccess interface {
 	// Connect to the appropriate backend.
 	Connect() derrors.Error
 	// AddDeviceGroupCredentials adds credentials of a device group
-	RetrieveSecret (id *grpc_device_go.DeviceGroupId) (string, derrors.Error)
+	RetrieveSecret(id *grpc_device_go.DeviceGroupId) (string, derrors.Error)
 }

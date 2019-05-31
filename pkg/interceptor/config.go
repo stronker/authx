@@ -40,9 +40,9 @@ func LoadAuthorizationConfig(path string) (*AuthorizationConfig, derrors.Error) 
 type Config struct {
 	Authorization *AuthorizationConfig
 	// Secret contains the shared secret with the authx component to sign the JWT token.
-	Secret        string
+	Secret string
 	// Name of the header where the token is found.
-	Header        string
+	Header string
 	// Number of cached entries for group secrets
 	NumCacheEntries int
 }

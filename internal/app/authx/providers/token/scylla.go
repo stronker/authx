@@ -18,19 +18,18 @@ const tablePK_2 = "token_id"
 
 const rowNotFound = "not found"
 
-const ttlExpired = time.Duration(3)*time.Hour
+const ttlExpired = time.Duration(3) * time.Hour
 
 type ScyllaTokenProvider struct {
-	Address string
-	Port int
+	Address  string
+	Port     int
 	KeySpace string
 	sync.Mutex
 	Session *gocql.Session
 }
 
-
-func NewScyllaTokenProvider (address string, port int, keyspace string) *ScyllaTokenProvider{
-	provider := ScyllaTokenProvider{Address:address, Port:port, KeySpace:keyspace}
+func NewScyllaTokenProvider(address string, port int, keyspace string) *ScyllaTokenProvider {
+	provider := ScyllaTokenProvider{Address: address, Port: port, KeySpace: keyspace}
 	provider.connect()
 	return &provider
 }
@@ -52,7 +51,7 @@ func (sp *ScyllaTokenProvider) connect() derrors.Error {
 	return nil
 }
 
-func (sp *ScyllaTokenProvider) Disconnect()  {
+func (sp *ScyllaTokenProvider) Disconnect() {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -66,7 +65,7 @@ func (sp *ScyllaTokenProvider) Disconnect()  {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-func (sp *ScyllaTokenProvider) unsafeGet(username string, tokenID string) (*entities.TokenData, derrors.Error){
+func (sp *ScyllaTokenProvider) unsafeGet(username string, tokenID string) (*entities.TokenData, derrors.Error) {
 
 	if err := sp.checkConnectionAndConnect(); err != nil {
 		return nil, err
@@ -82,7 +81,7 @@ func (sp *ScyllaTokenProvider) unsafeGet(username string, tokenID string) (*enti
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return nil, derrors.NewNotFoundError("token").WithParams(username, tokenID)
-		}else{
+		} else {
 			return nil, derrors.AsError(err, "cannot get token")
 		}
 	}
@@ -91,7 +90,7 @@ func (sp *ScyllaTokenProvider) unsafeGet(username string, tokenID string) (*enti
 }
 
 // Exist checks if the token was added.
-func (sp *ScyllaTokenProvider) unsafeExist(username string, tokenID string) (*bool, derrors.Error){
+func (sp *ScyllaTokenProvider) unsafeExist(username string, tokenID string) (*bool, derrors.Error) {
 
 	ok := false
 
@@ -110,21 +109,22 @@ func (sp *ScyllaTokenProvider) unsafeExist(username string, tokenID string) (*bo
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return &ok, nil
-		}else{
+		} else {
 			return &ok, derrors.AsError(err, "cannot determinate if token exists")
 		}
 	}
 	ok = true
 	return &ok, nil
 }
+
 // --------------------------------------------------------------------------------------------------------------------
 
-func (sp *ScyllaTokenProvider) checkConnectionAndConnect () derrors.Error {
+func (sp *ScyllaTokenProvider) checkConnectionAndConnect() derrors.Error {
 
 	if sp.Session != nil {
 		return nil
 	}
-	log.Info().Str("provider", "ScyllaTokeProvider"). Msg("session not connected, trying to connect it!")
+	log.Info().Str("provider", "ScyllaTokeProvider").Msg("session not connected, trying to connect it!")
 	err := sp.connect()
 	if err != nil {
 		return err
@@ -133,7 +133,7 @@ func (sp *ScyllaTokenProvider) checkConnectionAndConnect () derrors.Error {
 	return nil
 }
 
-func (sp *ScyllaTokenProvider) Delete(username string, tokenID string) derrors.Error{
+func (sp *ScyllaTokenProvider) Delete(username string, tokenID string) derrors.Error {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -147,7 +147,7 @@ func (sp *ScyllaTokenProvider) Delete(username string, tokenID string) derrors.E
 	if err != nil {
 		return err
 	}
-	if ! *exists {
+	if !*exists {
 		return derrors.NewNotFoundError("token").WithParams(username, tokenID)
 	}
 
@@ -162,7 +162,7 @@ func (sp *ScyllaTokenProvider) Delete(username string, tokenID string) derrors.E
 }
 
 // Add a token.
-func (sp *ScyllaTokenProvider) Add(token *entities.TokenData) derrors.Error{
+func (sp *ScyllaTokenProvider) Add(token *entities.TokenData) derrors.Error {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -176,7 +176,7 @@ func (sp *ScyllaTokenProvider) Add(token *entities.TokenData) derrors.Error{
 		return err
 	}
 	if *exists {
-		return  derrors.NewAlreadyExistsError("token").WithParams(token.Username, token.TokenID)
+		return derrors.NewAlreadyExistsError("token").WithParams(token.Username, token.TokenID)
 	}
 
 	// add new basic credential
@@ -192,7 +192,7 @@ func (sp *ScyllaTokenProvider) Add(token *entities.TokenData) derrors.Error{
 }
 
 // Get an existing token.
-func (sp *ScyllaTokenProvider) Get(username string, tokenID string) (*entities.TokenData, derrors.Error){
+func (sp *ScyllaTokenProvider) Get(username string, tokenID string) (*entities.TokenData, derrors.Error) {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -211,7 +211,7 @@ func (sp *ScyllaTokenProvider) Get(username string, tokenID string) (*entities.T
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return nil, derrors.NewNotFoundError("token").WithParams(username, tokenID)
-		}else{
+		} else {
 			return nil, derrors.AsError(err, "cannot get token")
 		}
 	}
@@ -220,7 +220,7 @@ func (sp *ScyllaTokenProvider) Get(username string, tokenID string) (*entities.T
 }
 
 // Exist checks if the token was added.
-func (sp *ScyllaTokenProvider) Exist(username string, tokenID string) (*bool, derrors.Error){
+func (sp *ScyllaTokenProvider) Exist(username string, tokenID string) (*bool, derrors.Error) {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -241,7 +241,7 @@ func (sp *ScyllaTokenProvider) Exist(username string, tokenID string) (*bool, de
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return &ok, nil
-		}else{
+		} else {
 			return &ok, derrors.AsError(err, "cannot determinate if token exists")
 		}
 	}
@@ -249,7 +249,7 @@ func (sp *ScyllaTokenProvider) Exist(username string, tokenID string) (*bool, de
 	return &ok, nil
 }
 
-func (sp *ScyllaTokenProvider) Update(token *entities.TokenData) derrors.Error{
+func (sp *ScyllaTokenProvider) Update(token *entities.TokenData) derrors.Error {
 	sp.Lock()
 	defer sp.Unlock()
 
@@ -262,7 +262,7 @@ func (sp *ScyllaTokenProvider) Update(token *entities.TokenData) derrors.Error{
 		return err
 	}
 	if !*exists {
-		return  derrors.NewNotFoundError("token").WithParams(token.Username, token.TokenID)
+		return derrors.NewNotFoundError("token").WithParams(token.Username, token.TokenID)
 	}
 
 	// add new basic credential
@@ -276,11 +276,11 @@ func (sp *ScyllaTokenProvider) Update(token *entities.TokenData) derrors.Error{
 		return derrors.AsError(cqlErr, "cannot update token")
 	}
 
-	return  nil
+	return nil
 }
 
 // Truncate cleans all data.
-func (sp *ScyllaTokenProvider) Truncate() derrors.Error{
+func (sp *ScyllaTokenProvider) Truncate() derrors.Error {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -298,7 +298,7 @@ func (sp *ScyllaTokenProvider) Truncate() derrors.Error{
 	return nil
 }
 
-func (sp *ScyllaTokenProvider) DeleteExpiredTokens() derrors.Error  {
+func (sp *ScyllaTokenProvider) DeleteExpiredTokens() derrors.Error {
 	// nothing to do, ttl uses to delete expired tokens
 	return nil
 }

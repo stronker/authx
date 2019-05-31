@@ -20,9 +20,9 @@ const DefaultCacheEntries = 100
 // MngtSecretAccess structure that provides a cache over the group secrets using a client that connects
 // directly with the Authx component. This implementation is intended to be used from within the management
 // cluster.
-type MngtSecretAccess struct{
+type MngtSecretAccess struct {
 	Connection
-	cache lru.Cache
+	cache  lru.Cache
 	Client grpc_authx_go.AuthxClient
 }
 
@@ -32,20 +32,20 @@ func DeviceGroupIdToKey(id *grpc_device_go.DeviceGroupId) string {
 
 func NewMngtSecretAccess(address string, numCachedEntries int) (SecretAccess, derrors.Error) {
 	lruCache, err := lru.New(numCachedEntries)
-	if err != nil{
+	if err != nil {
 		return nil, derrors.AsError(err, "cannot create cache")
 	}
 
 	var access SecretAccess = &MngtSecretAccess{
-		Connection: Connection{Address:address},
-		cache:  *lruCache,
+		Connection: Connection{Address: address},
+		cache:      *lruCache,
 	}
 	return access, nil
 }
 
-func NewMngtSecretAccessWithClient(client grpc_authx_go.AuthxClient, numCachedEntries int) (SecretAccess, derrors.Error){
+func NewMngtSecretAccessWithClient(client grpc_authx_go.AuthxClient, numCachedEntries int) (SecretAccess, derrors.Error) {
 	lruCache, err := lru.New(numCachedEntries)
-	if err != nil{
+	if err != nil {
 		return nil, derrors.AsError(err, "cannot create cache")
 	}
 
@@ -56,10 +56,10 @@ func NewMngtSecretAccessWithClient(client grpc_authx_go.AuthxClient, numCachedEn
 	return access, nil
 }
 
-func (sa * MngtSecretAccess) Connect() derrors.Error{
+func (sa *MngtSecretAccess) Connect() derrors.Error {
 	log.Debug().Msg("connecting to authx")
 	conn, err := sa.GetInsecureConnection()
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	sa.Client = grpc_authx_go.NewAuthxClient(conn)
@@ -73,7 +73,7 @@ func (sa *MngtSecretAccess) RetrieveSecret(id *grpc_device_go.DeviceGroupId) (st
 	}
 	// Put it on the cache
 	deviceGroupSecret, aErr := sa.Client.GetDeviceGroupSecret(context.Background(), id)
-	if aErr != nil{
+	if aErr != nil {
 		log.Warn().Msg("cannot retrieve secret from authx")
 		return "", conversions.ToDerror(aErr)
 	}

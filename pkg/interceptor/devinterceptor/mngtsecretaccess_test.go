@@ -29,7 +29,7 @@ var _ = ginkgo.Describe("Management secret access", func() {
 	var cachedClient SecretAccess
 	var client grpc_authx_go.AuthxClient
 
-	var targetDeviceGroup * grpc_authx_go.DeviceGroupCredentials
+	var targetDeviceGroup *grpc_authx_go.DeviceGroupCredentials
 
 	ginkgo.BeforeSuite(func() {
 		listener = test.GetDefaultListener()
@@ -57,27 +57,27 @@ var _ = ginkgo.Describe("Management secret access", func() {
 		// Add the device group
 		deviceGroup := &grpc_authx_go.AddDeviceGroupCredentialsRequest{
 			OrganizationId: uuid.New().String(),
-			DeviceGroupId: uuid.New().String(),
-			Enabled: true,
+			DeviceGroupId:  uuid.New().String(),
+			Enabled:        true,
 		}
 		group, err := client.AddDeviceGroupCredentials(context.Background(), deviceGroup)
 		gomega.Expect(err).To(gomega.Succeed())
 		targetDeviceGroup = group
 	})
 
-	ginkgo.It("should be able to retrieve the secret from an existing device group", func(){
+	ginkgo.It("should be able to retrieve the secret from an existing device group", func() {
 		deviceGroupId := &grpc_device_go.DeviceGroupId{
-			OrganizationId:       targetDeviceGroup.OrganizationId,
-			DeviceGroupId:        targetDeviceGroup.DeviceGroupId,
+			OrganizationId: targetDeviceGroup.OrganizationId,
+			DeviceGroupId:  targetDeviceGroup.DeviceGroupId,
 		}
-	    secret, err := cachedClient.RetrieveSecret(deviceGroupId)
-	    gomega.Expect(err).To(gomega.Succeed())
-	    gomega.Expect(secret).ShouldNot(gomega.BeNil())
+		secret, err := cachedClient.RetrieveSecret(deviceGroupId)
+		gomega.Expect(err).To(gomega.Succeed())
+		gomega.Expect(secret).ShouldNot(gomega.BeNil())
 	})
-	ginkgo.It("should be able to retrieve twice the secret from an existing device group", func(){
+	ginkgo.It("should be able to retrieve twice the secret from an existing device group", func() {
 		deviceGroupId := &grpc_device_go.DeviceGroupId{
-			OrganizationId:       targetDeviceGroup.OrganizationId,
-			DeviceGroupId:        targetDeviceGroup.DeviceGroupId,
+			OrganizationId: targetDeviceGroup.OrganizationId,
+			DeviceGroupId:  targetDeviceGroup.DeviceGroupId,
 		}
 		secret, err := cachedClient.RetrieveSecret(deviceGroupId)
 		gomega.Expect(err).To(gomega.Succeed())
@@ -86,10 +86,10 @@ var _ = ginkgo.Describe("Management secret access", func() {
 		gomega.Expect(err).To(gomega.Succeed())
 		gomega.Expect(secret).ShouldNot(gomega.BeEmpty())
 	})
-	ginkgo.It("should not be able to retrieve the secret from an unknown device group", func(){
+	ginkgo.It("should not be able to retrieve the secret from an unknown device group", func() {
 		deviceGroupId := &grpc_device_go.DeviceGroupId{
-			OrganizationId:       "not-found",
-			DeviceGroupId:        targetDeviceGroup.DeviceGroupId,
+			OrganizationId: "not-found",
+			DeviceGroupId:  targetDeviceGroup.DeviceGroupId,
 		}
 		secret, err := cachedClient.RetrieveSecret(deviceGroupId)
 		gomega.Expect(err).To(gomega.HaveOccurred())

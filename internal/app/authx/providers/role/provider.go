@@ -26,4 +26,3 @@ type Role interface {
 	// Truncate clears the provider.
 	Truncate() derrors.Error
 }
-

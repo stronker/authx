@@ -12,21 +12,18 @@ import (
 	"sync"
 )
 
-
 const (
 	deviceGroupCredentialsTable = "devicegroupcredentials"
-	deviceCredentialsTable = "devicecredentials"
-	rowNotFound = "not found"
+	deviceCredentialsTable      = "devicecredentials"
+	rowNotFound                 = "not found"
 )
 
-
 type ScyllaDeviceCredentialsProvider struct {
-	Address string
-	Port int
+	Address  string
+	Port     int
 	KeySpace string
 	sync.Mutex
 	Session *gocql.Session
-
 }
 
 func (sp *ScyllaDeviceCredentialsProvider) connect() derrors.Error {
@@ -46,7 +43,7 @@ func (sp *ScyllaDeviceCredentialsProvider) connect() derrors.Error {
 	return nil
 }
 
-func (sp *ScyllaDeviceCredentialsProvider) Disconnect()  {
+func (sp *ScyllaDeviceCredentialsProvider) Disconnect() {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -57,12 +54,12 @@ func (sp *ScyllaDeviceCredentialsProvider) Disconnect()  {
 	}
 }
 
-func (sp *ScyllaDeviceCredentialsProvider) checkConnectionAndConnect () derrors.Error {
+func (sp *ScyllaDeviceCredentialsProvider) checkConnectionAndConnect() derrors.Error {
 
 	if sp.Session != nil {
 		return nil
 	}
-	log.Info().Str("provider", "ScyllaDeviceCredentialsProvider"). Msg("session not connected, trying to connect it!")
+	log.Info().Str("provider", "ScyllaDeviceCredentialsProvider").Msg("session not connected, trying to connect it!")
 	err := sp.connect()
 	if err != nil {
 		return err
@@ -71,16 +68,16 @@ func (sp *ScyllaDeviceCredentialsProvider) checkConnectionAndConnect () derrors.
 	return nil
 }
 
-func NewScyllaDeviceCredentialsProvider (address string, port int, keyspace string) *ScyllaDeviceCredentialsProvider{
-	provider := ScyllaDeviceCredentialsProvider{Address:address, Port:port, KeySpace:keyspace}
+func NewScyllaDeviceCredentialsProvider(address string, port int, keyspace string) *ScyllaDeviceCredentialsProvider {
+	provider := ScyllaDeviceCredentialsProvider{Address: address, Port: port, KeySpace: keyspace}
 	provider.connect()
 	return &provider
 }
 
 // -------------------------------
 
-func (sp * ScyllaDeviceCredentialsProvider) unsafeExistsGroupCredentials (organizationId string, deviceGroupId string) (bool, derrors.Error) {
-	if err := sp.checkConnectionAndConnect(); err != nil{
+func (sp *ScyllaDeviceCredentialsProvider) unsafeExistsGroupCredentials(organizationId string, deviceGroupId string) (bool, derrors.Error) {
+	if err := sp.checkConnectionAndConnect(); err != nil {
 		return false, err
 	}
 
@@ -98,14 +95,14 @@ func (sp * ScyllaDeviceCredentialsProvider) unsafeExistsGroupCredentials (organi
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return false, nil
-		}else{
+		} else {
 			return false, derrors.AsError(err, "cannot determinate if device group credentials exists")
 		}
 	}
 
 	return true, nil
 }
-func (sp * ScyllaDeviceCredentialsProvider) AddDeviceGroupCredentials (groupCredentials * entities.DeviceGroupCredentials) derrors.Error {
+func (sp *ScyllaDeviceCredentialsProvider) AddDeviceGroupCredentials(groupCredentials *entities.DeviceGroupCredentials) derrors.Error {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -119,12 +116,12 @@ func (sp * ScyllaDeviceCredentialsProvider) AddDeviceGroupCredentials (groupCred
 		return err
 	}
 	if exists {
-		return  derrors.NewAlreadyExistsError("device group credentials").WithParams(groupCredentials.OrganizationID, groupCredentials.DeviceGroupID)
+		return derrors.NewAlreadyExistsError("device group credentials").WithParams(groupCredentials.OrganizationID, groupCredentials.DeviceGroupID)
 	}
 
 	// add new basic credential
 	stmt, names := qb.Insert(deviceGroupCredentialsTable).Columns("organization_id", "device_group_id",
-		"device_group_api_key","enabled","default_device_connectivity", "secret").ToCql()
+		"device_group_api_key", "enabled", "default_device_connectivity", "secret").ToCql()
 	q := gocqlx.Query(sp.Session.Query(stmt), names).BindStruct(groupCredentials)
 	cqlErr := q.ExecRelease()
 
@@ -135,7 +132,7 @@ func (sp * ScyllaDeviceCredentialsProvider) AddDeviceGroupCredentials (groupCred
 	return nil
 
 }
-func (sp * ScyllaDeviceCredentialsProvider) UpdateDeviceGroupCredentials (groupCredentials * entities.DeviceGroupCredentials) derrors.Error {
+func (sp *ScyllaDeviceCredentialsProvider) UpdateDeviceGroupCredentials(groupCredentials *entities.DeviceGroupCredentials) derrors.Error {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -148,14 +145,14 @@ func (sp * ScyllaDeviceCredentialsProvider) UpdateDeviceGroupCredentials (groupC
 	if err != nil {
 		return err
 	}
-	if ! exists {
-		return  derrors.NewNotFoundError("device group credentials").WithParams(groupCredentials.OrganizationID, groupCredentials.DeviceGroupID)
+	if !exists {
+		return derrors.NewNotFoundError("device group credentials").WithParams(groupCredentials.OrganizationID, groupCredentials.DeviceGroupID)
 	}
 
 	// add new basic credential
-	stmt, names := qb.Update(deviceGroupCredentialsTable).Set("enabled","default_device_connectivity").
+	stmt, names := qb.Update(deviceGroupCredentialsTable).Set("enabled", "default_device_connectivity").
 		Where(qb.Eq("organization_id")).Where(qb.Eq("device_group_id")).
-	 	ToCql()
+		ToCql()
 	q := gocqlx.Query(sp.Session.Query(stmt), names).BindStruct(groupCredentials)
 	cqlErr := q.ExecRelease()
 
@@ -163,9 +160,9 @@ func (sp * ScyllaDeviceCredentialsProvider) UpdateDeviceGroupCredentials (groupC
 		return derrors.AsError(cqlErr, "cannot update  device group credentials")
 	}
 
-	return  nil
+	return nil
 }
-func (sp * ScyllaDeviceCredentialsProvider) ExistsDeviceGroup (organizationId string, deviceGroupId string) (bool, derrors.Error) {
+func (sp *ScyllaDeviceCredentialsProvider) ExistsDeviceGroup(organizationId string, deviceGroupId string) (bool, derrors.Error) {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -173,12 +170,12 @@ func (sp * ScyllaDeviceCredentialsProvider) ExistsDeviceGroup (organizationId st
 	return sp.unsafeExistsGroupCredentials(organizationId, deviceGroupId)
 
 }
-func (sp * ScyllaDeviceCredentialsProvider) GetDeviceGroup (organizationId string, deviceGroupId string) (* entities.DeviceGroupCredentials, derrors.Error){
+func (sp *ScyllaDeviceCredentialsProvider) GetDeviceGroup(organizationId string, deviceGroupId string) (*entities.DeviceGroupCredentials, derrors.Error) {
 
 	sp.Lock()
 	defer sp.Unlock()
 
-	if err := sp.checkConnectionAndConnect(); err != nil{
+	if err := sp.checkConnectionAndConnect(); err != nil {
 		return nil, err
 	}
 
@@ -203,12 +200,12 @@ func (sp * ScyllaDeviceCredentialsProvider) GetDeviceGroup (organizationId strin
 	return &deviceGroup, nil
 
 }
-func (sp * ScyllaDeviceCredentialsProvider) GetDeviceGroupByApiKey (apiKey string) (* entities.DeviceGroupCredentials, derrors.Error){
+func (sp *ScyllaDeviceCredentialsProvider) GetDeviceGroupByApiKey(apiKey string) (*entities.DeviceGroupCredentials, derrors.Error) {
 
 	sp.Lock()
 	defer sp.Unlock()
 
-	if err := sp.checkConnectionAndConnect(); err != nil{
+	if err := sp.checkConnectionAndConnect(); err != nil {
 		return nil, err
 	}
 
@@ -231,12 +228,12 @@ func (sp * ScyllaDeviceCredentialsProvider) GetDeviceGroupByApiKey (apiKey strin
 	return &deviceGroup, nil
 
 }
-func (sp * ScyllaDeviceCredentialsProvider) RemoveDeviceGroup (organizationId string, deviceGroupId string) derrors.Error {
+func (sp *ScyllaDeviceCredentialsProvider) RemoveDeviceGroup(organizationId string, deviceGroupId string) derrors.Error {
 
 	sp.Lock()
 	defer sp.Unlock()
 
-	if err := sp.checkConnectionAndConnect(); err != nil{
+	if err := sp.checkConnectionAndConnect(); err != nil {
 		return err
 	}
 
@@ -259,7 +256,7 @@ func (sp * ScyllaDeviceCredentialsProvider) RemoveDeviceGroup (organizationId st
 
 	return nil
 }
-func (sp * ScyllaDeviceCredentialsProvider) TruncateDeviceGroup() derrors.Error {
+func (sp *ScyllaDeviceCredentialsProvider) TruncateDeviceGroup() derrors.Error {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -279,8 +276,8 @@ func (sp * ScyllaDeviceCredentialsProvider) TruncateDeviceGroup() derrors.Error 
 }
 
 // ---------------------------
-func (sp * ScyllaDeviceCredentialsProvider) unsafeExistsDeviceCredentials(organizationId string, deviceGroupId string, deviceId string) (bool, derrors.Error) {
-	if err := sp.checkConnectionAndConnect(); err != nil{
+func (sp *ScyllaDeviceCredentialsProvider) unsafeExistsDeviceCredentials(organizationId string, deviceGroupId string, deviceId string) (bool, derrors.Error) {
+	if err := sp.checkConnectionAndConnect(); err != nil {
 		return false, err
 	}
 
@@ -293,21 +290,21 @@ func (sp * ScyllaDeviceCredentialsProvider) unsafeExistsDeviceCredentials(organi
 	q := gocqlx.Query(sp.Session.Query(stmt), names).BindMap(qb.M{
 		"organization_id": organizationId,
 		"device_group_id": deviceGroupId,
-		"device_id": deviceId,
+		"device_id":       deviceId,
 	})
 
 	err := q.GetRelease(&returnedId)
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return false, nil
-		}else{
+		} else {
 			return false, derrors.AsError(err, "cannot determinate if device credentials exists")
 		}
 	}
 
 	return true, nil
 }
-func (sp * ScyllaDeviceCredentialsProvider) AddDeviceCredentials (credentials * entities.DeviceCredentials) derrors.Error {
+func (sp *ScyllaDeviceCredentialsProvider) AddDeviceCredentials(credentials *entities.DeviceCredentials) derrors.Error {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -321,7 +318,7 @@ func (sp * ScyllaDeviceCredentialsProvider) AddDeviceCredentials (credentials * 
 		return err
 	}
 	if !exists {
-		return  derrors.NewNotFoundError("device group credentials").WithParams(credentials.OrganizationID, credentials.DeviceGroupID)
+		return derrors.NewNotFoundError("device group credentials").WithParams(credentials.OrganizationID, credentials.DeviceGroupID)
 	}
 
 	exists, err = sp.unsafeExistsDeviceCredentials(credentials.OrganizationID, credentials.DeviceGroupID, credentials.DeviceID)
@@ -329,12 +326,12 @@ func (sp * ScyllaDeviceCredentialsProvider) AddDeviceCredentials (credentials * 
 		return err
 	}
 	if exists {
-		return  derrors.NewAlreadyExistsError("device credentials").WithParams(credentials.OrganizationID, credentials.DeviceGroupID, credentials.DeviceID)
+		return derrors.NewAlreadyExistsError("device credentials").WithParams(credentials.OrganizationID, credentials.DeviceGroupID, credentials.DeviceID)
 	}
 
 	// add new basic credential
 	stmt, names := qb.Insert(deviceCredentialsTable).Columns("organization_id", "device_group_id",
-		"device_id", "device_api_key","enabled").ToCql()
+		"device_id", "device_api_key", "enabled").ToCql()
 	q := gocqlx.Query(sp.Session.Query(stmt), names).BindStruct(credentials)
 	cqlErr := q.ExecRelease()
 
@@ -344,7 +341,7 @@ func (sp * ScyllaDeviceCredentialsProvider) AddDeviceCredentials (credentials * 
 
 	return nil
 }
-func (sp * ScyllaDeviceCredentialsProvider) UpdateDeviceCredentials (credentials * entities.DeviceCredentials) derrors.Error {
+func (sp *ScyllaDeviceCredentialsProvider) UpdateDeviceCredentials(credentials *entities.DeviceCredentials) derrors.Error {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -357,8 +354,8 @@ func (sp * ScyllaDeviceCredentialsProvider) UpdateDeviceCredentials (credentials
 	if err != nil {
 		return err
 	}
-	if ! exists {
-		return  derrors.NewNotFoundError("device credentials").WithParams(credentials.OrganizationID, credentials.DeviceGroupID, credentials.DeviceID)
+	if !exists {
+		return derrors.NewNotFoundError("device credentials").WithParams(credentials.OrganizationID, credentials.DeviceGroupID, credentials.DeviceID)
 	}
 
 	// add new basic credential
@@ -372,19 +369,19 @@ func (sp * ScyllaDeviceCredentialsProvider) UpdateDeviceCredentials (credentials
 		return derrors.AsError(cqlErr, "cannot update device credentials")
 	}
 
-	return  nil
+	return nil
 }
-func (sp * ScyllaDeviceCredentialsProvider) ExistsDevice (organizationId string, deviceGroupId string, deviceId string) (bool, derrors.Error) {
+func (sp *ScyllaDeviceCredentialsProvider) ExistsDevice(organizationId string, deviceGroupId string, deviceId string) (bool, derrors.Error) {
 	sp.Lock()
 	defer sp.Unlock()
 
 	return sp.unsafeExistsDeviceCredentials(organizationId, deviceGroupId, deviceId)
 }
-func (sp * ScyllaDeviceCredentialsProvider) GetDevice (organizationId string, deviceGroupId string, deviceId string) (* entities.DeviceCredentials, derrors.Error) {
+func (sp *ScyllaDeviceCredentialsProvider) GetDevice(organizationId string, deviceGroupId string, deviceId string) (*entities.DeviceCredentials, derrors.Error) {
 	sp.Lock()
 	defer sp.Unlock()
 
-	if err := sp.checkConnectionAndConnect(); err != nil{
+	if err := sp.checkConnectionAndConnect(); err != nil {
 		return nil, err
 	}
 
@@ -396,7 +393,7 @@ func (sp * ScyllaDeviceCredentialsProvider) GetDevice (organizationId string, de
 	q := gocqlx.Query(sp.Session.Query(stmt), names).BindMap(qb.M{
 		"organization_id": organizationId,
 		"device_group_id": deviceGroupId,
-		"device_id": deviceId,
+		"device_id":       deviceId,
 	})
 
 	err := q.GetRelease(&device)
@@ -410,12 +407,12 @@ func (sp * ScyllaDeviceCredentialsProvider) GetDevice (organizationId string, de
 
 	return &device, nil
 }
-func (sp * ScyllaDeviceCredentialsProvider) GetDeviceByApiKey (apiKey string) (* entities.DeviceCredentials, derrors.Error) {
+func (sp *ScyllaDeviceCredentialsProvider) GetDeviceByApiKey(apiKey string) (*entities.DeviceCredentials, derrors.Error) {
 
 	sp.Lock()
 	defer sp.Unlock()
 
-	if err := sp.checkConnectionAndConnect(); err != nil{
+	if err := sp.checkConnectionAndConnect(); err != nil {
 		return nil, err
 	}
 
@@ -437,11 +434,11 @@ func (sp * ScyllaDeviceCredentialsProvider) GetDeviceByApiKey (apiKey string) (*
 
 	return &device, nil
 }
-func (sp * ScyllaDeviceCredentialsProvider) RemoveDevice (organizationId string, deviceGroupId string, deviceId string) derrors.Error {
+func (sp *ScyllaDeviceCredentialsProvider) RemoveDevice(organizationId string, deviceGroupId string, deviceId string) derrors.Error {
 	sp.Lock()
 	defer sp.Unlock()
 
-	if err := sp.checkConnectionAndConnect(); err != nil{
+	if err := sp.checkConnectionAndConnect(); err != nil {
 		return err
 	}
 
@@ -464,7 +461,7 @@ func (sp * ScyllaDeviceCredentialsProvider) RemoveDevice (organizationId string,
 
 	return nil
 }
-func (sp * ScyllaDeviceCredentialsProvider) TruncateDevice() derrors.Error {
+func (sp *ScyllaDeviceCredentialsProvider) TruncateDevice() derrors.Error {
 	sp.Lock()
 	defer sp.Unlock()
 
@@ -482,7 +479,7 @@ func (sp * ScyllaDeviceCredentialsProvider) TruncateDevice() derrors.Error {
 	return nil
 }
 
-func (sp * ScyllaDeviceCredentialsProvider) Truncate()  derrors.Error{
+func (sp *ScyllaDeviceCredentialsProvider) Truncate() derrors.Error {
 
 	err := sp.TruncateDeviceGroup()
 	if err != nil {
@@ -496,4 +493,3 @@ func (sp * ScyllaDeviceCredentialsProvider) Truncate()  derrors.Error{
 
 	return nil
 }
-

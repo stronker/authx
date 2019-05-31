@@ -9,13 +9,13 @@ import (
 	"time"
 )
 
-type EICJoinToken struct{
+type EICJoinToken struct {
 	OrganizationID string `json:"organization_id"`
-	TokenID string `json:"token_id"`
-	ExpiresOn int64 `json:"expires_on"`
+	TokenID        string `json:"token_id"`
+	ExpiresOn      int64  `json:"expires_on"`
 }
 
-func NewEICJoinToken(organizationID string, ttl time.Duration) * EICJoinToken{
+func NewEICJoinToken(organizationID string, ttl time.Duration) *EICJoinToken {
 	return &EICJoinToken{
 		OrganizationID: organizationID,
 		TokenID:        uuid.New().String(),

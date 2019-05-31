@@ -6,7 +6,6 @@ import (
 	"sync"
 )
 
-
 // BasicCredentialsMockup is an implementation of this provider only for testing
 type BasicCredentialsMockup struct {
 	sync.Mutex
@@ -18,7 +17,7 @@ func NewBasicCredentialMockup() *BasicCredentialsMockup {
 	return &BasicCredentialsMockup{data: make(map[string]entities.BasicCredentialsData, 0)}
 }
 
-func (p * BasicCredentialsMockup) unsafeGet(username string) (*entities.BasicCredentialsData, derrors.Error) {
+func (p *BasicCredentialsMockup) unsafeGet(username string) (*entities.BasicCredentialsData, derrors.Error) {
 	data, ok := p.data[username]
 	if !ok {
 		return nil, derrors.NewNotFoundError("credentials not found").WithParams(username)
@@ -31,7 +30,7 @@ func (p *BasicCredentialsMockup) Delete(username string) derrors.Error {
 	p.Lock()
 	defer p.Unlock()
 	_, ok := p.data[username]
-	if ! ok {
+	if !ok {
 		return derrors.NewNotFoundError("username not found").WithParams(username)
 	}
 	delete(p.data, username)
@@ -60,12 +59,12 @@ func (p *BasicCredentialsMockup) Get(username string) (*entities.BasicCredential
 }
 
 // Exist check if exists a specific credentials.
-func (p *BasicCredentialsMockup) Exist(username string) (*bool,derrors.Error){
+func (p *BasicCredentialsMockup) Exist(username string) (*bool, derrors.Error) {
 	p.Lock()
 	defer p.Unlock()
 
 	_, ok := p.data[username]
-	return &ok,nil
+	return &ok, nil
 }
 
 // Edit update a specific user credentials.

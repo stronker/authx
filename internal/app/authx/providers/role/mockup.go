@@ -10,7 +10,6 @@ import (
 	"sync"
 )
 
-
 // RoleMockup is a in-memory provider.
 type RoleMockup struct {
 	sync.Mutex
@@ -19,10 +18,10 @@ type RoleMockup struct {
 
 // NewRoleMockup create a new instance of the RoleMockup structure.
 func NewRoleMockup() Role {
-	return &RoleMockup{data: make(map[string]entities.RoleData,0)}
+	return &RoleMockup{data: make(map[string]entities.RoleData, 0)}
 }
 
-func (p * RoleMockup) unsafeGet(organizationID string, roleID string) (*entities.RoleData, derrors.Error) {
+func (p *RoleMockup) unsafeGet(organizationID string, roleID string) (*entities.RoleData, derrors.Error) {
 	data, ok := p.data[roleID]
 	if !ok || data.OrganizationID != organizationID {
 		return nil, derrors.NewNotFoundError("role not found").WithParams(organizationID, roleID)
@@ -115,6 +114,6 @@ func (p *RoleMockup) List(organizationID string) ([]entities.RoleData, derrors.E
 func (p *RoleMockup) Truncate() derrors.Error {
 	p.Lock()
 	defer p.Unlock()
-	p.data = make(map[string]entities.RoleData,0)
+	p.data = make(map[string]entities.RoleData, 0)
 	return nil
 }

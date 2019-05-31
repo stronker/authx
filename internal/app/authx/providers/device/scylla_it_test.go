@@ -14,8 +14,7 @@ RUN_INTEGRATION_TEST=true
 IT_NALEJ_KEYSPACE=authx
 IT_SCYLLA_PORT=9042
 
- */
-
+*/
 
 import (
 	"github.com/nalej/authx/internal/app/authx/utils"
@@ -27,7 +26,7 @@ import (
 
 var _ = ginkgo.Describe("Scylla cluster provider", func() {
 
-	if ! utils.RunIntegrationTests() {
+	if !utils.RunIntegrationTests() {
 		log.Warn().Msg("Integration tests are skipped")
 		return
 	}

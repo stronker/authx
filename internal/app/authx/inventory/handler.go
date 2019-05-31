@@ -16,25 +16,25 @@ import (
 )
 
 // Handler for inventory related operations.
-type Handler struct{
+type Handler struct {
 	manager Manager
 }
 
 // NewHandler creates a new handler with a given manager
-func NewHandler(manager Manager) * Handler{
+func NewHandler(manager Manager) *Handler {
 	return &Handler{
 		manager: manager,
 	}
 }
 
 // CreateEICJoinToken creates an EICJoinToken for new controllers to join the system.
-func (h * Handler) CreateEICJoinToken(ctx context.Context, organizationID *grpc_organization_go.OrganizationId) (*grpc_authx_go.EICJoinToken, error) {
+func (h *Handler) CreateEICJoinToken(ctx context.Context, organizationID *grpc_organization_go.OrganizationId) (*grpc_authx_go.EICJoinToken, error) {
 	vErr := entities.ValidOrganizationID(organizationID)
-	if vErr != nil{
+	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
 	token, err := h.manager.CreateEICJoinToken(organizationID)
-	if err != nil{
+	if err != nil {
 		log.Error().Str("trace", err.DebugReport()).Msg("cannot generate join token")
 		return nil, conversions.ToGRPCError(derrors.NewInternalError("cannot generate join token"))
 	}
@@ -43,12 +43,12 @@ func (h * Handler) CreateEICJoinToken(ctx context.Context, organizationID *grpc_
 }
 
 // ValidEICJoinToken checks if the Token provide is still valid to join a EIC.
-func (h * Handler) ValidEICJoinToken(ctx context.Context, token *grpc_authx_go.EICJoinRequest) (*grpc_common_go.Success, error) {
+func (h *Handler) ValidEICJoinToken(ctx context.Context, token *grpc_authx_go.EICJoinRequest) (*grpc_common_go.Success, error) {
 	if token.Token == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("token is mandatory"))
 	}
 	valid, err := h.manager.ValidEICJoinToken(token)
-	if err != nil{
+	if err != nil {
 		return nil, conversions.ToGRPCError(err)
 	}
 	if valid {
@@ -56,4 +56,3 @@ func (h * Handler) ValidEICJoinToken(ctx context.Context, token *grpc_authx_go.E
 	}
 	return nil, conversions.ToGRPCError(derrors.NewUnauthenticatedError("invalid token"))
 }
-

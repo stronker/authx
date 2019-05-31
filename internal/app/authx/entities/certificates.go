@@ -9,11 +9,11 @@ import (
 	"github.com/nalej/grpc-authx-go"
 )
 
-func ValidEdgeControllerCertRequest(request *grpc_authx_go.EdgeControllerCertRequest) derrors.Error{
-	if request.OrganizationId == ""{
+func ValidEdgeControllerCertRequest(request *grpc_authx_go.EdgeControllerCertRequest) derrors.Error {
+	if request.OrganizationId == "" {
 		return derrors.NewInvalidArgumentError("organization_id cannot be empty")
 	}
-	if request.EdgeControllerId == ""{
+	if request.EdgeControllerId == "" {
 		return derrors.NewInvalidArgumentError("edge_controller_id cannot be empty")
 	}
 	return nil

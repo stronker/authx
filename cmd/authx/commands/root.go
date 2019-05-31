@@ -4,7 +4,6 @@
 
 package commands
 
-
 import (
 	"fmt"
 	"github.com/nalej/authx/version"

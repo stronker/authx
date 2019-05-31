@@ -1,6 +1,6 @@
 /*
 * Copyright (C) 2019 Nalej - All Rights Reserved
-*/
+ */
 
 package certificates
 
@@ -20,24 +20,24 @@ import (
 	"time"
 )
 
-func createTestCA() (*x509.Certificate, *rsa.PrivateKey){
+func createTestCA() (*x509.Certificate, *rsa.PrivateKey) {
 
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	gomega.Expect(err).To(gomega.Succeed())
 
 	caCert := x509.Certificate{
-		SerialNumber:                big.NewInt(1),
-		Issuer:                      pkix.Name{
-			Organization:       []string{"Nalej"},
-		},
-		Subject:                     pkix.Name{
+		SerialNumber: big.NewInt(1),
+		Issuer: pkix.Name{
 			Organization: []string{"Nalej"},
 		},
-		NotBefore:                   time.Now(),
-		NotAfter:                    time.Now().Add(CertValidity),
-		KeyUsage:                    x509.KeyUsageCertSign | x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:                 []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid:       true,
+		Subject: pkix.Name{
+			Organization: []string{"Nalej"},
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().Add(CertValidity),
+		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
 		IsCA:                  true,
 		MaxPathLen:            0,
 		MaxPathLenZero:        true,
@@ -56,7 +56,7 @@ func createTestCA() (*x509.Certificate, *rsa.PrivateKey){
 var testManager Manager
 
 var _ = ginkgo.Describe("With a manager", func() {
-	ginkgo.BeforeSuite(func(){
+	ginkgo.BeforeSuite(func() {
 		testCA, testPK := createTestCA()
 		helper := &CertHelper{
 			CACert:     testCA,
@@ -68,22 +68,21 @@ var _ = ginkgo.Describe("With a manager", func() {
 		testManager = NewManager(emptyCfg, helper)
 	})
 
-
-	ginkgo.It("should be able to generate an edge controller certificate", func(){
-	    request := &grpc_authx_go.EdgeControllerCertRequest{
-			OrganizationId:       "organization_id",
-			EdgeControllerId:     "edge_controller_id",
-			Name:                 "Fake EC",
-			Ips: []string{"10.0.0.10", "192.168.250.10"},
+	ginkgo.It("should be able to generate an edge controller certificate", func() {
+		request := &grpc_authx_go.EdgeControllerCertRequest{
+			OrganizationId:   "organization_id",
+			EdgeControllerId: "edge_controller_id",
+			Name:             "Fake EC",
+			Ips:              []string{"10.0.0.10", "192.168.250.10"},
 		}
-	    ecCert, err := testManager.CreateControllerCert(request)
-	    gomega.Expect(err).To(gomega.Succeed())
-	    gomega.Expect(ecCert).ToNot(gomega.BeNil())
+		ecCert, err := testManager.CreateControllerCert(request)
+		gomega.Expect(err).To(gomega.Succeed())
+		gomega.Expect(ecCert).ToNot(gomega.BeNil())
 		gomega.Expect(ecCert.Certificate).ShouldNot(gomega.BeNil())
 		gomega.Expect(ecCert.PrivateKey).ShouldNot(gomega.BeNil())
 
-	    x509Cert, cErr := tls.X509KeyPair([]byte(ecCert.Certificate), []byte(ecCert.PrivateKey))
-	    gomega.Expect(cErr).To(gomega.Succeed())
+		x509Cert, cErr := tls.X509KeyPair([]byte(ecCert.Certificate), []byte(ecCert.PrivateKey))
+		gomega.Expect(cErr).To(gomega.Succeed())
 
 		block, _ := pem.Decode([]byte(ecCert.Certificate))
 		gomega.Expect(block).ShouldNot(gomega.BeNil())
@@ -94,6 +93,5 @@ var _ = ginkgo.Describe("With a manager", func() {
 		log.Info().Interface("cert", x509Cert).Msg("result")
 		log.Info().Interface("cert", cert).Msg("result")
 	})
-
 
 })

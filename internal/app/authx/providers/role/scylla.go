@@ -17,18 +17,16 @@ const tablePK_2 = "role_id"
 
 const rowNotFound = "not found"
 
-
 type ScyllaRoleProvider struct {
-	Address string
-	Port int
+	Address  string
+	Port     int
 	KeySpace string
 	sync.Mutex
 	Session *gocql.Session
 }
 
-
-func NewScyllaRoleProvider (address string, port int, keyspace string) *ScyllaRoleProvider{
-	provider := ScyllaRoleProvider{Address:address, Port:port, KeySpace:keyspace}
+func NewScyllaRoleProvider(address string, port int, keyspace string) *ScyllaRoleProvider {
+	provider := ScyllaRoleProvider{Address: address, Port: port, KeySpace: keyspace}
 	provider.connect()
 	return &provider
 }
@@ -50,7 +48,7 @@ func (sp *ScyllaRoleProvider) connect() derrors.Error {
 	return nil
 }
 
-func (sp *ScyllaRoleProvider) Disconnect()  {
+func (sp *ScyllaRoleProvider) Disconnect() {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -62,12 +60,12 @@ func (sp *ScyllaRoleProvider) Disconnect()  {
 
 }
 
-func (sp *ScyllaRoleProvider) checkConnectionAndConnect () derrors.Error {
+func (sp *ScyllaRoleProvider) checkConnectionAndConnect() derrors.Error {
 
 	if sp.Session != nil {
 		return nil
 	}
-	log.Info().Str("provider", "ScyllaRolesProvider"). Msg("session not connected, trying to connect it!")
+	log.Info().Str("provider", "ScyllaRolesProvider").Msg("session not connected, trying to connect it!")
 	err := sp.connect()
 	if err != nil {
 		return err
@@ -90,7 +88,7 @@ func (sp *ScyllaRoleProvider) unsafeGet(organizationID string, roleID string) (*
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return nil, derrors.NewNotFoundError("role").WithParams(organizationID, roleID)
-		}else{
+		} else {
 			return nil, derrors.AsError(err, "cannot get role")
 		}
 	}
@@ -98,7 +96,7 @@ func (sp *ScyllaRoleProvider) unsafeGet(organizationID string, roleID string) (*
 	return &role, nil
 }
 
-func (sp *ScyllaRoleProvider) unsafeExist(organizationID string, roleID string) (*bool, derrors.Error){
+func (sp *ScyllaRoleProvider) unsafeExist(organizationID string, roleID string) (*bool, derrors.Error) {
 
 	ok := false
 	var returnedId string
@@ -112,13 +110,14 @@ func (sp *ScyllaRoleProvider) unsafeExist(organizationID string, roleID string) 
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return &ok, nil
-		}else{
+		} else {
 			return &ok, derrors.AsError(err, "cannot determine if role exists")
 		}
 	}
 	ok = true
 	return &ok, nil
 }
+
 // --------------------------------------------------------------------------------------------------------------------
 
 func (sp *ScyllaRoleProvider) Delete(organizationID string, roleID string) derrors.Error {
@@ -136,7 +135,7 @@ func (sp *ScyllaRoleProvider) Delete(organizationID string, roleID string) derro
 	if err != nil {
 		return err
 	}
-	if ! *exists {
+	if !*exists {
 		return derrors.NewNotFoundError("role").WithParams(organizationID, roleID)
 	}
 
@@ -165,7 +164,7 @@ func (sp *ScyllaRoleProvider) Add(role *entities.RoleData) derrors.Error {
 		return err
 	}
 	if *exists {
-		return  derrors.NewAlreadyExistsError("role").WithParams(role.OrganizationID, role.RoleID)
+		return derrors.NewAlreadyExistsError("role").WithParams(role.OrganizationID, role.RoleID)
 	}
 
 	// add new basic credential
@@ -200,7 +199,7 @@ func (sp *ScyllaRoleProvider) Get(organizationID string, roleID string) (*entiti
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return nil, derrors.NewNotFoundError("role").WithParams(organizationID, roleID)
-		}else{
+		} else {
 			return nil, derrors.AsError(err, "cannot get role")
 		}
 	}
@@ -238,7 +237,7 @@ func (sp *ScyllaRoleProvider) Edit(organizationID string, roleID string, edit *e
 }
 
 // Exist checks if a role exists.
-func (sp *ScyllaRoleProvider) Exist(organizationID string, roleID string) (*bool, derrors.Error){
+func (sp *ScyllaRoleProvider) Exist(organizationID string, roleID string) (*bool, derrors.Error) {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -260,7 +259,7 @@ func (sp *ScyllaRoleProvider) Exist(organizationID string, roleID string) (*bool
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return &ok, nil
-		}else{
+		} else {
 			return &ok, derrors.AsError(err, "cannot determine if role exists")
 		}
 	}
@@ -269,7 +268,7 @@ func (sp *ScyllaRoleProvider) Exist(organizationID string, roleID string) (*bool
 }
 
 // List the roles associated with an organization.
-func (sp *ScyllaRoleProvider) List(organizationID string) ([]entities.RoleData, derrors.Error){
+func (sp *ScyllaRoleProvider) List(organizationID string) ([]entities.RoleData, derrors.Error) {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -281,7 +280,7 @@ func (sp *ScyllaRoleProvider) List(organizationID string) ([]entities.RoleData, 
 	result := make([]entities.RoleData, 0)
 
 	stmt, names := qb.Select(table).Where(qb.Eq(tablePK_1)).ToCql()
-	q:= gocqlx.Query(sp.Session.Query(stmt), names).BindMap(qb.M{
+	q := gocqlx.Query(sp.Session.Query(stmt), names).BindMap(qb.M{
 		tablePK_1: organizationID,
 	})
 
@@ -295,7 +294,7 @@ func (sp *ScyllaRoleProvider) List(organizationID string) ([]entities.RoleData, 
 }
 
 // Truncate clears the provider.
-func (sp *ScyllaRoleProvider) Truncate() derrors.Error{
+func (sp *ScyllaRoleProvider) Truncate() derrors.Error {
 	sp.Lock()
 	defer sp.Unlock()
 

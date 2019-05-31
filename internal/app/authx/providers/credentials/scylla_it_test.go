@@ -8,9 +8,9 @@ import (
 	"strconv"
 )
 
-var _ = ginkgo.Describe("ScyllaCredentialsProvider", func(){
+var _ = ginkgo.Describe("ScyllaCredentialsProvider", func() {
 
-	if ! utils.RunIntegrationTests() {
+	if !utils.RunIntegrationTests() {
 		log.Warn().Msg("Integration tests are skipped")
 		return
 	}
@@ -20,7 +20,7 @@ var _ = ginkgo.Describe("ScyllaCredentialsProvider", func(){
 		ginkgo.Fail("missing environment variables")
 	}
 
-	scyllaPort, _  := strconv.Atoi(os.Getenv("IT_SCYLLA_PORT"))
+	scyllaPort, _ := strconv.Atoi(os.Getenv("IT_SCYLLA_PORT"))
 
 	if scyllaPort <= 0 {
 		ginkgo.Fail("missing environment variables")

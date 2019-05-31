@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestInventoryProviderPackage(t *testing.T){
+func TestInventoryProviderPackage(t *testing.T) {
 	gomega.RegisterFailHandler(ginkgo.Fail)
 	ginkgo.RunSpecs(t, "Inventory Providers package suite")
 }

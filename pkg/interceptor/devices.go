@@ -36,7 +36,7 @@ func managementDeviceInterceptor(secretAccess devinterceptor.SecretAccess, confi
 		if ok {
 			// Extract the raw token to be able to obtain the device group id required to retrieve the secret.
 			tk, err := extractDeviceRawToken(ctx, config)
-			if err != nil{
+			if err != nil {
 				return nil, conversions.ToGRPCError(derrors.NewUnauthenticatedError("token is not supplied"))
 			}
 			// Check the claim using the extracted device group id.
@@ -79,14 +79,14 @@ func managementDeviceInterceptor(secretAccess devinterceptor.SecretAccess, confi
 // RawDeviceToken is a structure that permits to store the raw token as well as the parsed one before checking for
 // the signature.
 type RawDeviceToken struct {
-	RawToken string
+	RawToken    string
 	DeviceClaim token.DeviceClaim
 }
 
-func (rdt * RawDeviceToken) GetDeviceGroupId() *grpc_device_go.DeviceGroupId{
+func (rdt *RawDeviceToken) GetDeviceGroupId() *grpc_device_go.DeviceGroupId {
 	return &grpc_device_go.DeviceGroupId{
-		OrganizationId:       rdt.DeviceClaim.OrganizationID,
-		DeviceGroupId:        rdt.DeviceClaim.DeviceGroupID,
+		OrganizationId: rdt.DeviceClaim.OrganizationID,
+		DeviceGroupId:  rdt.DeviceClaim.DeviceGroupID,
 	}
 }
 
@@ -103,19 +103,19 @@ func extractDeviceRawToken(ctx context.Context, config *Config) (*RawDeviceToken
 	rawToken := authHeader[0]
 	parser := new(jwt.Parser)
 	tk, _, err := parser.ParseUnverified(rawToken, &token.DeviceClaim{})
-	if err != nil{
+	if err != nil {
 		return nil, derrors.NewUnauthenticatedError("token is not valid", err)
 	}
 	return &RawDeviceToken{
-		RawToken:      rawToken,
-		DeviceClaim:   *tk.Claims.(*token.DeviceClaim),
+		RawToken:    rawToken,
+		DeviceClaim: *tk.Claims.(*token.DeviceClaim),
 	}, nil
 }
 
 // CheckDeviceJWT checks the validity of the device JWT token and returns the DeviceClaim
 func checkDeviceJWT(rawToken RawDeviceToken, secretAccess devinterceptor.SecretAccess, config *Config) (*token.DeviceClaim, derrors.Error) {
 	secret, rErr := secretAccess.RetrieveSecret(rawToken.GetDeviceGroupId())
-	if rErr != nil{
+	if rErr != nil {
 		return nil, rErr
 	}
 	// validateToken function validates the token

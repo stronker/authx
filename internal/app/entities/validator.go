@@ -21,7 +21,6 @@ const emptyDeviceId = "device_id cannot be empty"
 const emptyRefreshToken = "refreshToken is mandatory"
 const emptyToken = "token is mandatory"
 
-
 func ValidOrganizationID(organizationID *grpc_organization_go.OrganizationId) derrors.Error {
 	if organizationID.OrganizationId == "" {
 		return derrors.NewInvalidArgumentError(emptyOrganizationId)
@@ -29,7 +28,7 @@ func ValidOrganizationID(organizationID *grpc_organization_go.OrganizationId) de
 	return nil
 }
 
-func ValidUserID(userID * grpc_user_go.UserId) derrors.Error {
+func ValidUserID(userID *grpc_user_go.UserId) derrors.Error {
 	if userID.OrganizationId == "" {
 		return derrors.NewInvalidArgumentError(emptyOrganizationId)
 	}
@@ -41,7 +40,7 @@ func ValidUserID(userID * grpc_user_go.UserId) derrors.Error {
 
 // -- Device Credentials -- //
 
-func ValidAddDeviceGroupCredentials (addRequest * grpc_authx_go.AddDeviceGroupCredentialsRequest) derrors.Error {
+func ValidAddDeviceGroupCredentials(addRequest *grpc_authx_go.AddDeviceGroupCredentialsRequest) derrors.Error {
 
 	if addRequest.OrganizationId == "" {
 		return derrors.NewInvalidArgumentError(emptyOrganizationId)
@@ -52,7 +51,7 @@ func ValidAddDeviceGroupCredentials (addRequest * grpc_authx_go.AddDeviceGroupCr
 	return nil
 }
 
-func ValidUpdateDeviceGroupCredentialsRequest (request * grpc_authx_go.UpdateDeviceGroupCredentialsRequest) derrors.Error{
+func ValidUpdateDeviceGroupCredentialsRequest(request *grpc_authx_go.UpdateDeviceGroupCredentialsRequest) derrors.Error {
 	if request.OrganizationId == "" {
 		return derrors.NewInvalidArgumentError(emptyOrganizationId)
 	}
@@ -65,7 +64,7 @@ func ValidUpdateDeviceGroupCredentialsRequest (request * grpc_authx_go.UpdateDev
 	return nil
 }
 
-func ValidDeviceGroupLoginRequest (request * grpc_authx_go.DeviceGroupLoginRequest) derrors.Error{
+func ValidDeviceGroupLoginRequest(request *grpc_authx_go.DeviceGroupLoginRequest) derrors.Error {
 
 	if request.OrganizationId == "" {
 		return derrors.NewInvalidArgumentError(emptyOrganizationId)
@@ -77,7 +76,7 @@ func ValidDeviceGroupLoginRequest (request * grpc_authx_go.DeviceGroupLoginReque
 
 }
 
-func ValidAddDeviceCredentials (addRequest * grpc_authx_go.AddDeviceCredentialsRequest) derrors.Error {
+func ValidAddDeviceCredentials(addRequest *grpc_authx_go.AddDeviceCredentialsRequest) derrors.Error {
 
 	if addRequest.OrganizationId == "" {
 		return derrors.NewInvalidArgumentError(emptyOrganizationId)
@@ -91,7 +90,7 @@ func ValidAddDeviceCredentials (addRequest * grpc_authx_go.AddDeviceCredentialsR
 	return nil
 }
 
-func ValidUpdateDeviceCredentialsRequest (request * grpc_authx_go.UpdateDeviceCredentialsRequest) derrors.Error{
+func ValidUpdateDeviceCredentialsRequest(request *grpc_authx_go.UpdateDeviceCredentialsRequest) derrors.Error {
 
 	if request.OrganizationId == "" {
 		return derrors.NewInvalidArgumentError(emptyOrganizationId)
@@ -106,7 +105,7 @@ func ValidUpdateDeviceCredentialsRequest (request * grpc_authx_go.UpdateDeviceCr
 	return nil
 }
 
-func ValidDeviceLoginRequest (request * grpc_authx_go.DeviceLoginRequest) derrors.Error{
+func ValidDeviceLoginRequest(request *grpc_authx_go.DeviceLoginRequest) derrors.Error {
 
 	if request.OrganizationId == "" {
 		return derrors.NewInvalidArgumentError(emptyOrganizationId)
@@ -118,7 +117,7 @@ func ValidDeviceLoginRequest (request * grpc_authx_go.DeviceLoginRequest) derror
 
 }
 
-func ValidDeviceID (request * grpc_device_go.DeviceId) derrors.Error {
+func ValidDeviceID(request *grpc_device_go.DeviceId) derrors.Error {
 	if request.OrganizationId == "" {
 		return derrors.NewInvalidArgumentError(emptyOrganizationId)
 	}
@@ -131,7 +130,7 @@ func ValidDeviceID (request * grpc_device_go.DeviceId) derrors.Error {
 	return nil
 }
 
-func ValidDeviceGroupID (request * grpc_device_go.DeviceGroupId) derrors.Error {
+func ValidDeviceGroupID(request *grpc_device_go.DeviceGroupId) derrors.Error {
 	if request.OrganizationId == "" {
 		return derrors.NewInvalidArgumentError(emptyOrganizationId)
 	}
@@ -141,7 +140,7 @@ func ValidDeviceGroupID (request * grpc_device_go.DeviceGroupId) derrors.Error {
 	return nil
 }
 
-func ValidRefreshToken (request * grpc_authx_go.RefreshTokenRequest) derrors.Error {
+func ValidRefreshToken(request *grpc_authx_go.RefreshTokenRequest) derrors.Error {
 	if request.RefreshToken == "" {
 		return derrors.NewInvalidArgumentError(emptyRefreshToken)
 	}

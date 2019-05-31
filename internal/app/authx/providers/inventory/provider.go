@@ -9,7 +9,7 @@ import (
 	"github.com/nalej/derrors"
 )
 
-type Provider interface{
+type Provider interface {
 	// AddECJoinToken stores a join token for edge controllers.
 	AddECJoinToken(token *entities.EICJoinToken) derrors.Error
 	// IsJoinTokenValidForEC checks if a token is still valid for joining new EC

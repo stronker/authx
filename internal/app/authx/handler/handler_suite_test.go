@@ -14,7 +14,3 @@ func TestManagerPackage(t *testing.T) {
 	gomega.RegisterFailHandler(ginkgo.Fail)
 	ginkgo.RunSpecs(t, "Handler package suite")
 }
-
-
-
-

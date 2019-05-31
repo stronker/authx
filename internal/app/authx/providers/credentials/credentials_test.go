@@ -10,7 +10,6 @@ import (
 	"github.com/onsi/gomega"
 )
 
-
 func CredentialsContexts(provider BasicCredentials) {
 
 	ginkgo.Context("with a register", func() {
@@ -68,7 +67,6 @@ func CredentialsContexts(provider BasicCredentials) {
 			gomega.Expect(c).To(gomega.BeNil())
 		})
 
-
 	})
 	ginkgo.Context("empty data store", func() {
 
@@ -85,7 +83,7 @@ func CredentialsContexts(provider BasicCredentials) {
 		})
 
 		ginkgo.It("should  add correctly", func() {
-			err := provider.Add(entities.NewBasicCredentialsData("u1",[] byte("pwd"),"r1","o1"))
+			err := provider.Add(entities.NewBasicCredentialsData("u1", []byte("pwd"), "r1", "o1"))
 			gomega.Expect(err).To(gomega.Succeed())
 		})
 

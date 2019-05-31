@@ -24,9 +24,9 @@ var _ = ginkgo.Describe("Authorize method", func() {
 	ginkgo.Context("empty authorization list with AllowsAll", func() {
 
 		duration, _ := time.ParseDuration("1d")
-		claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{}, "o1"),
+		claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", []string{}, "o1"),
 			"i1", time.Now(), duration)
-		cfg := NewConfig(&AuthorizationConfig{AllowsAll:true,Permissions: map[string]Permission{}},
+		cfg := NewConfig(&AuthorizationConfig{AllowsAll: true, Permissions: map[string]Permission{}},
 			"myLittleSecret", "auth")
 
 		ginkgo.It("allows any method", func() {
@@ -39,9 +39,9 @@ var _ = ginkgo.Describe("Authorize method", func() {
 	ginkgo.Context("empty authorization list without AllowsAll", func() {
 
 		duration, _ := time.ParseDuration("1d")
-		claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{}, "o1"),
+		claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", []string{}, "o1"),
 			"i1", time.Now(), duration)
-		cfg := NewConfig(&AuthorizationConfig{AllowsAll:false,Permissions: map[string]Permission{}},
+		cfg := NewConfig(&AuthorizationConfig{AllowsAll: false, Permissions: map[string]Permission{}},
 			"myLittleSecret", "auth")
 
 		ginkgo.It("should allows any method", func() {
@@ -61,14 +61,14 @@ var _ = ginkgo.Describe("Authorize method", func() {
 		primitive1 := "primitive1"
 		primitive2 := "primitive2"
 
-		cfg := NewConfig(&AuthorizationConfig{AllowsAll:true,Permissions: map[string]Permission{
-			method1: {Must: [] string{primitive1}},
-			method2: {Must: [] string{primitive2}},
+		cfg := NewConfig(&AuthorizationConfig{AllowsAll: true, Permissions: map[string]Permission{
+			method1: {Must: []string{primitive1}},
+			method2: {Must: []string{primitive2}},
 		}},
 			"myLittleSecret", "auth")
 
 		ginkgo.Context("without primitives", func() {
-			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{}, "o1"),
+			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", []string{}, "o1"),
 				"i1", time.Now(), duration)
 			ginkgo.It("should allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
@@ -86,7 +86,7 @@ var _ = ginkgo.Describe("Authorize method", func() {
 		})
 
 		ginkgo.Context("with primitive1", func() {
-			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{primitive1}, "o1"),
+			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", []string{primitive1}, "o1"),
 				"i1", time.Now(), duration)
 			ginkgo.It("should allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
@@ -103,7 +103,7 @@ var _ = ginkgo.Describe("Authorize method", func() {
 			})
 		})
 		ginkgo.Context("with primitive2", func() {
-			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{primitive2}, "o1"),
+			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", []string{primitive2}, "o1"),
 				"i1", time.Now(), duration)
 			ginkgo.It("should allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
@@ -121,7 +121,7 @@ var _ = ginkgo.Describe("Authorize method", func() {
 		})
 
 		ginkgo.Context("with all primitives", func() {
-			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{primitive1, primitive2}, "o1"),
+			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", []string{primitive1, primitive2}, "o1"),
 				"i1", time.Now(), duration)
 			ginkgo.It("should allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
@@ -150,14 +150,14 @@ var _ = ginkgo.Describe("Authorize method", func() {
 		primitive1 := "primitive1"
 		primitive2 := "primitive2"
 
-		cfg := NewConfig(&AuthorizationConfig{AllowsAll:false,Permissions: map[string]Permission{
-			method1: {Must: [] string{primitive1}},
-			method2: {Must: [] string{primitive2}},
+		cfg := NewConfig(&AuthorizationConfig{AllowsAll: false, Permissions: map[string]Permission{
+			method1: {Must: []string{primitive1}},
+			method2: {Must: []string{primitive2}},
 		}},
 			"myLittleSecret", "auth")
 
 		ginkgo.Context("without primitives", func() {
-			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{}, "o1"),
+			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", []string{}, "o1"),
 				"i1", time.Now(), duration)
 			ginkgo.It("should not allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
@@ -175,7 +175,7 @@ var _ = ginkgo.Describe("Authorize method", func() {
 		})
 
 		ginkgo.Context("with primitive1", func() {
-			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{primitive1}, "o1"),
+			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", []string{primitive1}, "o1"),
 				"i1", time.Now(), duration)
 			ginkgo.It("should not allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
@@ -192,7 +192,7 @@ var _ = ginkgo.Describe("Authorize method", func() {
 			})
 		})
 		ginkgo.Context("with primitive2", func() {
-			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{primitive2}, "o1"),
+			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", []string{primitive2}, "o1"),
 				"i1", time.Now(), duration)
 			ginkgo.It("should not allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
@@ -210,7 +210,7 @@ var _ = ginkgo.Describe("Authorize method", func() {
 		})
 
 		ginkgo.Context("with all primitives", func() {
-			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{primitive1, primitive2}, "o1"),
+			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", []string{primitive1, primitive2}, "o1"),
 				"i1", time.Now(), duration)
 			ginkgo.It("should not allow unknown method", func() {
 				err := authorize(unknownMethod, claim, cfg)
@@ -236,11 +236,11 @@ var _ = ginkgo.Describe("checkJWT method", func() {
 		duration, _ := time.ParseDuration("1d")
 		secret := "myLittleSecret"
 		header := "auth"
-		claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{}, "o1"),
+		claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", []string{}, "o1"),
 			"i1", time.Now(), duration)
 		t := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 		tokenString, _ := t.SignedString([]byte(secret))
-		cfg := NewConfig(&AuthorizationConfig{AllowsAll:true,Permissions: map[string]Permission{}},
+		cfg := NewConfig(&AuthorizationConfig{AllowsAll: true, Permissions: map[string]Permission{}},
 			secret, header)
 		md := metadata.New(map[string]string{header: tokenString})
 
@@ -259,10 +259,10 @@ var _ = ginkgo.Describe("checkJWT method", func() {
 		wrongSecret := "myWrongSecret"
 		header := "auth"
 
-		cfg := NewConfig(&AuthorizationConfig{AllowsAll:true,Permissions: map[string]Permission{}},
+		cfg := NewConfig(&AuthorizationConfig{AllowsAll: true, Permissions: map[string]Permission{}},
 			secret, header)
 
-		claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{}, "o1"),
+		claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", []string{}, "o1"),
 			"i1", time.Now(), duration)
 		t := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 		tokenString, _ := t.SignedString([]byte(wrongSecret))
@@ -282,11 +282,11 @@ var _ = ginkgo.Describe("checkJWT method", func() {
 		secret := "myLittleSecret"
 		header := "auth"
 		wrongHeader := "authx"
-		claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{}, "o1"),
+		claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", []string{}, "o1"),
 			"i1", time.Now(), duration)
 		t := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 		tokenString, _ := t.SignedString([]byte(secret))
-		cfg := NewConfig(&AuthorizationConfig{AllowsAll:true,Permissions: map[string]Permission{}},
+		cfg := NewConfig(&AuthorizationConfig{AllowsAll: true, Permissions: map[string]Permission{}},
 			secret, header)
 
 		md := metadata.New(map[string]string{wrongHeader: tokenString})
@@ -304,11 +304,11 @@ var _ = ginkgo.Describe("checkJWT method", func() {
 		duration, _ := time.ParseDuration("1d")
 		secret := "myLittleSecret"
 		header := "auth"
-		claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", [] string{}, "o1"),
+		claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1", []string{}, "o1"),
 			"i1", time.Now(), duration)
 		t := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 		tokenString, _ := t.SignedString([]byte(secret))
-		cfg := NewConfig(&AuthorizationConfig{AllowsAll:true,Permissions: map[string]Permission{}},
+		cfg := NewConfig(&AuthorizationConfig{AllowsAll: true, Permissions: map[string]Permission{}},
 			secret, header)
 
 		md := metadata.New(map[string]string{header: tokenString})
@@ -344,11 +344,10 @@ var _ = ginkgo.Describe("GRP interceptor method ", func() {
 	primitive1 := "primitive1"
 	primitive2 := "primitive2"
 
-
 	ginkgo.Context("with AllowsAll", func() {
-		cfg := NewConfig(&AuthorizationConfig{AllowsAll:true,Permissions: map[string]Permission{
-			method1: {Must: [] string{primitive1}},
-			method2: {Must: [] string{primitive2}},
+		cfg := NewConfig(&AuthorizationConfig{AllowsAll: true, Permissions: map[string]Permission{
+			method1: {Must: []string{primitive1}},
+			method2: {Must: []string{primitive2}},
 		}}, "myLittleSecret", "auth")
 
 		ginkgo.BeforeSuite(func() {
@@ -387,7 +386,7 @@ var _ = ginkgo.Describe("GRP interceptor method ", func() {
 		ginkgo.It("add basic credentials with correct roleID and correct JWT", func() {
 
 			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1",
-				[] string{primitive1, primitive2}, "o1"),
+				[]string{primitive1, primitive2}, "o1"),
 				"i1", time.Now(), duration)
 			t := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 			tokenString, _ := t.SignedString([]byte(cfg.Secret))
@@ -408,7 +407,7 @@ var _ = ginkgo.Describe("GRP interceptor method ", func() {
 		ginkgo.It("should add basic credentials with correct roleID and incorrect JWT", func() {
 
 			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1",
-				[] string{primitive1, primitive2}, "o1"),
+				[]string{primitive1, primitive2}, "o1"),
 				"i1", time.Now(), duration)
 			t := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 			tokenString, _ := t.SignedString([]byte("wrongSecret"))
@@ -429,7 +428,7 @@ var _ = ginkgo.Describe("GRP interceptor method ", func() {
 		ginkgo.It("should add basic credentials with correct roleID and correct JWT", func() {
 
 			claim := token.NewClaim(*token.NewPersonalClaim("u1", "r1",
-				[] string{primitive2}, "o1"),
+				[]string{primitive2}, "o1"),
 				"i1", time.Now(), duration)
 			t := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 			tokenString, _ := t.SignedString([]byte(cfg.Secret))

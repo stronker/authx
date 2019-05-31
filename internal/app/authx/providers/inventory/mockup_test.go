@@ -6,7 +6,7 @@ package inventory
 
 import "github.com/onsi/ginkgo"
 
-var _ = ginkgo.Describe("Inventory provider", func(){
+var _ = ginkgo.Describe("Inventory provider", func() {
 
 	sp := NewMockupInventoryProvider()
 	RunTest(sp)

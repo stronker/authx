@@ -155,40 +155,39 @@ func (h *Authx) EditUserRole(_ context.Context, request *pbAuthx.EditUserRoleReq
 }
 
 // ListRoles returns a list of roles inside an organization.
-func (h * Authx) ListRoles(ctx context.Context, organizationID *grpc_organization_go.OrganizationId) (*grpc_authx_go.RoleList, error){
+func (h *Authx) ListRoles(ctx context.Context, organizationID *grpc_organization_go.OrganizationId) (*grpc_authx_go.RoleList, error) {
 	vErr := entities.ValidOrganizationID(organizationID)
-	if vErr != nil{
+	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
 	roles, err := h.Manager.ListRoles(organizationID)
-	if err != nil{
+	if err != nil {
 		return nil, conversions.ToGRPCError(err)
 	}
 	result := make([]*grpc_authx_go.Role, 0)
-	for _, r := range roles{
+	for _, r := range roles {
 		result = append(result, r.ToGRPC())
 	}
 	return &grpc_authx_go.RoleList{
-		Roles:                result,
+		Roles: result,
 	}, nil
 }
 
 // Retrieve the role associated with a user.
-func (h * Authx) GetUserRole(ctx context.Context, userID * grpc_user_go.UserId) (*grpc_authx_go.Role, error){
+func (h *Authx) GetUserRole(ctx context.Context, userID *grpc_user_go.UserId) (*grpc_authx_go.Role, error) {
 	vErr := entities.ValidUserID(userID)
-	if vErr != nil{
+	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
 	retrieved, err := h.Manager.GetUserRole(userID)
-	if err != nil{
+	if err != nil {
 		return nil, conversions.ToGRPCError(err)
 	}
 	return retrieved.ToGRPC(), nil
 }
 
-
 // -- Device Credentials -- //
-func (h * Authx) AddDeviceCredentials(ctx context.Context, request * pbAuthx.AddDeviceCredentialsRequest) (*pbAuthx.DeviceCredentials, error) {
+func (h *Authx) AddDeviceCredentials(ctx context.Context, request *pbAuthx.AddDeviceCredentialsRequest) (*pbAuthx.DeviceCredentials, error) {
 	vErr := entities.ValidAddDeviceCredentials(request)
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
@@ -202,8 +201,9 @@ func (h * Authx) AddDeviceCredentials(ctx context.Context, request * pbAuthx.Add
 	return added.ToGRPC(), nil
 
 }
+
 // UpdateDeviceCredentials enable /disable the device
-func (h * Authx) UpdateDeviceCredentials(ctx context.Context, request *pbAuthx.UpdateDeviceCredentialsRequest) (*pbCommon.Success, error) {
+func (h *Authx) UpdateDeviceCredentials(ctx context.Context, request *pbAuthx.UpdateDeviceCredentialsRequest) (*pbCommon.Success, error) {
 
 	vErr := entities.ValidUpdateDeviceCredentialsRequest(request)
 	if vErr != nil {
@@ -218,9 +218,10 @@ func (h * Authx) UpdateDeviceCredentials(ctx context.Context, request *pbAuthx.U
 
 	return &pbCommon.Success{}, nil
 }
+
 // GetDeviceCredentials retrieves the credentials associated with a device
-func (h * Authx) GetDeviceCredentials(ctx context.Context, request *grpc_device_go.DeviceId) (*pbAuthx.DeviceCredentials, error){
-	vErr :=  entities.ValidDeviceID(request)
+func (h *Authx) GetDeviceCredentials(ctx context.Context, request *grpc_device_go.DeviceId) (*pbAuthx.DeviceCredentials, error) {
+	vErr := entities.ValidDeviceID(request)
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
@@ -232,10 +233,11 @@ func (h * Authx) GetDeviceCredentials(ctx context.Context, request *grpc_device_
 	return credentials.ToGRPC(), nil
 
 }
-// RemoveDeviceCredentials removes a credential
-func (h * Authx) RemoveDeviceCredentials(ctx context.Context, credentials * grpc_device_go.DeviceId) (*pbCommon.Success, error) {
 
-	vErr :=  entities.ValidDeviceID(credentials)
+// RemoveDeviceCredentials removes a credential
+func (h *Authx) RemoveDeviceCredentials(ctx context.Context, credentials *grpc_device_go.DeviceId) (*pbCommon.Success, error) {
+
+	vErr := entities.ValidDeviceID(credentials)
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
@@ -247,8 +249,9 @@ func (h * Authx) RemoveDeviceCredentials(ctx context.Context, credentials * grpc
 	return &pbCommon.Success{}, nil
 
 }
+
 // DeviceLogin checks if the device credentials are valid and returns a token
-func (h * Authx) DeviceLogin(ctx context.Context, loginRequest *pbAuthx.DeviceLoginRequest) (*pbAuthx.LoginResponse, error){
+func (h *Authx) DeviceLogin(ctx context.Context, loginRequest *pbAuthx.DeviceLoginRequest) (*pbAuthx.LoginResponse, error) {
 
 	vErr := entities.ValidDeviceLoginRequest(loginRequest)
 	if vErr != nil {
@@ -263,7 +266,7 @@ func (h * Authx) DeviceLogin(ctx context.Context, loginRequest *pbAuthx.DeviceLo
 }
 
 // AddDeviceGroupCredentials adds a device in the system
-func (h * Authx) AddDeviceGroupCredentials(ctx context.Context, request *pbAuthx.AddDeviceGroupCredentialsRequest) (*pbAuthx.DeviceGroupCredentials, error){
+func (h *Authx) AddDeviceGroupCredentials(ctx context.Context, request *pbAuthx.AddDeviceGroupCredentialsRequest) (*pbAuthx.DeviceGroupCredentials, error) {
 	vErr := entities.ValidAddDeviceGroupCredentials(request)
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
@@ -276,8 +279,9 @@ func (h * Authx) AddDeviceGroupCredentials(ctx context.Context, request *pbAuthx
 
 	return added.ToGRPC(), nil
 }
+
 // UpdateDeviceGroupCredentials enable /disable the device
-func (h * Authx) UpdateDeviceGroupCredentials(ctx context.Context, request *pbAuthx.UpdateDeviceGroupCredentialsRequest) (*pbCommon.Success, error){
+func (h *Authx) UpdateDeviceGroupCredentials(ctx context.Context, request *pbAuthx.UpdateDeviceGroupCredentialsRequest) (*pbCommon.Success, error) {
 	vErr := entities.ValidUpdateDeviceGroupCredentialsRequest(request)
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
@@ -290,9 +294,10 @@ func (h * Authx) UpdateDeviceGroupCredentials(ctx context.Context, request *pbAu
 
 	return &pbCommon.Success{}, nil
 }
+
 // GetDeviceGroupCredentials retrieves retrieves the credentials associated with a device group
-func (h * Authx) GetDeviceGroupCredentials(ctx context.Context, request *grpc_device_go.DeviceGroupId) (*pbAuthx.DeviceGroupCredentials, error){
-	vErr :=  entities.ValidDeviceGroupID(request)
+func (h *Authx) GetDeviceGroupCredentials(ctx context.Context, request *grpc_device_go.DeviceGroupId) (*pbAuthx.DeviceGroupCredentials, error) {
+	vErr := entities.ValidDeviceGroupID(request)
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
@@ -304,9 +309,10 @@ func (h * Authx) GetDeviceGroupCredentials(ctx context.Context, request *grpc_de
 	return credentials.ToGRPC(), nil
 
 }
+
 // RemoveDeviceGroupCredentials removes a group credentials
-func (h * Authx) RemoveDeviceGroupCredentials(ctx context.Context, credentials *grpc_device_go.DeviceGroupId) (*pbCommon.Success, error){
-	vErr :=  entities.ValidDeviceGroupID(credentials)
+func (h *Authx) RemoveDeviceGroupCredentials(ctx context.Context, credentials *grpc_device_go.DeviceGroupId) (*pbCommon.Success, error) {
+	vErr := entities.ValidDeviceGroupID(credentials)
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
@@ -318,8 +324,9 @@ func (h * Authx) RemoveDeviceGroupCredentials(ctx context.Context, credentials *
 	return &pbCommon.Success{}, nil
 
 }
+
 // DeviceGroupLogin checks if the device group credentials are valid
-func (h * Authx) DeviceGroupLogin(ctx context.Context, credentials *grpc_authx_go.DeviceGroupLoginRequest) (*pbCommon.Success, error){
+func (h *Authx) DeviceGroupLogin(ctx context.Context, credentials *grpc_authx_go.DeviceGroupLoginRequest) (*pbCommon.Success, error) {
 	vErr := entities.ValidDeviceGroupLoginRequest(credentials)
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)

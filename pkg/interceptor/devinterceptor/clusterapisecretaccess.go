@@ -27,49 +27,48 @@ const AuthHeader = "Authorization"
 // api cluster. Notice that for this type of connections, it is required to log into the management cluster
 // with a set of credentials, and use the associated JWT token to send the requests.
 type ClusterApiSecretAccess struct {
-	LoginAPI Connection
-	ClusterAPI Connection
-	Username string
-	Password string
-	cache lru.Cache
-	LoginClient grpc_login_api_go.LoginClient
+	LoginAPI            Connection
+	ClusterAPI          Connection
+	Username            string
+	Password            string
+	cache               lru.Cache
+	LoginClient         grpc_login_api_go.LoginClient
 	DeviceManagerClient grpc_cluster_api_go.DeviceManagerClient
-	Token string
+	Token               string
 }
 
-func NewClusterApiSecretAccess (loginAPIAddress string, clusterAPIAddress string, username string,
-	password string, numCachedEntries int)(SecretAccess, derrors.Error) {
+func NewClusterApiSecretAccess(loginAPIAddress string, clusterAPIAddress string, username string,
+	password string, numCachedEntries int) (SecretAccess, derrors.Error) {
 	lruCache, err := lru.New(numCachedEntries)
-	if err != nil{
+	if err != nil {
 		return nil, derrors.AsError(err, "cannot create cache")
 	}
 	var access SecretAccess = &ClusterApiSecretAccess{
-		LoginAPI: Connection{Address:loginAPIAddress},
-		ClusterAPI: Connection{Address:clusterAPIAddress},
-		Username: username,
-		Password:password,
-		cache:  *lruCache,
+		LoginAPI:   Connection{Address: loginAPIAddress},
+		ClusterAPI: Connection{Address: clusterAPIAddress},
+		Username:   username,
+		Password:   password,
+		cache:      *lruCache,
 	}
 	return access, nil
 }
 
 func NewClusterApiSecretAccessWithClients(loginClient grpc_login_api_go.LoginClient, deviceManagerClient grpc_cluster_api_go.DeviceManagerClient,
-	username string, password string, numCachedEntries int) (SecretAccess, derrors.Error){
+	username string, password string, numCachedEntries int) (SecretAccess, derrors.Error) {
 	lruCache, err := lru.New(numCachedEntries)
-	if err != nil{
+	if err != nil {
 		return nil, derrors.AsError(err, "cannot create cache")
 	}
 
 	var access SecretAccess = &ClusterApiSecretAccess{
-		LoginClient: loginClient,
-		DeviceManagerClient:deviceManagerClient,
-		Username: username,
-		Password:password,
-		cache:  *lruCache,
+		LoginClient:         loginClient,
+		DeviceManagerClient: deviceManagerClient,
+		Username:            username,
+		Password:            password,
+		cache:               *lruCache,
 	}
 	return access, nil
 }
-
 
 func (sa *ClusterApiSecretAccess) login() derrors.Error {
 	ctx, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
@@ -88,25 +87,25 @@ func (sa *ClusterApiSecretAccess) login() derrors.Error {
 
 func (sa *ClusterApiSecretAccess) Connect() derrors.Error {
 	loginConn, err := sa.LoginAPI.GetConnection()
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	sa.LoginClient = grpc_login_api_go.NewLoginClient(loginConn)
 
 	cErr := sa.login()
-	if cErr != nil{
+	if cErr != nil {
 		return cErr
 	}
 
 	clusterConn, err := sa.ClusterAPI.GetConnection()
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	sa.DeviceManagerClient = grpc_cluster_api_go.NewDeviceManagerClient(clusterConn)
- 	return nil
+	return nil
 }
 
-func (sa * ClusterApiSecretAccess) GetContext(timeout ...time.Duration) (context.Context, context.CancelFunc) {
+func (sa *ClusterApiSecretAccess) GetContext(timeout ...time.Duration) (context.Context, context.CancelFunc) {
 	md := metadata.New(map[string]string{AuthHeader: sa.Token})
 	if len(timeout) == 0 {
 		baseContext, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
@@ -137,7 +136,7 @@ func (sa *ClusterApiSecretAccess) RetrieveSecret(id *grpc_device_go.DeviceGroupI
 			ctx2, cancel2 := sa.GetContext()
 			defer cancel2()
 			deviceGroupSecret, err = sa.DeviceManagerClient.GetDeviceGroupSecret(ctx2, id)
-			if err != nil{
+			if err != nil {
 				return "", conversions.ToDerror(err)
 			}
 		} else {
@@ -150,4 +149,3 @@ func (sa *ClusterApiSecretAccess) RetrieveSecret(id *grpc_device_go.DeviceGroupI
 	_ = sa.cache.Add(DeviceGroupIdToKey(id), deviceGroupSecret.Secret)
 	return deviceGroupSecret.Secret, nil
 }
-

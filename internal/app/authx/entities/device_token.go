@@ -15,12 +15,11 @@ func NewDeviceTokenData(deviceID string, tokenID string, refreshToken string,
 	expirationDate int64, organizationID string, deviceGroupID string) *DeviceTokenData {
 
 	return &DeviceTokenData{
-		DeviceId: 		deviceID,
+		DeviceId:       deviceID,
 		TokenID:        tokenID,
 		RefreshToken:   refreshToken,
 		ExpirationDate: expirationDate,
 		OrganizationId: organizationID,
-		DeviceGroupId: 	deviceGroupID,
+		DeviceGroupId:  deviceGroupID,
 	}
 }
-

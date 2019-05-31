@@ -23,9 +23,9 @@ type Config struct {
 	// Debug level is active.
 	Debug bool
 	// Port where the Authx components listens for incoming connections.
-	Port       int
+	Port int
 	// Secret used to sign JWT tokens.
-	Secret     string
+	Secret string
 	// ManagementClusterCertPath with the path of the management cluster certificate.
 	ManagementClusterCertPath string
 	// ManagementClusterCert with the Management cluster certificate.
@@ -52,7 +52,7 @@ type Config struct {
 	CAPrivateKeyPath string
 }
 
-func (conf * Config) Validate() derrors.Error {
+func (conf *Config) Validate() derrors.Error {
 	if conf.Port <= 0 {
 		return derrors.NewInvalidArgumentError("port must be specified")
 	}
@@ -60,7 +60,7 @@ func (conf * Config) Validate() derrors.Error {
 		if conf.ScyllaDBAddress == "" {
 			return derrors.NewInvalidArgumentError("address must be specified to use dbScylla Providers")
 		}
-		if  conf.KeySpace == "" {
+		if conf.KeySpace == "" {
 			return derrors.NewInvalidArgumentError("keyspace must be specified to use dbScylla Providers")
 		}
 		if conf.ScyllaDBPort <= 0 {
@@ -82,9 +82,9 @@ func (conf * Config) Validate() derrors.Error {
 	}
 
 	// Load server certificate
-	if conf.ManagementClusterCertPath != ""{
+	if conf.ManagementClusterCertPath != "" {
 		err := conf.loadCert()
-		if err != nil{
+		if err != nil {
 			return err
 		}
 	}
@@ -97,9 +97,9 @@ func (conf * Config) Validate() derrors.Error {
 }
 
 // LoadCert loads the management cluster certificate in memory.
-func (conf * Config) loadCert() derrors.Error{
+func (conf *Config) loadCert() derrors.Error {
 	content, err := ioutil.ReadFile(conf.ManagementClusterCertPath)
-	if err != nil{
+	if err != nil {
 		return derrors.AsError(err, "cannot load management cluster certificate")
 	}
 	conf.ManagementClusterCert = string(content)
@@ -107,13 +107,13 @@ func (conf * Config) loadCert() derrors.Error{
 }
 
 // Print information about the configuration of the application.
-func (conf * Config) Print() {
+func (conf *Config) Print() {
 	log.Info().Str("app", version.AppVersion).Str("commit", version.Commit).Msg("Version")
 	log.Info().Int("port", conf.Port).Msg("gRPC port")
 	log.Info().Str("secret", strings.Repeat("*", len(conf.Secret))).Msg("JWT Token secret")
 	if conf.ManagementClusterCert != "" {
-		log.Info().Str("md5", fmt.Sprintf("%x",md5.Sum([]byte(conf.ManagementClusterCert)))).Msg("Management cluster server certificate")
-	}else{
+		log.Info().Str("md5", fmt.Sprintf("%x", md5.Sum([]byte(conf.ManagementClusterCert)))).Msg("Management cluster server certificate")
+	} else {
 		log.Warn().Msg("Management cluster server certificate is not set")
 	}
 	log.Info().Str("duration", conf.ExpirationTime.String()).Msg("JWT Expiration time")

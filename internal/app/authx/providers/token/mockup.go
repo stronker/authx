@@ -20,10 +20,10 @@ type TokenMockup struct {
 
 // NewTokenMockup create a new instance of TokenMockup.
 func NewTokenMockup() Token {
-	return &TokenMockup{data: make(map[string]entities.TokenData,0)}
+	return &TokenMockup{data: make(map[string]entities.TokenData, 0)}
 }
 
-func (p *TokenMockup) unsafeExists (username string, tokenID string) bool {
+func (p *TokenMockup) unsafeExists(username string, tokenID string) bool {
 	_, ok := p.data[p.generateID(tokenID, username)]
 	return ok
 }
@@ -57,7 +57,7 @@ func (p *TokenMockup) Delete(username string, tokenID string) derrors.Error {
 func (p *TokenMockup) Add(token *entities.TokenData) derrors.Error {
 	p.Lock()
 	defer p.Unlock()
-	if p.unsafeExists(token.Username, token.TokenID){
+	if p.unsafeExists(token.Username, token.TokenID) {
 		return derrors.NewAlreadyExistsError("token").WithParams(token.Username, token.TokenID)
 	}
 	p.data[p.generateID(token.TokenID, token.Username)] = *token
@@ -83,13 +83,13 @@ func (p *TokenMockup) Exist(username string, tokenID string) (*bool, derrors.Err
 	return &ok, nil
 }
 
-func (p *TokenMockup) Update(token *entities.TokenData) derrors.Error{
+func (p *TokenMockup) Update(token *entities.TokenData) derrors.Error {
 
 	p.Lock()
 	defer p.Unlock()
 
-	if ! p.unsafeExists(token.Username, token.TokenID){
-		return  derrors.NewNotFoundError("token").WithParams(token.Username, token.TokenID)
+	if !p.unsafeExists(token.Username, token.TokenID) {
+		return derrors.NewNotFoundError("token").WithParams(token.Username, token.TokenID)
 	}
 	p.data[p.generateID(token.TokenID, token.Username)] = *token
 	return nil
@@ -99,7 +99,7 @@ func (p *TokenMockup) Update(token *entities.TokenData) derrors.Error{
 func (p *TokenMockup) Truncate() derrors.Error {
 	p.Lock()
 	defer p.Unlock()
-	p.data = make(map[string]entities.TokenData,0)
+	p.data = make(map[string]entities.TokenData, 0)
 	return nil
 }
 
@@ -107,20 +107,20 @@ func (p *TokenMockup) generateID(tokenID string, username string) string {
 	return fmt.Sprintf("%s:%s", username, tokenID)
 }
 
-func (p *TokenMockup) DeleteExpiredTokens()derrors.Error {
+func (p *TokenMockup) DeleteExpiredTokens() derrors.Error {
 	p.Lock()
 	defer p.Unlock()
 
 	idBorrow := make([]string, 0)
 
-	for _, token := range p.data{
+	for _, token := range p.data {
 		if token.ExpirationDate < time.Now().Unix() {
 			id := p.generateID(token.TokenID, token.Username)
 			idBorrow = append(idBorrow, id)
 		}
 
 	}
-	for _, id := range idBorrow{
+	for _, id := range idBorrow {
 		delete(p.data, id)
 	}
 	return nil

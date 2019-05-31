@@ -14,10 +14,10 @@ import (
 const DeviceIdField = "device_id"
 const DeviceGroupIdField = "device_group_id"
 
-type DeviceRequestMetadata struct{
-	OrganizationID         string
-	DeviceGroupID string
-	DeviceID string
+type DeviceRequestMetadata struct {
+	OrganizationID  string
+	DeviceGroupID   string
+	DeviceID        string
 	DevicePrimitive bool
 }
 

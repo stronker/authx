@@ -9,7 +9,6 @@ import (
 	"github.com/nalej/derrors"
 )
 
-
 // BasicCredentials is the interface that define how we are store the basic credential information.
 type BasicCredentials interface {
 	// Delete remove a specific user credentials.
@@ -21,7 +20,7 @@ type BasicCredentials interface {
 	// Edit update a specific user credentials.
 	Edit(username string, edit *entities.EditBasicCredentialsData) derrors.Error
 	// Exist check if exists a specific credentials.
-	Exist(username string) (*bool,derrors.Error)
+	Exist(username string) (*bool, derrors.Error)
 	// Truncate removes all credentials.
 	Truncate() derrors.Error
 }
