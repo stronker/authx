@@ -18,19 +18,19 @@ import (
 
 // Connection is a helper structure to establish the gRPC connection.
 type Connection struct {
-	Address    string
-	UseTLS bool
-	CACertPath string
+	Address          string
+	UseTLS           bool
+	CACertPath       string
 	SkipCAValidation bool
 }
 
-func (c*Connection) SplitAddress() (string, int, derrors.Error){
+func (c *Connection) SplitAddress() (string, int, derrors.Error) {
 	splits := strings.Split(c.Address, ":")
-	if len(splits) != 2{
+	if len(splits) != 2 {
 		return "", -1, derrors.NewInvalidArgumentError("expecting address as hostname:port")
 	}
 	port, err := strconv.Atoi(splits[1])
-	if err != nil{
+	if err != nil {
 		return "", -1, derrors.AsError(err, "expecting address as hostname:port")
 	}
 	return splits[0], port, nil
@@ -49,14 +49,14 @@ func (c *Connection) GetInsecureGRPCConnection(address string) (*grpc.ClientConn
 	return conn, nil
 }
 
-func (c* Connection) GetSecureConnection() (*grpc.ClientConn, derrors.Error){
+func (c *Connection) GetSecureConnection() (*grpc.ClientConn, derrors.Error) {
 	targetHostname, _, err := c.SplitAddress()
-	if err !=nil{
+	if err != nil {
 		return nil, err
 	}
 	rootCAs := x509.NewCertPool()
 	tlsConfig := &tls.Config{
-		ServerName:   targetHostname,
+		ServerName: targetHostname,
 	}
 
 	if c.CACertPath != "" {

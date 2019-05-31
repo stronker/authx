@@ -23,11 +23,10 @@ type DeviceToken interface {
 	Refresh(oldToken string, refreshToken string,
 		expirationPeriod time.Duration, secret string) (*GeneratedToken, derrors.Error)
 	// Gets the deviceClaim of a deviceToken
-	GetTokenInfo (tokenInfo string, secret string) (*token.DeviceClaim, derrors.Error )
+	GetTokenInfo(tokenInfo string, secret string) (*token.DeviceClaim, derrors.Error)
 	// Clean remove all the data from the providers.
 	Clean() derrors.Error
 }
-
 
 type JWTDeviceToken struct {
 	DeviceProvider      device.Provider // device Provider
@@ -37,13 +36,13 @@ type JWTDeviceToken struct {
 // NewJWTToken create a new instance of JWTToken
 func NewJWTDeviceToken(deviceProvider device.Provider, tokenProvider device_token.Provider) DeviceToken {
 	return &JWTDeviceToken{
-		DeviceProvider:deviceProvider,
+		DeviceProvider:      deviceProvider,
 		DeviceTokenProvider: tokenProvider}
 
 }
 
 // NewJWTTokenMockup create a new mockup of JWTToken
-	func NewJWTDeviceTokenMockup() DeviceToken {
+func NewJWTDeviceTokenMockup() DeviceToken {
 	return NewJWTDeviceToken(device.NewMockupDeviceCredentialsProvider(),
 		device_token.NewDeviceTokenMockup())
 }
@@ -73,20 +72,20 @@ func (m *JWTDeviceToken) Generate(deviceClaim *token.DeviceClaim, expirationPeri
 	return gToken, nil
 }
 
-func (m *JWTDeviceToken) GetTokenInfo (tokenInfo string, secret string) (*token.DeviceClaim, derrors.Error ) {
+func (m *JWTDeviceToken) GetTokenInfo(tokenInfo string, secret string) (*token.DeviceClaim, derrors.Error) {
 
-		tk, jwtErr := jwt.ParseWithClaims(tokenInfo, &token.DeviceClaim{}, func(token *jwt.Token) (interface{}, error) {
-			return []byte(secret), nil
-		})
-		if jwtErr != nil {
-			return nil, derrors.NewUnauthenticatedError("impossible recover token", jwtErr)
-		}
+	tk, jwtErr := jwt.ParseWithClaims(tokenInfo, &token.DeviceClaim{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
+	})
+	if jwtErr != nil {
+		return nil, derrors.NewUnauthenticatedError("impossible recover token", jwtErr)
+	}
 
-		cl, ok := tk.Claims.(*token.DeviceClaim)
-		if !ok {
-			return nil, derrors.NewUnauthenticatedError("impossible recover device token")
-		}
-		return cl, nil
+	cl, ok := tk.Claims.(*token.DeviceClaim)
+	if !ok {
+		return nil, derrors.NewUnauthenticatedError("impossible recover device token")
+	}
+	return cl, nil
 
 }
 
@@ -104,7 +103,6 @@ func (m *JWTDeviceToken) Refresh(oldToken string, refreshToken string,
 		return nil, err
 	}
 
-
 	tk, jwtErr := jwt.ParseWithClaims(oldToken, &token.DeviceClaim{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(group.Secret), nil
 	})
@@ -118,7 +116,7 @@ func (m *JWTDeviceToken) Refresh(oldToken string, refreshToken string,
 	}
 
 	deviceID := cl.DeviceID
-	tokenID:= cl.Id
+	tokenID := cl.Id
 
 	tokenData, err := m.DeviceTokenProvider.Get(deviceID, tokenID)
 	if err != nil {
@@ -146,4 +144,3 @@ func (m *JWTDeviceToken) Refresh(oldToken string, refreshToken string,
 func (m *JWTDeviceToken) Clean() derrors.Error {
 	return m.DeviceTokenProvider.Truncate()
 }
-

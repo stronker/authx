@@ -5,16 +5,16 @@
 package manager
 
 import (
-"github.com/nalej/derrors"
-"golang.org/x/crypto/bcrypt"
+	"github.com/nalej/derrors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 //Password is an interface to generate hash of passwords.
 type Password interface {
 	// GenerateHashedPassword generates a password with a random salt.
-	GenerateHashedPassword(password string) ([] byte, derrors.Error)
+	GenerateHashedPassword(password string) ([]byte, derrors.Error)
 	// CompareHashAndPassword compare a hashed password with a specif password.
-	CompareHashAndPassword(hashedPassword [] byte, password string) derrors.Error
+	CompareHashAndPassword(hashedPassword []byte, password string) derrors.Error
 }
 
 // NewBCryptPassword build a object that uses BCrypt to implement the Password interface.
@@ -28,7 +28,7 @@ type BCryptPassword struct {
 }
 
 // GenerateHashedPassword generates a password with a random salt.
-func (m *BCryptPassword) GenerateHashedPassword(password string) ([] byte, derrors.Error) {
+func (m *BCryptPassword) GenerateHashedPassword(password string) ([]byte, derrors.Error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, derrors.NewInternalError("error hashing the password", err)
@@ -37,7 +37,7 @@ func (m *BCryptPassword) GenerateHashedPassword(password string) ([] byte, derro
 }
 
 // CompareHashAndPassword compare a hashed password with a specif password.
-func (m *BCryptPassword) CompareHashAndPassword(hashedPassword [] byte, password string) derrors.Error {
+func (m *BCryptPassword) CompareHashAndPassword(hashedPassword []byte, password string) derrors.Error {
 	err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
 	if err != nil {
 		return derrors.NewUnauthenticatedError("password is not valid", err)

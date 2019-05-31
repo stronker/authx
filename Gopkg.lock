@@ -129,12 +129,12 @@
   version = "v0.0.80"
 
 [[projects]]
-  digest = "1:6d89b471722a7f0ca141d840663e9344c1408a9b623beffcec3d008e2db42ce0"
+  digest = "1:331610ec015e9d378c3b6535da1278255cfd9a9c08faec2c21a116707d9b9ca6"
   name = "github.com/nalej/grpc-authx-go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "e88bcfc43493188985aa28c6992847f82f314758"
-  version = "v0.0.49"
+  revision = "27c410c0c02716415a772e92832e9059a1c3e95a"
+  version = "v0.0.50"
 
 [[projects]]
   digest = "1:6b1818a882d22c88c7bde00a417c3561966037d858b7c8f8d568c24941ed34c0"
@@ -340,7 +340,7 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "22d7a77e9e5f409e934ed268692e56707cd169e5"
+  revision = "20be4c3c3ed52bfccdb2d59a412ee1a936d175a7"
 
 [[projects]]
   branch = "master"
@@ -367,7 +367,7 @@
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "5219a1e1c5f8dfaadf9d314b1289417a73674973"
+  revision = "46560c3f3c0a091352115a3d825af45663b983d8"
 
 [[projects]]
   digest = "1:28deae5fe892797ff37a317b5bcda96d11d1c90dadd89f1337651df3bc4c586e"
@@ -418,7 +418,7 @@
     "protobuf/field_mask",
   ]
   pruneopts = "UT"
-  revision = "c2c4e71fbf6989c3e46a18d65cb88c288f8a3a55"
+  revision = "fb225487d10142b5bcc35abfc6cb9a0609614976"
 
 [[projects]]
   digest = "1:b2b5ba56ef711b4eb9aab2329a01393b225ada1703d0cbfb71f87393bf6c064b"

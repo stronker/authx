@@ -1,4 +1,4 @@
-package  credentials
+package credentials
 
 import "github.com/onsi/ginkgo"
 

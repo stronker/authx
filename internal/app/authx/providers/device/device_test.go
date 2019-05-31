@@ -8,7 +8,7 @@ import (
 	"github.com/onsi/gomega"
 )
 
-func RunTest (provider Provider) {
+func RunTest(provider Provider) {
 
 	ginkgo.AfterEach(func() {
 		provider.Truncate()
@@ -52,7 +52,6 @@ func RunTest (provider Provider) {
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(updated.Enabled).Should(gomega.Equal(toAdd.Enabled))
 			gomega.Expect(updated.DefaultDeviceConnectivity).Should(gomega.Equal(toAdd.DefaultDeviceConnectivity))
-
 
 		})
 		ginkgo.It("Should not be able to update non existing device group", func() {
@@ -137,7 +136,7 @@ func RunTest (provider Provider) {
 		})
 	})
 	ginkgo.Context("device credential tests", func() {
-		var targetDeviceGroup * entities.DeviceGroupCredentials
+		var targetDeviceGroup *entities.DeviceGroupCredentials
 		ginkgo.BeforeEach(func() {
 			targetDeviceGroup = testHelper.CreateDeviceGroupCredentials()
 			err := provider.AddDeviceGroupCredentials(targetDeviceGroup)

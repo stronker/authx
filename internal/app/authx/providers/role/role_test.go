@@ -10,11 +10,10 @@ import (
 	"github.com/onsi/gomega"
 )
 
-
 func RoleContexts(provider Role) {
 
 	ginkgo.Context("with a register", func() {
-		role := entities.NewRoleData("o1", "r1", "n1", false, [] string{"p1", "p2"})
+		role := entities.NewRoleData("o1", "r1", "n1", false, []string{"p1", "p2"})
 		ginkgo.BeforeEach(func() {
 			err := provider.Add(role)
 			gomega.Expect(err).To(gomega.BeNil())

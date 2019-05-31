@@ -9,7 +9,6 @@ import (
 	"github.com/nalej/derrors"
 )
 
-
 // Token is the interface to store the token information.
 type Token interface {
 	// Delete an existing token.
@@ -27,4 +26,3 @@ type Token interface {
 
 	DeleteExpiredTokens() derrors.Error
 }
-

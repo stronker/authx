@@ -15,18 +15,18 @@ import (
 const rowNotFound = "not found"
 const table = "devicetokens"
 
-const ttlExpired = time.Duration(3)*time.Hour
+const ttlExpired = time.Duration(3) * time.Hour
 
 type ScyllaDeviceTokenProvider struct {
-	Address string
-	Port int
+	Address  string
+	Port     int
 	KeySpace string
 	sync.Mutex
 	Session *gocql.Session
 }
 
-func NewScyllaDeviceTokenProvider (address string, port int, keyspace string) *ScyllaDeviceTokenProvider{
-	provider := ScyllaDeviceTokenProvider{Address:address, Port:port, KeySpace:keyspace}
+func NewScyllaDeviceTokenProvider(address string, port int, keyspace string) *ScyllaDeviceTokenProvider {
+	provider := ScyllaDeviceTokenProvider{Address: address, Port: port, KeySpace: keyspace}
 	provider.connect()
 	return &provider
 }
@@ -48,7 +48,7 @@ func (sp *ScyllaDeviceTokenProvider) connect() derrors.Error {
 	return nil
 }
 
-func (sp *ScyllaDeviceTokenProvider) Disconnect()  {
+func (sp *ScyllaDeviceTokenProvider) Disconnect() {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -63,7 +63,7 @@ func (sp *ScyllaDeviceTokenProvider) Disconnect()  {
 // -------------------- //
 // -- unsafe methods -- //
 // -------------------- //
-func (sp *ScyllaDeviceTokenProvider) unsafeGet(deviceID string, tokenID string) (*entities.TokenData, derrors.Error){
+func (sp *ScyllaDeviceTokenProvider) unsafeGet(deviceID string, tokenID string) (*entities.TokenData, derrors.Error) {
 
 	if err := sp.checkConnectionAndConnect(); err != nil {
 		return nil, err
@@ -73,13 +73,13 @@ func (sp *ScyllaDeviceTokenProvider) unsafeGet(deviceID string, tokenID string) 
 	stmt, names := qb.Select(table).Where(qb.Eq("device_id")).Where(qb.Eq("token_id")).ToCql()
 	q := gocqlx.Query(sp.Session.Query(stmt), names).BindMap(qb.M{
 		"device_id": deviceID,
-		"token_id": tokenID})
+		"token_id":  tokenID})
 
 	err := q.GetRelease(&token)
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return nil, derrors.NewNotFoundError("device token").WithParams(deviceID, tokenID)
-		}else{
+		} else {
 			return nil, derrors.AsError(err, "cannot get device token")
 		}
 	}
@@ -88,7 +88,7 @@ func (sp *ScyllaDeviceTokenProvider) unsafeGet(deviceID string, tokenID string) 
 }
 
 // Exist checks if the token was added.
-func (sp *ScyllaDeviceTokenProvider) unsafeExist(deviceID string, tokenID string) (*bool, derrors.Error){
+func (sp *ScyllaDeviceTokenProvider) unsafeExist(deviceID string, tokenID string) (*bool, derrors.Error) {
 
 	ok := false
 
@@ -101,28 +101,28 @@ func (sp *ScyllaDeviceTokenProvider) unsafeExist(deviceID string, tokenID string
 	stmt, names := qb.Select(table).Count("device_id").Where(qb.Eq("device_id")).Where(qb.Eq("token_id")).ToCql()
 	q := gocqlx.Query(sp.Session.Query(stmt), names).BindMap(qb.M{
 		"device_id": deviceID,
-		"token_id": tokenID})
+		"token_id":  tokenID})
 
 	err := q.GetRelease(&count)
 	if err != nil {
 		if err.Error() == rowNotFound { // TODO: mirar si lo puedo quitar
 			return &ok, nil
-		}else{
+		} else {
 			return &ok, derrors.AsError(err, "cannot determinate if device token exists")
 		}
 	}
-	if count > 0{
+	if count > 0 {
 		ok = true
 	}
 	return &ok, nil
 }
 
-func (sp *ScyllaDeviceTokenProvider) checkConnectionAndConnect () derrors.Error {
+func (sp *ScyllaDeviceTokenProvider) checkConnectionAndConnect() derrors.Error {
 
 	if sp.Session != nil {
 		return nil
 	}
-	log.Info().Str("provider", "ScyllaDeviceTokeProvider"). Msg("session not connected, trying to connect it!")
+	log.Info().Str("provider", "ScyllaDeviceTokeProvider").Msg("session not connected, trying to connect it!")
 	err := sp.connect()
 	if err != nil {
 		return err
@@ -149,7 +149,7 @@ func (sp *ScyllaDeviceTokenProvider) Delete(deviceID string, tokenID string) der
 	if err != nil {
 		return err
 	}
-	if ! *exists {
+	if !*exists {
 		return derrors.NewNotFoundError("device token").WithParams(deviceID, tokenID)
 	}
 
@@ -162,6 +162,7 @@ func (sp *ScyllaDeviceTokenProvider) Delete(deviceID string, tokenID string) der
 
 	return nil
 }
+
 // Add a token.
 func (sp *ScyllaDeviceTokenProvider) Add(token *entities.DeviceTokenData) derrors.Error {
 	sp.Lock()
@@ -176,7 +177,7 @@ func (sp *ScyllaDeviceTokenProvider) Add(token *entities.DeviceTokenData) derror
 		return err
 	}
 	if *exists {
-		return  derrors.NewAlreadyExistsError("device token").WithParams(token.DeviceId, token.TokenID)
+		return derrors.NewAlreadyExistsError("device token").WithParams(token.DeviceId, token.TokenID)
 	}
 
 	// add new basic credential
@@ -190,6 +191,7 @@ func (sp *ScyllaDeviceTokenProvider) Add(token *entities.DeviceTokenData) derror
 
 	return nil
 }
+
 // Get an existing token.
 func (sp *ScyllaDeviceTokenProvider) Get(deviceID string, tokenID string) (*entities.DeviceTokenData, derrors.Error) {
 	sp.Lock()
@@ -203,19 +205,20 @@ func (sp *ScyllaDeviceTokenProvider) Get(deviceID string, tokenID string) (*enti
 	stmt, names := qb.Select(table).Where(qb.Eq("device_id")).Where(qb.Eq("token_id")).ToCql()
 	q := gocqlx.Query(sp.Session.Query(stmt), names).BindMap(qb.M{
 		"device_id": deviceID,
-		"token_id": tokenID})
+		"token_id":  tokenID})
 
 	err := q.GetRelease(&token)
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return nil, derrors.NewNotFoundError("device token").WithParams(deviceID, tokenID)
-		}else{
+		} else {
 			return nil, derrors.AsError(err, "cannot get device token")
 		}
 	}
 
 	return &token, nil
 }
+
 // Exist checks if the token was added.
 func (sp *ScyllaDeviceTokenProvider) Exist(deviceID string, tokenID string) (*bool, derrors.Error) {
 	sp.Lock()
@@ -223,6 +226,7 @@ func (sp *ScyllaDeviceTokenProvider) Exist(deviceID string, tokenID string) (*bo
 
 	return sp.unsafeExist(deviceID, tokenID)
 }
+
 // Update an existing token
 func (sp *ScyllaDeviceTokenProvider) Update(token *entities.DeviceTokenData) derrors.Error {
 	sp.Lock()
@@ -237,7 +241,7 @@ func (sp *ScyllaDeviceTokenProvider) Update(token *entities.DeviceTokenData) der
 		return err
 	}
 	if !*exists {
-		return  derrors.NewNotFoundError("device token").WithParams(token.DeviceId, token.TokenID)
+		return derrors.NewNotFoundError("device token").WithParams(token.DeviceId, token.TokenID)
 	}
 
 	// add new basic credential
@@ -251,8 +255,9 @@ func (sp *ScyllaDeviceTokenProvider) Update(token *entities.DeviceTokenData) der
 		return derrors.AsError(cqlErr, "cannot update device token")
 	}
 
-	return  nil
+	return nil
 }
+
 // Truncate cleans all data.
 func (sp *ScyllaDeviceTokenProvider) Truncate() derrors.Error {
 	sp.Lock()
@@ -271,11 +276,11 @@ func (sp *ScyllaDeviceTokenProvider) Truncate() derrors.Error {
 	return nil
 }
 
-func (sp *ScyllaDeviceTokenProvider)  DeleteExpiredTokens() derrors.Error{
+func (sp *ScyllaDeviceTokenProvider) DeleteExpiredTokens() derrors.Error {
 	// nothing to do, ttl used to delete expired tokens
 	return nil
 }
 
-func (m *ScyllaDeviceTokenProvider)  GetByRefreshToken(refreshToken string) (*entities.DeviceTokenData, derrors.Error){
+func (m *ScyllaDeviceTokenProvider) GetByRefreshToken(refreshToken string) (*entities.DeviceTokenData, derrors.Error) {
 	return nil, nil
 }

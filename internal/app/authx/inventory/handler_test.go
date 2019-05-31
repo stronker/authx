@@ -15,10 +15,10 @@ import (
 	"time"
 )
 
-func createTestConfig() * config.Config{
+func createTestConfig() *config.Config {
 	return &config.Config{
-		ManagementClusterCert:     "ManagementCertContent",
-		EdgeControllerExpTime:     time.Minute,
+		ManagementClusterCert: "ManagementCertContent",
+		EdgeControllerExpTime: time.Minute,
 	}
 }
 
@@ -60,26 +60,26 @@ var _ = ginkgo.Describe("Asset service", func() {
 		})
 	})
 
-	ginkgo.It("should be able to create a token", func(){
-	    orgID := &grpc_organization_go.OrganizationId{
-			OrganizationId:       uuid.New().String(),
+	ginkgo.It("should be able to create a token", func() {
+		orgID := &grpc_organization_go.OrganizationId{
+			OrganizationId: uuid.New().String(),
 		}
-	    token, err := client.CreateEICJoinToken(context.Background(), orgID)
-	    gomega.Expect(err).To(gomega.Succeed())
-	    gomega.Expect(token.OrganizationId).Should(gomega.Equal(orgID.OrganizationId))
-	    gomega.Expect(token.Token).ShouldNot(gomega.BeEmpty())
-	    gomega.Expect(token.Cacert).Should(gomega.Equal(createTestConfig().ManagementClusterCert))
+		token, err := client.CreateEICJoinToken(context.Background(), orgID)
+		gomega.Expect(err).To(gomega.Succeed())
+		gomega.Expect(token.OrganizationId).Should(gomega.Equal(orgID.OrganizationId))
+		gomega.Expect(token.Token).ShouldNot(gomega.BeEmpty())
+		gomega.Expect(token.Cacert).Should(gomega.Equal(createTestConfig().ManagementClusterCert))
 	})
 
-	ginkgo.It("should be able to use a valid join token", func(){
+	ginkgo.It("should be able to use a valid join token", func() {
 		orgID := &grpc_organization_go.OrganizationId{
-			OrganizationId:       uuid.New().String(),
+			OrganizationId: uuid.New().String(),
 		}
 		token, err := client.CreateEICJoinToken(context.Background(), orgID)
 		gomega.Expect(err).To(gomega.Succeed())
 		joinRequest := &grpc_authx_go.EICJoinRequest{
-			OrganizationId:       token.OrganizationId,
-			Token:                token.Token,
+			OrganizationId: token.OrganizationId,
+			Token:          token.Token,
 		}
 		success, err := client.ValidEICJoinToken(context.Background(), joinRequest)
 		gomega.Expect(err).To(gomega.Succeed())

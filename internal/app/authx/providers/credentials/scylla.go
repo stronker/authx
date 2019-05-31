@@ -16,18 +16,16 @@ const tablePK = "username"
 
 const rowNotFound = "not found"
 
-
 type ScyllaCredentialsProvider struct {
-	Address string
-	Port int
+	Address  string
+	Port     int
 	KeySpace string
 	sync.Mutex
 	Session *gocql.Session
 }
 
-
-func NewScyllaCredentialsProvider (address string, port int, keyspace string) *ScyllaCredentialsProvider{
-	provider := ScyllaCredentialsProvider{Address:address, Port:port, KeySpace:keyspace}
+func NewScyllaCredentialsProvider(address string, port int, keyspace string) *ScyllaCredentialsProvider {
+	provider := ScyllaCredentialsProvider{Address: address, Port: port, KeySpace: keyspace}
 	provider.connect()
 	return &provider
 }
@@ -49,7 +47,7 @@ func (sp *ScyllaCredentialsProvider) connect() derrors.Error {
 	return nil
 }
 
-func (sp *ScyllaCredentialsProvider) Disconnect()  {
+func (sp *ScyllaCredentialsProvider) Disconnect() {
 
 	sp.Lock()
 	defer sp.Unlock()
@@ -60,13 +58,12 @@ func (sp *ScyllaCredentialsProvider) Disconnect()  {
 	}
 }
 
-
-func (sp *ScyllaCredentialsProvider) checkConnectionAndConnect () derrors.Error {
+func (sp *ScyllaCredentialsProvider) checkConnectionAndConnect() derrors.Error {
 
 	if sp.Session != nil {
 		return nil
 	}
-	log.Info().Str("provider", "ScyllaCredentialsProvider"). Msg("session not connected, trying to connect it!")
+	log.Info().Str("provider", "ScyllaCredentialsProvider").Msg("session not connected, trying to connect it!")
 	err := sp.connect()
 	if err != nil {
 		return derrors.AsError(err, "cannot connect")
@@ -78,7 +75,6 @@ func (sp *ScyllaCredentialsProvider) checkConnectionAndConnect () derrors.Error 
 // --------------------------------------------------------------------------------------------------------------------
 func (sp *ScyllaCredentialsProvider) unsafeGet(username string) (*entities.BasicCredentialsData, derrors.Error) {
 
-
 	var credentials entities.BasicCredentialsData
 	stmt, names := qb.Select(table).Where(qb.Eq(tablePK)).ToCql()
 	q := gocqlx.Query(sp.Session.Query(stmt), names).BindMap(qb.M{
@@ -89,7 +85,7 @@ func (sp *ScyllaCredentialsProvider) unsafeGet(username string) (*entities.Basic
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return nil, derrors.NewNotFoundError(username)
-		}else{
+		} else {
 			return nil, derrors.AsError(err, "cannot get credentials")
 		}
 	}
@@ -97,20 +93,20 @@ func (sp *ScyllaCredentialsProvider) unsafeGet(username string) (*entities.Basic
 	return &credentials, nil
 }
 
-func (sp *ScyllaCredentialsProvider) unsafeExist(username string) (*bool,derrors.Error){
+func (sp *ScyllaCredentialsProvider) unsafeExist(username string) (*bool, derrors.Error) {
 	var returnedEmail string
 
 	ok := false
 
 	stmt, names := qb.Select(table).Columns(tablePK).Where(qb.Eq(tablePK)).ToCql()
 	q := gocqlx.Query(sp.Session.Query(stmt), names).BindMap(qb.M{
-		tablePK: username })
+		tablePK: username})
 
 	err := q.GetRelease(&returnedEmail)
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return &ok, nil
-		}else{
+		} else {
 			return &ok, derrors.AsError(err, "cannot determine if credentials exists")
 		}
 	}
@@ -118,6 +114,7 @@ func (sp *ScyllaCredentialsProvider) unsafeExist(username string) (*bool,derrors
 	ok = true
 	return &ok, nil
 }
+
 // --------------------------------------------------------------------------------------------------------------------
 
 // Delete remove a specific user credentials.
@@ -137,7 +134,7 @@ func (sp *ScyllaCredentialsProvider) Delete(username string) derrors.Error {
 	if err != nil {
 		return err
 	}
-	if ! *exists {
+	if !*exists {
 		return derrors.NewNotFoundError("credentials").WithParams(username)
 	}
 
@@ -167,7 +164,7 @@ func (sp *ScyllaCredentialsProvider) Add(credentials *entities.BasicCredentialsD
 		return err
 	}
 	if *exists {
-		return  derrors.NewAlreadyExistsError("credentials").WithParams(credentials.Username)
+		return derrors.NewAlreadyExistsError("credentials").WithParams(credentials.Username)
 	}
 
 	// add new basic credential
@@ -202,13 +199,14 @@ func (sp *ScyllaCredentialsProvider) Get(username string) (*entities.BasicCreden
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return nil, derrors.NewNotFoundError(username)
-		}else{
+		} else {
 			return nil, derrors.AsError(err, "cannot get credentials")
 		}
 	}
 
 	return &credentials, nil
 }
+
 // Edit update a specific user credentials.
 func (sp *ScyllaCredentialsProvider) Edit(username string, edit *entities.EditBasicCredentialsData) derrors.Error {
 
@@ -216,7 +214,7 @@ func (sp *ScyllaCredentialsProvider) Edit(username string, edit *entities.EditBa
 	defer sp.Unlock()
 
 	if err := sp.checkConnectionAndConnect(); err != nil {
-		return  err
+		return err
 	}
 
 	data, err := sp.unsafeGet(username)
@@ -242,8 +240,9 @@ func (sp *ScyllaCredentialsProvider) Edit(username string, edit *entities.EditBa
 	return nil
 
 }
+
 // Exist check if exists a specific credentials.
-func (sp *ScyllaCredentialsProvider) Exist(username string) (*bool,derrors.Error){
+func (sp *ScyllaCredentialsProvider) Exist(username string) (*bool, derrors.Error) {
 
 	var returnedEmail string
 	ok := false
@@ -258,13 +257,13 @@ func (sp *ScyllaCredentialsProvider) Exist(username string) (*bool,derrors.Error
 
 	stmt, names := qb.Select(table).Columns(tablePK).Where(qb.Eq(tablePK)).ToCql()
 	q := gocqlx.Query(sp.Session.Query(stmt), names).BindMap(qb.M{
-		tablePK: username })
+		tablePK: username})
 
 	err := q.GetRelease(&returnedEmail)
 	if err != nil {
 		if err.Error() == rowNotFound {
 			return &ok, nil
-		}else{
+		} else {
 			return &ok, derrors.AsError(err, "cannot determine if credentials exists")
 		}
 	}
@@ -272,6 +271,7 @@ func (sp *ScyllaCredentialsProvider) Exist(username string) (*bool,derrors.Error
 	ok = true
 	return &ok, nil
 }
+
 // Truncate removes all credentials.
 func (sp *ScyllaCredentialsProvider) Truncate() derrors.Error {
 

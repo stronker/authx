@@ -12,14 +12,14 @@ import (
 
 // PersonalClaim is the claim that include system information.
 type PersonalClaim struct {
-	UserID         string    `json:"userID,omitempty"`
-	Primitives     [] string `json:"access,omitempty"`
-	RoleName       string    `json:"role,omitempty"`
-	OrganizationID string    `json:"organizationID,omitempty"`
+	UserID         string   `json:"userID,omitempty"`
+	Primitives     []string `json:"access,omitempty"`
+	RoleName       string   `json:"role,omitempty"`
+	OrganizationID string   `json:"organizationID,omitempty"`
 }
 
 // NewPersonalClaim creates a new instance of the structure.
-func NewPersonalClaim(userID string, roleName string, primitives [] string, organizationID string) *PersonalClaim {
+func NewPersonalClaim(userID string, roleName string, primitives []string, organizationID string) *PersonalClaim {
 	return &PersonalClaim{UserID: userID, RoleName: roleName, Primitives: primitives, OrganizationID: organizationID}
 }
 

@@ -20,7 +20,7 @@ const Issuer string = "authx"
 // GeneratedToken is the object that defines the basic structure.
 type GeneratedToken struct {
 	// Token is the token generated.
-	Token        string
+	Token string
 	// RefreshToken is the id required to renew an old token.
 	RefreshToken string
 }
@@ -29,6 +29,7 @@ type GeneratedToken struct {
 func NewGeneratedToken(token string, refreshToken string) *GeneratedToken {
 	return &GeneratedToken{Token: token, RefreshToken: refreshToken}
 }
+
 // Token is a interface manages the business logic of tokens.
 type Token interface {
 	// Generate a new token with the personal claim.
@@ -100,7 +101,7 @@ func (m *JWTToken) Refresh(oldToken string, refreshToken string,
 		return nil, derrors.NewUnauthenticatedError("impossible recover token")
 	}
 	username := cl.UserID
-	tokenID:= cl.Id
+	tokenID := cl.Id
 
 	tokenData, err := m.TokenProvider.Get(username, tokenID)
 	if err != nil {

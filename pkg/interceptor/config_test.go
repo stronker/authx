@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-const ValidConfig =`
+const ValidConfig = `
 {
 	"allows_all":true,
 	"permissions": {
@@ -22,7 +22,7 @@ const ValidConfig =`
 }
 `
 
-const InValidConfig =`
+const InValidConfig = `
 {
 	"allows_all":true,
 	"permissions": {
@@ -34,7 +34,6 @@ const InValidConfig =`
 var _ = ginkgo.Describe("Load config", func() {
 	ginkgo.Context("with a valid config file", func() {
 
-
 		ginkgo.It("should add basic credentials with correct roleID and correct JWT", func() {
 			var tmpFile *os.File
 			tmpFile, fileErr := ioutil.TempFile("", "load-test")
@@ -42,8 +41,7 @@ var _ = ginkgo.Describe("Load config", func() {
 			gomega.Expect(tmpFile).NotTo(gomega.BeNil())
 			tmpFile.WriteString(ValidConfig)
 
-
-			cfg,err:=LoadAuthorizationConfig(tmpFile.Name())
+			cfg, err := LoadAuthorizationConfig(tmpFile.Name())
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(cfg).NotTo(gomega.BeNil())
 			gomega.Expect(cfg.AllowsAll).To(gomega.BeTrue())
@@ -54,16 +52,14 @@ var _ = ginkgo.Describe("Load config", func() {
 
 	ginkgo.Context("with a invalid path", func() {
 
-
 		ginkgo.It("should fail", func() {
-			cfg,err:=LoadAuthorizationConfig("/invalidPath/test.txt")
+			cfg, err := LoadAuthorizationConfig("/invalidPath/test.txt")
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(cfg).To(gomega.BeNil())
 		})
 	})
 
 	ginkgo.Context("with a bad config file", func() {
-
 
 		ginkgo.It("should fail", func() {
 			var tmpFile *os.File
@@ -72,8 +68,7 @@ var _ = ginkgo.Describe("Load config", func() {
 			gomega.Expect(tmpFile).NotTo(gomega.BeNil())
 			tmpFile.WriteString(InValidConfig)
 
-
-			cfg,err:=LoadAuthorizationConfig(tmpFile.Name())
+			cfg, err := LoadAuthorizationConfig(tmpFile.Name())
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(cfg).To(gomega.BeNil())
 		})

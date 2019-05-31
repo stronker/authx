@@ -23,5 +23,4 @@ type Provider interface {
 	GetByRefreshToken(refreshToken string) (*entities.DeviceTokenData, derrors.Error)
 
 	DeleteExpiredTokens() derrors.Error
-
 }

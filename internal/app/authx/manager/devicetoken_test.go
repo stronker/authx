@@ -14,8 +14,7 @@ import (
 
 var _ = ginkgo.Describe("Device Token tests", func() {
 	var devProvider = device.NewMockupDeviceCredentialsProvider()
-	var devTokenManager = NewJWTDeviceToken(devProvider, device_token.NewDeviceTokenMockup() )
-
+	var devTokenManager = NewJWTDeviceToken(devProvider, device_token.NewDeviceTokenMockup())
 
 	expirationPeriod, _ := time.ParseDuration("10m")
 	secret := "myLittleSecret12345"
@@ -24,19 +23,18 @@ var _ = ginkgo.Describe("Device Token tests", func() {
 
 	ginkgo.Context("Device Token tests", func() {
 		var group entities.DeviceGroupCredentials
-		ginkgo.BeforeSuite(func(){
+		ginkgo.BeforeSuite(func() {
 			group = entities.DeviceGroupCredentials{
-				OrganizationID: deviceClaim.OrganizationID,
-				DeviceGroupID: deviceClaim.DeviceGroupID,
-				DeviceGroupApiKey: uuid.New().String(),
-				Enabled: true,
+				OrganizationID:            deviceClaim.OrganizationID,
+				DeviceGroupID:             deviceClaim.DeviceGroupID,
+				DeviceGroupApiKey:         uuid.New().String(),
+				Enabled:                   true,
 				DefaultDeviceConnectivity: true,
-				Secret: uuid.New().String(),
+				Secret:                    uuid.New().String(),
 			}
 			err := devProvider.AddDeviceGroupCredentials(&group)
 			gomega.Expect(err).To(gomega.Succeed())
 		})
-
 
 		ginkgo.It("Can generate a token", func() {
 			gT, err := devTokenManager.Generate(deviceClaim, expirationPeriod, secret)
@@ -56,12 +54,9 @@ var _ = ginkgo.Describe("Device Token tests", func() {
 		})
 		ginkgo.It("can refresh a device token", func() {
 
-
-
 			gT, err := devTokenManager.Generate(deviceClaim, expirationPeriod, group.Secret)
 			gomega.Expect(err).To(gomega.Succeed())
 			gomega.Expect(gT).NotTo(gomega.BeNil())
-
 
 			tk, jwtErr := jwt.ParseWithClaims(gT.Token, &token.DeviceClaim{}, func(token *jwt.Token) (interface{}, error) {
 				return []byte(group.Secret), nil
@@ -71,7 +66,6 @@ var _ = ginkgo.Describe("Device Token tests", func() {
 			cl, ok := tk.Claims.(*token.DeviceClaim)
 			gomega.Expect(ok).To(gomega.BeTrue())
 			gomega.Expect(cl).NotTo(gomega.BeNil())
-
 
 			gTNew, err := devTokenManager.Refresh(gT.Token, gT.RefreshToken, expirationPeriod, group.Secret)
 			gomega.Expect(err).To(gomega.Succeed())
@@ -96,7 +90,7 @@ var _ = ginkgo.Describe("Device Token tests", func() {
 			gomega.Expect(ok).To(gomega.BeTrue())
 			gomega.Expect(cl).NotTo(gomega.BeNil())
 
-			gTNew, err := devTokenManager.Refresh(gT.Token,gT.RefreshToken, expirationPeriod, group.Secret)
+			gTNew, err := devTokenManager.Refresh(gT.Token, gT.RefreshToken, expirationPeriod, group.Secret)
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			gomega.Expect(gTNew).To(gomega.BeNil())
 
@@ -177,4 +171,3 @@ var _ = ginkgo.Describe("Device Token tests", func() {
 		gomega.Expect(err).To(gomega.Succeed())
 	})
 })
-

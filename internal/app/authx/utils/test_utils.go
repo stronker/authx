@@ -12,32 +12,31 @@ func RunIntegrationTests() bool {
 }
 
 type DeviceTestHelper struct {
-
 }
 
 func NewDeviceTestHepler() *DeviceTestHelper {
 	return &DeviceTestHelper{}
 }
 
-func (d * DeviceTestHelper) CreateDeviceGroupCredentials() * entities.DeviceGroupCredentials{
+func (d *DeviceTestHelper) CreateDeviceGroupCredentials() *entities.DeviceGroupCredentials {
 
 	return &entities.DeviceGroupCredentials{
-		OrganizationID: uuid.New().String(),
-		DeviceGroupID: uuid.New().String(),
-		DeviceGroupApiKey: uuid.New().String(),
-		Enabled: true,
+		OrganizationID:            uuid.New().String(),
+		DeviceGroupID:             uuid.New().String(),
+		DeviceGroupApiKey:         uuid.New().String(),
+		Enabled:                   true,
 		DefaultDeviceConnectivity: false,
-		Secret: uuid.New().String(),
+		Secret:                    uuid.New().String(),
 	}
 }
 
-func (d * DeviceTestHelper) CreateDeviceCredentials(group entities.DeviceGroupCredentials) * entities.DeviceCredentials{
+func (d *DeviceTestHelper) CreateDeviceCredentials(group entities.DeviceGroupCredentials) *entities.DeviceCredentials {
 
 	return &entities.DeviceCredentials{
 		OrganizationID: group.OrganizationID,
-		DeviceGroupID: group.DeviceGroupID,
-		DeviceID: uuid.New().String(),
-		DeviceApiKey: uuid.New().String(),
-		Enabled: true,
+		DeviceGroupID:  group.DeviceGroupID,
+		DeviceID:       uuid.New().String(),
+		DeviceApiKey:   uuid.New().String(),
+		Enabled:        true,
 	}
 }

@@ -14,20 +14,20 @@ import (
 // MockupInventoryTTL to match the scylladb one. This value will automatically expire entries.
 const MockupInventoryTTL = time.Hour * 3
 
-type MockupInventoryProvider struct{
+type MockupInventoryProvider struct {
 	// Mutex for managing mockup access.
 	sync.Mutex
 	// eicJoinToken with the join tokens per tokenID
 	eicJoinToken map[string]entities.EICJoinToken
 }
 
-func NewMockupInventoryProvider() * MockupInventoryProvider{
+func NewMockupInventoryProvider() *MockupInventoryProvider {
 	return &MockupInventoryProvider{
 		eicJoinToken: make(map[string]entities.EICJoinToken, 0),
 	}
 }
 
-func (m* MockupInventoryProvider) unsafeExistECJoinToken(organizationID string, token string) bool{
+func (m *MockupInventoryProvider) unsafeExistECJoinToken(organizationID string, token string) bool {
 	retrieved, existToken := m.eicJoinToken[token]
 	return existToken && (retrieved.OrganizationID == organizationID)
 }
@@ -35,7 +35,7 @@ func (m* MockupInventoryProvider) unsafeExistECJoinToken(organizationID string, 
 func (m *MockupInventoryProvider) AddECJoinToken(token *entities.EICJoinToken) derrors.Error {
 	m.Lock()
 	defer m.Unlock()
-	if m.unsafeExistECJoinToken(token.OrganizationID, token.TokenID){
+	if m.unsafeExistECJoinToken(token.OrganizationID, token.TokenID) {
 		derrors.NewAlreadyExistsError("token already exists")
 	}
 	m.eicJoinToken[token.TokenID] = *token
@@ -45,7 +45,7 @@ func (m *MockupInventoryProvider) AddECJoinToken(token *entities.EICJoinToken) d
 func (m *MockupInventoryProvider) GetECJoinToken(organizationID string, token string) (*entities.EICJoinToken, derrors.Error) {
 	m.Lock()
 	defer m.Unlock()
-	if !m.unsafeExistECJoinToken(organizationID, token){
+	if !m.unsafeExistECJoinToken(organizationID, token) {
 		return nil, derrors.NewNotFoundError("invalid token")
 	}
 	result, _ := m.eicJoinToken[token]
@@ -58,6 +58,3 @@ func (m *MockupInventoryProvider) Clear() derrors.Error {
 	m.Unlock()
 	return nil
 }
-
-
-

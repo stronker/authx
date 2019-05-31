@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func CreateTestECJoinToken() * entities.EICJoinToken{
+func CreateTestECJoinToken() *entities.EICJoinToken {
 	return entities.NewEICJoinToken(uuid.New().String(), time.Hour)
 }
 
@@ -22,13 +22,13 @@ func RunTest(provider Provider) {
 		provider.Clear()
 	})
 
-	ginkgo.Context("Edge controllers", func(){
-		ginkgo.It("should be able to add a join token", func(){
-		    toAdd := CreateTestECJoinToken()
-		    err := provider.AddECJoinToken(toAdd)
-		    gomega.Expect(err).To(gomega.Succeed())
+	ginkgo.Context("Edge controllers", func() {
+		ginkgo.It("should be able to add a join token", func() {
+			toAdd := CreateTestECJoinToken()
+			err := provider.AddECJoinToken(toAdd)
+			gomega.Expect(err).To(gomega.Succeed())
 		})
-		ginkgo.It("should be able to retrieve a valid token", func(){
+		ginkgo.It("should be able to retrieve a valid token", func() {
 			toAdd := CreateTestECJoinToken()
 			err := provider.AddECJoinToken(toAdd)
 			gomega.Expect(err).To(gomega.Succeed())
