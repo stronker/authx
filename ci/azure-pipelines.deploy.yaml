@@ -94,6 +94,14 @@ jobs:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
       subdomain: $(Build.BuildId)
+      certificateName: ingress-tls
+
+  - template: cert-manager/certificate/issue.yaml@ci_templates
+    parameters:
+      kubeconfig: $(kubeconfig)
+      namespace: $(namespace)
+      subdomain: mngt-ca
+      certificateName: mngt-ca-cert
 
   - template: k8s/resources/create.yaml@ci_templates
     parameters:
