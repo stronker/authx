@@ -124,6 +124,18 @@ jobs:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
 
+  - template: cert-manager/certificate/revoke.yaml@ci_templates
+    parameters:
+      kubeconfig: $(kubeconfig)
+      namespace: $(namespace)
+      certificateName: ingress-tls
+    
+  - template: cert-manager/certificate/revoke.yaml@ci_templates
+    parameters:
+      kubeconfig: $(kubeconfig)
+      namespace: $(namespace)
+      certificateName: mngt-ca-cert
+
   - template: k8s/ns/delete.yaml@ci_templates
     parameters:
       kubeconfig: $(kubeconfig)
