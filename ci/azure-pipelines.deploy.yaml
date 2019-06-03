@@ -89,6 +89,12 @@ jobs:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
 
+  - template: cert-manager/certificate/issue.yaml@ci_templates
+    parameters:
+      kubeconfig: $(kubeconfig)
+      namespace: $(namespace)
+      subdomain: $(Build.BuildId)
+
   - template: k8s/resources/create.yaml@ci_templates
     parameters:
       kubeconfig: $(kubeconfig)
