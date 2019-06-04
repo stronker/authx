@@ -89,14 +89,14 @@ jobs:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
 
-  - template: cert-manager/certificate/issue.yaml@ci_templates
+  - template: certificates/letsencrypt/issue.yaml@ci_templates
     parameters:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
       subdomain: $(Build.BuildId)
       certificateName: ingress-tls
 
-  - template: cert-manager/certificate/issue.yaml@ci_templates
+  - template: certificates/letsencrypt/issue.yaml@ci_templates
     parameters:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
@@ -124,13 +124,13 @@ jobs:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
 
-  - template: cert-manager/certificate/revoke.yaml@ci_templates
+  - template: certificates/letsencrypt/revoke.yaml@ci_templates
     parameters:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
       certificateName: ingress-tls
     
-  - template: cert-manager/certificate/revoke.yaml@ci_templates
+  - template: certificates/letsencrypt/revoke.yaml@ci_templates
     parameters:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
