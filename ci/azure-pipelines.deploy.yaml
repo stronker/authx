@@ -89,6 +89,20 @@ jobs:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
 
+  - template: certificates/letsencrypt/issue.yaml@ci_templates
+    parameters:
+      kubeconfig: $(kubeconfig)
+      namespace: $(namespace)
+      subdomain: $(Build.BuildId)
+      certificateName: ingress-tls
+
+  - template: certificates/letsencrypt/issue.yaml@ci_templates
+    parameters:
+      kubeconfig: $(kubeconfig)
+      namespace: $(namespace)
+      subdomain: mngt-ca
+      certificateName: mngt-ca-cert
+
   - template: k8s/resources/create.yaml@ci_templates
     parameters:
       kubeconfig: $(kubeconfig)
@@ -109,6 +123,18 @@ jobs:
     parameters:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
+
+  - template: certificates/letsencrypt/revoke.yaml@ci_templates
+    parameters:
+      kubeconfig: $(kubeconfig)
+      namespace: $(namespace)
+      certificateName: ingress-tls
+    
+  - template: certificates/letsencrypt/revoke.yaml@ci_templates
+    parameters:
+      kubeconfig: $(kubeconfig)
+      namespace: $(namespace)
+      certificateName: mngt-ca-cert
 
   - template: k8s/ns/delete.yaml@ci_templates
     parameters:
