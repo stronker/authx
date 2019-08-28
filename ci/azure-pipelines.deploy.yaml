@@ -128,7 +128,7 @@ jobs:
     parameters:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
-      certificateName: ingress-tls
+      certificateName: tls-client-certificate
     
   - template: certificates/letsencrypt/revoke.yaml@ci_templates
     parameters:
