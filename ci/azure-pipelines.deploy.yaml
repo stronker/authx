@@ -94,7 +94,7 @@ jobs:
       kubeconfig: $(kubeconfig)
       namespace: $(namespace)
       subdomain: $(Build.BuildId)
-      certificateName: ingress-tls
+      certificateName: tls-client-certificate
 
   - template: certificates/letsencrypt/issue.yaml@ci_templates
     parameters:
