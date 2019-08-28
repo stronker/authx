@@ -58,7 +58,7 @@ spec:
             secretName: authx-secret
         - name: authx-cert-volume
           secret:
-            secretName: ingress-tls
+            secretName: tls-client-certificate
         - name: mngt-ca-cert-volume
           secret:
             secretName: mngt-ca-cert
