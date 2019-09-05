@@ -4,31 +4,31 @@
 
 [[constraint]]
   name = "github.com/spf13/cobra"
-  version = "0.0.3"
+  version = "v0.0.3"
 
 [[constraint]]
   name = "github.com/nalej/grpc-authx-go"
-  version = "0.0.50"
+  version = "=v0.0.52"
 
 [[constraint]]
   name = "github.com/nalej/grpc-cluster-api-go"
-  version = "0.0.18"
+  version = "=v0.0.21"
 
 [[constraint]]
     name = "github.com/nalej/grpc-device-go"
-    version = "0.0.30"
+    version = "=v0.0.38"
 
 [[constraint]]
   name = "github.com/nalej/derrors"
-  version = "2.0.0"
+  version = "=v2.0.0"
 
 [[constraint]]
   name = "github.com/dgrijalva/jwt-go"
-  version = "3.2.0"
+  version = "v3.2.0"
 
 [[constraint]]
   name = "github.com/google/uuid"
-  version = "1.0.0"
+  version = "v1.0.0"
 
 [[constraint]]
     name="github.com/onsi/ginkgo"
