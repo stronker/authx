@@ -18,6 +18,9 @@ import (
 	"github.com/nalej/grpc-utils/pkg/conversions"
 )
 
+// MinPasswordLenght Minimum password length for user credentials set to 6
+const MinPasswordLenght = 6
+
 // Authx is the struct that handles the gRPC service.
 type Authx struct {
 	// Manager is the struct responsible of the service business logic.
@@ -90,7 +93,7 @@ func (h *Authx) ChangePassword(ctx context.Context, request *pbAuthx.ChangePassw
 }
 
 func ValidatePassword(password string) error {
-	if len(password) < 6 {
+	if len(password) < MinPasswordLenght {
 		return conversions.ToGRPCError(derrors.NewInvalidArgumentError("password must be at least 6 characters long"))
 	}
 	return nil
