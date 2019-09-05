@@ -34,6 +34,10 @@ func PrimitiveToGRPC(name string) grpc_authx_go.AccessPrimitive {
 		return grpc_authx_go.AccessPrimitive_PROFILE
 	case grpc_authx_go.AccessPrimitive_APPCLUSTEROPS.String():
 		return grpc_authx_go.AccessPrimitive_APPCLUSTEROPS
+	case grpc_authx_go.AccessPrimitive_ORGMNGT.String():
+		return grpc_authx_go.AccessPrimitive_ORGMNGT
+	case grpc_authx_go.AccessPrimitive_RESOURCESMNGT.String():
+		return grpc_authx_go.AccessPrimitive_RESOURCESMNGT
 	}
 	panic("access primitive not found")
 }
