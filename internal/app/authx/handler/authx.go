@@ -18,6 +18,9 @@ import (
 	"github.com/nalej/grpc-utils/pkg/conversions"
 )
 
+// MinPasswordLength Minimum password length for user credentials set to 6
+const MinPasswordLength = 6
+
 // Authx is the struct that handles the gRPC service.
 type Authx struct {
 	// Manager is the struct responsible of the service business logic.
@@ -55,6 +58,9 @@ func (h *Authx) AddBasicCredentials(_ context.Context, request *pbAuthx.AddBasic
 	if request.Password == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("password is mandatory"))
 	}
+	if err := ValidatePassword(request.Password); err != nil {
+		return nil, err
+	}
 
 	err := h.Manager.AddBasicCredentials(request.Username, request.OrganizationId, request.RoleId, request.Password)
 	if err != nil {
@@ -75,12 +81,22 @@ func (h *Authx) ChangePassword(ctx context.Context, request *pbAuthx.ChangePassw
 	if request.NewPassword == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("newPassword is mandatory"))
 	}
+	if err := ValidatePassword(request.NewPassword); err != nil {
+		return nil, err
+	}
 
 	err := h.Manager.ChangePassword(request.Username, request.Password, request.NewPassword)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
 	}
 	return &pbCommon.Success{}, nil
+}
+
+func ValidatePassword(password string) error {
+	if len(password) < MinPasswordLength {
+		return conversions.ToGRPCError(derrors.NewInvalidArgumentError("password must be at least 6 characters long"))
+	}
+	return nil
 }
 
 // LoginWithBasicCredentials login in the system and recovers a auth token.
