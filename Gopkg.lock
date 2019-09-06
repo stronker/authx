@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d47a1367fdb00263a26fc107b1ac4fae88d353fbf2ab76593517cef0d9ceb627"
+  digest = "1:5d089907ac41e71ea67227b5d6f1809335e2cb2656ea563a0e8562ec22ae9ae9"
   name = "github.com/gocql/gocql"
   packages = [
     ".",
@@ -20,7 +20,7 @@
     "internal/streams",
   ]
   pruneopts = "UT"
-  revision = "df4b9cc330307b4a196f255fc0d1e8a53cabfbcd"
+  revision = "e163eff7a8c6863df050dae7d3daa4bf98474d8e"
 
 [[projects]]
   digest = "1:b532ee3f683c057e797694b5bfeb3827d89e6adf41c53dbc80e549bca76364ea"
@@ -60,7 +60,7 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:3b341cd71012c63aacddabfc70b9110be8e30c553349552ad3f77242843f2d03"
+  digest = "1:99a9eab89cf8193a246811614678f34432e95446c34142594c450acb1a7a31cc"
   name = "github.com/grpc-ecosystem/grpc-gateway"
   packages = [
     "internal",
@@ -68,8 +68,8 @@
     "utilities",
   ]
   pruneopts = "UT"
-  revision = "fd2d159495beeea56e2b747d3d4b68299a81210c"
-  version = "v1.9.6"
+  revision = "471f45a5a99a578de7a8638dc7ed29e245bde097"
+  version = "v1.11.1"
 
 [[projects]]
   branch = "master"
@@ -137,12 +137,12 @@
   version = "v0.0.83"
 
 [[projects]]
-  digest = "1:719bfa3cd60f799396580197b5b1dff5513b8c94f345b79836d0e357d3c1cc54"
+  digest = "1:7ae31e463969d03a02043358155aafa7ccd9b49bd980da7ae06feffc34236ee3"
   name = "github.com/nalej/grpc-authx-go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "9a1fb72c0e3c646d4976fb205c09cc26db138806"
-  version = "v0.0.52"
+  revision = "1eda9772318a852d1de2139e075962e95fc8ef76"
+  version = "v0.0.53"
 
 [[projects]]
   digest = "1:06a71d87ea65c3b2444066a9cb2224493ddd2f654564fb124e30cb9d680dbeea"
@@ -260,7 +260,7 @@
   version = "v1.4.0"
 
 [[projects]]
-  digest = "1:3e2dd43d579954e11bf866eae02afa8312b2647c10db0746cc647b95fd0d4e6b"
+  digest = "1:aed50c53dce3e0ee52c84e5515b8b85404af5b7efc6a9199ab0035b8c25efcb8"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -283,11 +283,11 @@
     "types",
   ]
   pruneopts = "UT"
-  revision = "7e8b50db0c6d0a15ac0eb015d4ca64e7e7e2c88c"
-  version = "v1.9.0"
+  revision = "974566c482abc93ffd3df6f4626e79076c7ed290"
+  version = "v1.10.1"
 
 [[projects]]
-  digest = "1:7bd41dc846ca46b6d82a649920df6826590c69fed13cdc82699ec23ecdd7f748"
+  digest = "1:5a9c247f0da47393b38eb20b53077be9e25452d8b2de1fdfec857233a18c503c"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -304,8 +304,8 @@
     "types",
   ]
   pruneopts = "UT"
-  revision = "27d50ea6455b212cf516609fa58b2b5dce1abc81"
-  version = "v1.6.0"
+  revision = "bdebf9e0ece900259084cfa4121b97ce1a540939"
+  version = "v1.7.0"
 
 [[projects]]
   digest = "1:6cf4e9f5ea82d48699eed7a836781037621227fb8551d7571b82aabde422fec1"
@@ -364,11 +364,11 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "60c769a6c58655dab1b9adac0d58967dd517cfba"
+  revision = "9756ffdc24725223350eb3266ffb92590d28f278"
 
 [[projects]]
   branch = "master"
-  digest = "1:580eb6227f0f8be80e558b60c260b44ec1f7e72fdfbbc166719582d5c60ba0d4"
+  digest = "1:b617c55d56bc863224c068c125f45fa7d56b5b7aedd15893c70d7a01c9be9657"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -383,15 +383,15 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "74dc4d7220e7acc4e100824340f3e66577424772"
+  revision = "ba9fcec4b297b415637633c5a6e8fa592e4a16c3"
 
 [[projects]]
   branch = "master"
-  digest = "1:47844666be86089349a441f5f0ece22f42a87a8cb8c9a31294c593f43209ad19"
+  digest = "1:767025ef5997eeba9a3b7fba288b8b9e71b44f0e3a2ec6dcd01f144d3dc8f173"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "c7b8b68b14567162c6602a7c5659ee0f26417c18"
+  revision = "749cb33beabd9aa6d3178e3de05bcc914f70b2bf"
 
 [[projects]]
   digest = "1:28deae5fe892797ff37a317b5bcda96d11d1c90dadd89f1337651df3bc4c586e"
@@ -442,7 +442,7 @@
     "protobuf/field_mask",
   ]
   pruneopts = "UT"
-  revision = "24fa4b261c55da65468f2abfdae2b024eef27dfb"
+  revision = "92dd089d5514cecde7a465f807541f83dfd486d5"
 
 [[projects]]
   digest = "1:ba1aa0bf41122b38e27e6db55f9d815fb72bde0ef05b07c7979af81da338b485"
