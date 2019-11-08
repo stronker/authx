@@ -151,12 +151,12 @@
   version = "v0.0.53"
 
 [[projects]]
-  digest = "1:06a71d87ea65c3b2444066a9cb2224493ddd2f654564fb124e30cb9d680dbeea"
+  digest = "1:688b550939f97ac6c3c97f4f00332e758043aa1b9b8d45b7f9a792405c31369e"
   name = "github.com/nalej/grpc-cluster-api-go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "47baffca04a4a57e84fe7a3a9dc6a1af408b1e4a"
-  version = "v0.0.21"
+  revision = "b6afde65d08adb11af2bd63941a8e538ef3c58e0"
+  version = "v0.0.24"
 
 [[projects]]
   digest = "1:b71726e4a69b351279af52199d3818a6cc49277a536e76903dd983814d73aaa3"
@@ -247,12 +247,12 @@
   version = "v0.0.29"
 
 [[projects]]
-  digest = "1:7b5a8da09a03dfc35fe8ec6913f65bf4888236de1f58e53f6c026d23c801b900"
+  digest = "1:1484cd83e8c3d27270fa4054e54c590749bf503afe41708b3d3cf01cc36da57a"
   name = "github.com/nalej/grpc-ping-go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "ac2cd0ccd9bbf2c47fd2c432bb74467978b514fd"
-  version = "v0.0.33"
+  revision = "1a80540525d857f3e1ed8f1ade24c97c60c13007"
+  version = "v0.0.30"
 
 [[projects]]
   digest = "1:3ba57285084b17d034119f41480fe7bc4db2bef51a05aa9f1827890293230391"

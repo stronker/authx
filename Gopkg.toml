@@ -1,26 +1,38 @@
 [[constraint]]
-  name = "github.com/rs/zerolog"
-  version = "1.9.1"
-
-[[constraint]]
-  name = "github.com/spf13/cobra"
-  version = "v0.0.3"
-
-[[constraint]]
   name = "github.com/nalej/grpc-authx-go"
   version = "=v0.0.53"
 
 [[constraint]]
   name = "github.com/nalej/grpc-cluster-api-go"
-  version = "=v0.0.21"
+  version = "=v0.0.24"
 
 [[constraint]]
     name = "github.com/nalej/grpc-device-go"
     version = "=v0.0.38"
 
 [[constraint]]
+    name="github.com/nalej/grpc-ping-go"
+    version="=v0.0.30"
+
+[[constraint]]
+    name="github.com/nalej/grpc-login-api-go"
+    version="=v0.0.22"
+
+[[constraint]]
   name = "github.com/nalej/derrors"
   version = "=v2.1.0"
+
+[[constraint]]
+    name="github.com/nalej/grpc-utils"
+    version="=v1.5.0"
+
+[[constraint]]
+  name = "github.com/rs/zerolog"
+  version = "1.9.1"
+
+[[constraint]]
+  name = "github.com/spf13/cobra"
+  version = "v0.0.3"
 
 [[constraint]]
   name = "github.com/dgrijalva/jwt-go"
@@ -35,10 +47,6 @@
     version="v1.6.0"
 
 [[constraint]]
-    name="github.com/nalej/grpc-utils"
-    version="=v1.5.0"
-
-[[constraint]]
     name="github.com/onsi/gomega"
     version="v1.4.2"
 
@@ -49,14 +57,6 @@
 [[constraint]]
     name="github.com/hashicorp/golang-lru"
     version="v0.5.0"
-
-[[constraint]]
-    name="github.com/nalej/grpc-ping-go"
-    version="v0.0.30"
-
-[[constraint]]
-    name="github.com/nalej/grpc-login-api-go"
-    version="v0.0.21"
 
 [prune]
   go-tests = true
