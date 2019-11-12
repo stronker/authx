@@ -31,7 +31,6 @@ spec:
             - "run"
             - "--secret=/etc/authx/secret"
             - "--managementClusterCertPath=/etc/certs/tls.crt"
-            - "--debug"
             - "--useDBScyllaProviders=true"
             - "--scyllaDBAddress=scylladb.__NPH_NAMESPACE"
             - "--scyllaDBKeyspace=authx"
