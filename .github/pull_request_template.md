@@ -8,10 +8,4 @@
 
 #### Any background context you want to provide?
 
-#### What are the relevant tickets?
-
-- [NP-XXX](https://nalej.atlassian.net/browse/NP-XXX)
-
-#### Screenshots (if appropriate)
-
 #### Questions
