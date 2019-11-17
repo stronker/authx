@@ -19,7 +19,7 @@ package utils
 
 import (
 	"github.com/google/uuid"
-	"github.com/nalej/authx/internal/app/authx/entities"
+	"github.com/stronker/authx/internal/app/authx/entities"
 	"os"
 )
 

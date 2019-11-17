@@ -19,10 +19,10 @@ package certificates
 
 import (
 	"context"
-	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/nalej/grpc-authx-go"
 	"github.com/nalej/grpc-utils/pkg/conversions"
 	"github.com/rs/zerolog/log"
+	"github.com/stronker/authx/internal/app/authx/entities"
 )
 
 type Handler struct {

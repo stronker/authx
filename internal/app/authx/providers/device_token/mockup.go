@@ -19,8 +19,8 @@ package device_token
 
 import (
 	"fmt"
-	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/nalej/derrors"
+	"github.com/stronker/authx/internal/app/authx/entities"
 	"sync"
 	"time"
 )
@@ -32,7 +32,7 @@ type DeviceTokenMockup struct {
 	dataByRefreshToken map[string]entities.DeviceTokenData
 }
 
-// NewTokenMockup create a new instance of TokenMockup.
+// NewTokenMockUp create a new instance of TokenMockUp.
 func NewDeviceTokenMockup() Provider {
 	return &DeviceTokenMockup{
 		data:               make(map[string]entities.DeviceTokenData, 0),
@@ -45,7 +45,7 @@ func (m *DeviceTokenMockup) unsafeExists(deviceID string, tokenID string) bool {
 }
 
 func (m *DeviceTokenMockup) unsafeGet(deviceID string, tokenID string) (*entities.DeviceTokenData, derrors.Error) {
-
+	
 	data, ok := m.data[m.generateID(deviceID, tokenID)]
 	if !ok {
 		return nil, derrors.NewNotFoundError("device token not found").WithParams(deviceID, tokenID)
@@ -61,13 +61,13 @@ func (m *DeviceTokenMockup) generateID(deviceID string, tokenID string) string {
 func (m *DeviceTokenMockup) Delete(deviceID string, tokenID string) derrors.Error {
 	m.Lock()
 	defer m.Unlock()
-
+	
 	id := m.generateID(deviceID, tokenID)
 	token, err := m.unsafeGet(deviceID, tokenID)
 	if err != nil {
 		return derrors.NewNotFoundError("device not found").WithParams(deviceID)
 	}
-
+	
 	delete(m.data, id)
 	delete(m.dataByRefreshToken, token.RefreshToken)
 	return nil
@@ -77,7 +77,7 @@ func (m *DeviceTokenMockup) Delete(deviceID string, tokenID string) derrors.Erro
 func (m *DeviceTokenMockup) Add(token *entities.DeviceTokenData) derrors.Error {
 	m.Lock()
 	defer m.Unlock()
-
+	
 	if m.unsafeExists(token.DeviceId, token.TokenID) {
 		return derrors.NewAlreadyExistsError("device token").WithParams(token.DeviceId, token.TokenID)
 	}
@@ -90,7 +90,7 @@ func (m *DeviceTokenMockup) Add(token *entities.DeviceTokenData) derrors.Error {
 func (m *DeviceTokenMockup) Get(deviceID string, tokenID string) (*entities.DeviceTokenData, derrors.Error) {
 	m.Lock()
 	defer m.Unlock()
-
+	
 	data, ok := m.data[m.generateID(deviceID, tokenID)]
 	if !ok {
 		return nil, derrors.NewNotFoundError("device token not found").WithParams(deviceID, tokenID)
@@ -110,7 +110,7 @@ func (m *DeviceTokenMockup) Exist(deviceID string, tokenID string) (*bool, derro
 func (m *DeviceTokenMockup) Update(token *entities.DeviceTokenData) derrors.Error {
 	m.Lock()
 	defer m.Unlock()
-
+	
 	oldToken, err := m.unsafeGet(token.DeviceId, token.TokenID)
 	if err != nil {
 		return derrors.NewNotFoundError("device token").WithParams(token.DeviceId, token.TokenID)
@@ -125,7 +125,7 @@ func (m *DeviceTokenMockup) Update(token *entities.DeviceTokenData) derrors.Erro
 func (m *DeviceTokenMockup) Truncate() derrors.Error {
 	m.Lock()
 	defer m.Unlock()
-
+	
 	m.data = make(map[string]entities.DeviceTokenData, 0)
 	m.dataByRefreshToken = make(map[string]entities.DeviceTokenData, 0)
 	return nil
@@ -134,16 +134,16 @@ func (m *DeviceTokenMockup) Truncate() derrors.Error {
 func (m *DeviceTokenMockup) DeleteExpiredTokens() derrors.Error {
 	m.Lock()
 	defer m.Unlock()
-
+	
 	idBorrow := make([]string, 0)
-
+	
 	for _, token := range m.data {
 		if token.ExpirationDate < time.Now().Unix() {
 			id := m.generateID(token.DeviceId, token.TokenID)
 			idBorrow = append(idBorrow, id)
 			delete(m.dataByRefreshToken, token.RefreshToken)
 		}
-
+		
 	}
 	for _, id := range idBorrow {
 		delete(m.data, id)
@@ -154,7 +154,7 @@ func (m *DeviceTokenMockup) DeleteExpiredTokens() derrors.Error {
 func (m *DeviceTokenMockup) GetByRefreshToken(refreshToken string) (*entities.DeviceTokenData, derrors.Error) {
 	m.Lock()
 	defer m.Unlock()
-
+	
 	data, ok := m.dataByRefreshToken[refreshToken]
 	if !ok {
 		return nil, derrors.NewNotFoundError("device token not found").WithParams(refreshToken)

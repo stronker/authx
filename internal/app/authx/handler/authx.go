@@ -19,8 +19,6 @@ package handler
 
 import (
 	"context"
-	"github.com/nalej/authx/internal/app/authx/manager"
-	"github.com/nalej/authx/internal/app/entities"
 	"github.com/nalej/derrors"
 	"github.com/nalej/grpc-authx-go"
 	pbAuthx "github.com/nalej/grpc-authx-go"
@@ -29,6 +27,8 @@ import (
 	"github.com/nalej/grpc-organization-go"
 	"github.com/nalej/grpc-user-go"
 	"github.com/nalej/grpc-utils/pkg/conversions"
+	"github.com/stronker/authx/internal/app/authx/manager"
+	"github.com/stronker/authx/internal/app/entities"
 )
 
 // MinPasswordLength Minimum password length for user credentials set to 6
@@ -74,7 +74,7 @@ func (h *Authx) AddBasicCredentials(_ context.Context, request *pbAuthx.AddBasic
 	if err := ValidatePassword(request.Password); err != nil {
 		return nil, err
 	}
-
+	
 	err := h.Manager.AddBasicCredentials(request.Username, request.OrganizationId, request.RoleId, request.Password)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
@@ -90,14 +90,14 @@ func (h *Authx) ChangePassword(ctx context.Context, request *pbAuthx.ChangePassw
 	if request.Password == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("password is mandatory"))
 	}
-
+	
 	if request.NewPassword == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("newPassword is mandatory"))
 	}
 	if err := ValidatePassword(request.NewPassword); err != nil {
 		return nil, err
 	}
-
+	
 	err := h.Manager.ChangePassword(request.Username, request.Password, request.NewPassword)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
@@ -120,7 +120,7 @@ func (h *Authx) LoginWithBasicCredentials(_ context.Context, request *pbAuthx.Lo
 	if request.Password == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("password is mandatory"))
 	}
-
+	
 	response, err := h.Manager.LoginWithBasicCredentials(request.Username, request.Password)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
@@ -130,15 +130,15 @@ func (h *Authx) LoginWithBasicCredentials(_ context.Context, request *pbAuthx.Lo
 
 // RefreshToken renews an existing token.
 func (h *Authx) RefreshToken(_ context.Context, request *pbAuthx.RefreshTokenRequest) (*pbAuthx.LoginResponse, error) {
-
+	
 	if request.RefreshToken == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("refreshToken is mandatory"))
 	}
-
+	
 	if request.Token == "" {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("token is mandatory"))
 	}
-
+	
 	response, err := h.Manager.RefreshToken(request.Token, request.RefreshToken)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
@@ -160,7 +160,7 @@ func (h *Authx) AddRole(_ context.Context, request *pbAuthx.Role) (*pbCommon.Suc
 	if request.Primitives == nil || len(request.Primitives) == 0 {
 		return nil, conversions.ToGRPCError(derrors.NewInvalidArgumentError("primitives is mandatory"))
 	}
-
+	
 	err := h.Manager.AddRole(request)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
@@ -221,30 +221,30 @@ func (h *Authx) AddDeviceCredentials(ctx context.Context, request *pbAuthx.AddDe
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
-
+	
 	added, err := h.Manager.AddDeviceCredentials(request)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
 	}
-
+	
 	return added.ToGRPC(), nil
-
+	
 }
 
 // UpdateDeviceCredentials enable /disable the device
 func (h *Authx) UpdateDeviceCredentials(ctx context.Context, request *pbAuthx.UpdateDeviceCredentialsRequest) (*pbCommon.Success, error) {
-
+	
 	vErr := entities.ValidUpdateDeviceCredentialsRequest(request)
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
-
+	
 	err := h.Manager.UpdateDeviceCredentials(request)
-
+	
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
 	}
-
+	
 	return &pbCommon.Success{}, nil
 }
 
@@ -254,39 +254,39 @@ func (h *Authx) GetDeviceCredentials(ctx context.Context, request *grpc_device_g
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
-
+	
 	credentials, err := h.Manager.GetDeviceCredentials(request)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
 	}
 	return credentials.ToGRPC(), nil
-
+	
 }
 
 // RemoveDeviceCredentials removes a credential
 func (h *Authx) RemoveDeviceCredentials(ctx context.Context, credentials *grpc_device_go.DeviceId) (*pbCommon.Success, error) {
-
+	
 	vErr := entities.ValidDeviceID(credentials)
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
-
+	
 	err := h.Manager.RemoveDeviceCredentials(credentials)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
 	}
 	return &pbCommon.Success{}, nil
-
+	
 }
 
 // DeviceLogin checks if the device credentials are valid and returns a token
 func (h *Authx) DeviceLogin(ctx context.Context, loginRequest *pbAuthx.DeviceLoginRequest) (*pbAuthx.LoginResponse, error) {
-
+	
 	vErr := entities.ValidDeviceLoginRequest(loginRequest)
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
-
+	
 	response, err := h.Manager.LoginDeviceCredentials(loginRequest)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
@@ -300,12 +300,12 @@ func (h *Authx) AddDeviceGroupCredentials(ctx context.Context, request *pbAuthx.
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
-
+	
 	added, err := h.Manager.AddDeviceGroupCredentials(request)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
 	}
-
+	
 	return added.ToGRPC(), nil
 }
 
@@ -315,12 +315,12 @@ func (h *Authx) UpdateDeviceGroupCredentials(ctx context.Context, request *pbAut
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
-
+	
 	err := h.Manager.UpdateDeviceGroupCredentials(request)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
 	}
-
+	
 	return &pbCommon.Success{}, nil
 }
 
@@ -330,13 +330,13 @@ func (h *Authx) GetDeviceGroupCredentials(ctx context.Context, request *grpc_dev
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
-
+	
 	credentials, err := h.Manager.GetDeviceGroupCredentials(request)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
 	}
 	return credentials.ToGRPC(), nil
-
+	
 }
 
 // RemoveDeviceGroupCredentials removes a group credentials
@@ -345,13 +345,13 @@ func (h *Authx) RemoveDeviceGroupCredentials(ctx context.Context, credentials *g
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
-
+	
 	err := h.Manager.RemoveDeviceGroupCredentials(credentials)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
 	}
 	return &pbCommon.Success{}, nil
-
+	
 }
 
 // DeviceGroupLogin checks if the device group credentials are valid
@@ -364,19 +364,19 @@ func (h *Authx) DeviceGroupLogin(ctx context.Context, credentials *grpc_authx_go
 	if err != nil {
 		return nil, err
 	}
-
+	
 	return &pbCommon.Success{}, nil
-
+	
 }
 
 // RefreshDeviceToken renews an existing token.
 func (h *Authx) RefreshDeviceToken(_ context.Context, request *pbAuthx.RefreshTokenRequest) (*pbAuthx.LoginResponse, error) {
-
+	
 	vErr := entities.ValidRefreshToken(request)
 	if vErr != nil {
 		return nil, conversions.ToGRPCError(vErr)
 	}
-
+	
 	response, err := h.Manager.RefreshDeviceToken(request.Token, request.RefreshToken)
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
@@ -390,7 +390,7 @@ func (h *Authx) GetDeviceGroupSecret(context context.Context, request *grpc_devi
 		return nil, conversions.ToGRPCError(vErr)
 	}
 	secret, err := h.Manager.GetDeviceGroupSecret(request)
-
+	
 	if err != nil {
 		return nil, conversions.ToGRPCError(err)
 	}

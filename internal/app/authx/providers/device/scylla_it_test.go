@@ -34,15 +34,15 @@ IT_SCYLLA_PORT=9042
 */
 
 import (
-	"github.com/nalej/authx/internal/app/authx/utils"
 	"github.com/onsi/ginkgo"
 	"github.com/rs/zerolog/log"
+	"github.com/stronker/authx/internal/app/authx/utils"
 	"os"
 	"strconv"
 )
 
 var _ = ginkgo.Describe("Scylla cluster provider", func() {
-
+	
 	if !utils.RunIntegrationTests() {
 		log.Warn().Msg("Integration tests are skipped")
 		return
@@ -59,14 +59,14 @@ var _ = ginkgo.Describe("Scylla cluster provider", func() {
 	if scyllaPort <= 0 {
 		ginkgo.Fail("missing environment variables")
 	}
-
+	
 	// create a provider and connect it
 	sp := NewScyllaDeviceCredentialsProvider(scyllaHost, scyllaPort, nalejKeySpace)
-
+	
 	ginkgo.AfterSuite(func() {
 		sp.Disconnect()
 	})
-
+	
 	RunTest(sp)
-
+	
 })

@@ -18,8 +18,8 @@
 package credentials
 
 import (
-	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/nalej/derrors"
+	"github.com/stronker/authx/internal/app/authx/entities"
 )
 
 // BasicCredentials is the interface that define how we are store the basic credential information.

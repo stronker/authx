@@ -20,9 +20,9 @@ package certificates
 import (
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"github.com/nalej/authx/internal/app/authx/config"
 	"github.com/nalej/derrors"
 	"github.com/nalej/grpc-authx-go"
+	"github.com/stronker/authx/internal/app/authx/config"
 	"math/big"
 	"math/rand"
 	"net"
