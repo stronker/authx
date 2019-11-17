@@ -19,19 +19,19 @@ package authx
 
 import (
 	"fmt"
-	"github.com/nalej/authx/internal/app/authx/certificates"
-	"github.com/nalej/authx/internal/app/authx/config"
-	"github.com/nalej/authx/internal/app/authx/handler"
-	"github.com/nalej/authx/internal/app/authx/inventory"
-	"github.com/nalej/authx/internal/app/authx/manager"
-	"github.com/nalej/authx/internal/app/authx/providers/credentials"
-	"github.com/nalej/authx/internal/app/authx/providers/device"
-	"github.com/nalej/authx/internal/app/authx/providers/device_token"
-	inventoryProv "github.com/nalej/authx/internal/app/authx/providers/inventory"
-	"github.com/nalej/authx/internal/app/authx/providers/role"
-	"github.com/nalej/authx/internal/app/authx/providers/token"
 	pbAuthx "github.com/nalej/grpc-authx-go"
 	"github.com/rs/zerolog/log"
+	"github.com/stronker/authx/internal/app/authx/certificates"
+	"github.com/stronker/authx/internal/app/authx/config"
+	"github.com/stronker/authx/internal/app/authx/handler"
+	"github.com/stronker/authx/internal/app/authx/inventory"
+	"github.com/stronker/authx/internal/app/authx/manager"
+	"github.com/stronker/authx/internal/app/authx/providers/credentials"
+	"github.com/stronker/authx/internal/app/authx/providers/device"
+	"github.com/stronker/authx/internal/app/authx/providers/device_token"
+	inventoryProv "github.com/stronker/authx/internal/app/authx/providers/inventory"
+	"github.com/stronker/authx/internal/app/authx/providers/role"
+	"github.com/stronker/authx/internal/app/authx/providers/token"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"net"
@@ -134,28 +134,28 @@ func (s *Service) Run() {
 	}
 	s.Config.Print()
 	p := s.GetProviders()
-
+	
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", s.Port))
 	if err != nil {
 		log.Fatal().Errs("failed to listen: %v", []error{err})
 		return
 	}
-
+	
 	passwordMgr := manager.NewBCryptPassword()
-
+	
 	// Create the token manager (memory/scylla)
 	t := s.getTokenManager(p.tokenProvider, passwordMgr, p.devProvider, p.devTokenProvider)
 	tokenMgr := t.tokenManager
 	deviceMgr := t.deviceTokenManager
-
+	
 	authxMgr := manager.NewAuthx(passwordMgr, tokenMgr, deviceMgr, p.credProvider, p.roleProvider, p.devProvider,
 		s.Secret, s.ExpirationTime, s.DeviceExpirationTime, p.devTokenProvider)
-
+	
 	h := handler.NewAuthx(authxMgr)
-
+	
 	inventoryManager := inventory.NewManager(p.inventoryProvider, s.Config)
 	inventoryHandler := inventory.NewHandler(inventoryManager)
-
+	
 	helper, cErr := certificates.NewCertHelper(s.Config.CACertPath, s.Config.CAPrivateKeyPath)
 	if cErr != nil {
 		log.Fatal().Str("trace", cErr.DebugReport()).Msg("cannot create certificate helper")
@@ -163,19 +163,19 @@ func (s *Service) Run() {
 	}
 	certManager := certificates.NewManager(s.Config, helper)
 	certHandler := certificates.NewHandler(certManager)
-
+	
 	grpcServer := grpc.NewServer()
-
+	
 	pbAuthx.RegisterAuthxServer(grpcServer, h)
 	pbAuthx.RegisterInventoryServer(grpcServer, inventoryHandler)
 	pbAuthx.RegisterCertificatesServer(grpcServer, certHandler)
-
+	
 	if s.Config.Debug {
 		log.Info().Msg("Enabling gRPC server reflection")
 		// Register reflection service on gRPC server.
 		reflection.Register(grpcServer)
 	}
-
+	
 	log.Info().Int("Port", s.Port).Msg("Launching gRPC server")
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatal().Errs("failed to serve: %v", []error{err})

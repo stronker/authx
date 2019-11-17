@@ -18,8 +18,8 @@
 package role
 
 import (
-	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/nalej/derrors"
+	"github.com/stronker/authx/internal/app/authx/entities"
 	"sync"
 )
 
@@ -39,7 +39,7 @@ func (p *RoleMockup) unsafeGet(organizationID string, roleID string) (*entities.
 	if !ok || data.OrganizationID != organizationID {
 		return nil, derrors.NewNotFoundError("role not found").WithParams(organizationID, roleID)
 	}
-
+	
 	return &data, nil
 }
 
@@ -47,7 +47,7 @@ func (p *RoleMockup) unsafeGet(organizationID string, roleID string) (*entities.
 func (p *RoleMockup) Delete(organizationID string, roleID string) derrors.Error {
 	p.Lock()
 	defer p.Unlock()
-
+	
 	data, ok := p.data[roleID]
 	if !ok || data.OrganizationID != organizationID {
 		return derrors.NewNotFoundError("role not found").WithParams(roleID)
@@ -72,16 +72,16 @@ func (p *RoleMockup) Get(organizationID string, roleID string) (*entities.RoleDa
 	if !ok || data.OrganizationID != organizationID {
 		return nil, derrors.NewNotFoundError("role not found").WithParams(organizationID, roleID)
 	}
-
+	
 	return &data, nil
 }
 
 // Edit updates an existing role.
 func (p *RoleMockup) Edit(organizationID string, roleID string, edit *entities.EditRoleData) derrors.Error {
-
+	
 	p.Lock()
 	defer p.Unlock()
-
+	
 	data, err := p.unsafeGet(organizationID, roleID)
 	if err != nil {
 		return err
@@ -92,7 +92,7 @@ func (p *RoleMockup) Edit(organizationID string, roleID string, edit *entities.E
 	if edit.Primitives != nil {
 		data.Primitives = *edit.Primitives
 	}
-
+	
 	p.data[roleID] = *data
 	return nil
 }

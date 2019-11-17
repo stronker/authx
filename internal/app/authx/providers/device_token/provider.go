@@ -18,8 +18,8 @@
 package device_token
 
 import (
-	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/nalej/derrors"
+	"github.com/stronker/authx/internal/app/authx/entities"
 )
 
 type Provider interface {
@@ -35,9 +35,9 @@ type Provider interface {
 	Update(token *entities.DeviceTokenData) derrors.Error
 	// Truncate cleans all data.
 	Truncate() derrors.Error
-
+	
 	// Get an existing token.
 	GetByRefreshToken(refreshToken string) (*entities.DeviceTokenData, derrors.Error)
-
+	
 	DeleteExpiredTokens() derrors.Error
 }

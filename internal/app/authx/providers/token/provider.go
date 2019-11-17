@@ -18,8 +18,8 @@
 package token
 
 import (
-	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/nalej/derrors"
+	"github.com/stronker/authx/internal/app/authx/entities"
 )
 
 // Token is the interface to store the token information.
@@ -36,6 +36,6 @@ type Token interface {
 	Update(token *entities.TokenData) derrors.Error
 	// Truncate cleans all data.
 	Truncate() derrors.Error
-
+	
 	DeleteExpiredTokens() derrors.Error
 }

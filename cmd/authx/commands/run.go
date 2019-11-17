@@ -18,9 +18,9 @@
 package commands
 
 import (
-	"github.com/nalej/authx/internal/app/authx"
-	"github.com/nalej/authx/internal/app/authx/config"
 	"github.com/spf13/cobra"
+	"github.com/stronker/authx/internal/app/authx"
+	"github.com/stronker/authx/internal/app/authx/config"
 	"io/ioutil"
 	"time"
 )
@@ -64,26 +64,26 @@ var runCmd = &cobra.Command{
 }
 
 func init() {
-
+	
 	d, _ := time.ParseDuration(DefaultExpirationDuration)
 	e, _ := time.ParseDuration(DefaultDeviceExpiration)
 	ece, _ := time.ParseDuration(DefaultEdgeControllerJoinExpiration)
-
+	
 	rootCmd.AddCommand(runCmd)
 	runCmd.Flags().IntVar(&cfg.Port, "port", DefaultPort, "Port to launch Authx server")
 	runCmd.Flags().StringVar(&secretPath, "secret", "", "Path to internal secret to generate Tokens")
 	runCmd.Flags().DurationVar(&cfg.ExpirationTime, "expiration", d, "Expiration time of Tokens. No more than 3 hours allowed")
 	runCmd.Flags().DurationVar(&cfg.DeviceExpirationTime, "deviceExpiration", e, "Expiration time of devices Tokens")
 	runCmd.Flags().DurationVar(&cfg.EdgeControllerExpTime, "edgeControllerJoinExpiration", ece, "Expiration time of Edge Controller join tokens")
-
+	
 	runCmd.Flags().BoolVar(&cfg.UseInMemoryProviders, "userInMemoryProviders", false, "Whether in-memory providers should be used. ONLY for development")
 	runCmd.Flags().BoolVar(&cfg.UseDBScyllaProviders, "useDBScyllaProviders", true, "Whether dbscylla providers should be used")
 	runCmd.Flags().StringVar(&cfg.ScyllaDBAddress, "scyllaDBAddress", "", "address to connect to scylla database")
 	runCmd.Flags().IntVar(&cfg.ScyllaDBPort, "scyllaDBPort", 9042, "port to connect to scylla database")
 	runCmd.Flags().StringVar(&cfg.KeySpace, "scyllaDBKeyspace", "", "keyspace of scylla database")
-
+	
 	runCmd.Flags().StringVar(&cfg.ManagementClusterCertPath, "managementClusterCertPath", "", "Server certificate that joining entities can use for authentication")
 	runCmd.Flags().StringVar(&cfg.CACertPath, "caCertPath", "", "CA certificate path")
 	runCmd.Flags().StringVar(&cfg.CAPrivateKeyPath, "caPrivateKeyPath", "", "CA Private Key path")
-
+	
 }

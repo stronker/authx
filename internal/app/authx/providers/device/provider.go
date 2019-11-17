@@ -18,12 +18,11 @@
 package device
 
 import (
-	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/nalej/derrors"
+	"github.com/stronker/authx/internal/app/authx/entities"
 )
 
 type Provider interface {
-
 	// AddDeviceGroupCredentials adds credentials of a device group
 	AddDeviceGroupCredentials(*entities.DeviceGroupCredentials) derrors.Error
 	// UpdateDeviceGroupCredentials updates a device group (Enabled and/or DefaultDeviceConnectivity" flags)
@@ -36,10 +35,10 @@ type Provider interface {
 	GetDeviceGroupByApiKey(deviceApiKey string) (*entities.DeviceGroupCredentials, derrors.Error)
 	// RemoveDeviceGroup removes a device group
 	RemoveDeviceGroup(organizationId string, deviceGroupId string) derrors.Error
-
+	
 	// Truncate removes all stored devices and device groups
 	Truncate() derrors.Error
-
+	
 	// AddDeviceCredentials adds credentials of a device
 	AddDeviceCredentials(*entities.DeviceCredentials) derrors.Error
 	// UpdateDeviceCredentials updates a device credentials (Enable flag)

@@ -18,8 +18,8 @@
 package credentials
 
 import (
-	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/nalej/derrors"
+	"github.com/stronker/authx/internal/app/authx/entities"
 	"sync"
 )
 
@@ -58,7 +58,7 @@ func (p *BasicCredentialsMockup) Delete(username string) derrors.Error {
 func (p *BasicCredentialsMockup) Add(credentials *entities.BasicCredentialsData) derrors.Error {
 	p.Lock()
 	defer p.Unlock()
-
+	
 	p.data[credentials.Username] = *credentials
 	return nil
 }
@@ -67,7 +67,7 @@ func (p *BasicCredentialsMockup) Add(credentials *entities.BasicCredentialsData)
 func (p *BasicCredentialsMockup) Get(username string) (*entities.BasicCredentialsData, derrors.Error) {
 	p.Lock()
 	defer p.Unlock()
-
+	
 	data, ok := p.data[username]
 	if !ok {
 		return nil, derrors.NewNotFoundError("credentials not found").WithParams(username)
@@ -79,7 +79,7 @@ func (p *BasicCredentialsMockup) Get(username string) (*entities.BasicCredential
 func (p *BasicCredentialsMockup) Exist(username string) (*bool, derrors.Error) {
 	p.Lock()
 	defer p.Unlock()
-
+	
 	_, ok := p.data[username]
 	return &ok, nil
 }
@@ -88,7 +88,7 @@ func (p *BasicCredentialsMockup) Exist(username string) (*bool, derrors.Error) {
 func (p *BasicCredentialsMockup) Edit(username string, edit *entities.EditBasicCredentialsData) derrors.Error {
 	p.Lock()
 	defer p.Unlock()
-
+	
 	data, err := p.unsafeGet(username)
 	if err != nil {
 		return err
@@ -99,7 +99,7 @@ func (p *BasicCredentialsMockup) Edit(username string, edit *entities.EditBasicC
 	if edit.Password != nil {
 		data.Password = *edit.Password
 	}
-
+	
 	p.data[username] = *data
 	return nil
 }

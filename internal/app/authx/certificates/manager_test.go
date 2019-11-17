@@ -24,20 +24,20 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"github.com/nalej/authx/internal/app/authx/config"
 	"github.com/nalej/grpc-authx-go"
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 	"github.com/rs/zerolog/log"
+	"github.com/stronker/authx/internal/app/authx/config"
 	"math/big"
 	"time"
 )
 
 func createTestCA() (*x509.Certificate, *rsa.PrivateKey) {
-
+	
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	gomega.Expect(err).To(gomega.Succeed())
-
+	
 	caCert := x509.Certificate{
 		SerialNumber: big.NewInt(1),
 		Issuer: pkix.Name{
@@ -59,10 +59,10 @@ func createTestCA() (*x509.Certificate, *rsa.PrivateKey) {
 	publicKey := &privateKey.PublicKey
 	rawCert, err := x509.CreateCertificate(rand.Reader, &caCert, &caCert, publicKey, privateKey)
 	gomega.Expect(err).To(gomega.Succeed())
-
+	
 	cert, err := x509.ParseCertificate(rawCert)
 	gomega.Expect(err).To(gomega.Succeed())
-
+	
 	return cert, privateKey
 }
 
@@ -75,12 +75,12 @@ var _ = ginkgo.Describe("With a manager", func() {
 			CACert:     testCA,
 			PrivateKey: testPK,
 		}
-
+		
 		emptyCfg := config.Config{}
-
+		
 		testManager = NewManager(emptyCfg, helper)
 	})
-
+	
 	ginkgo.It("should be able to generate an edge controller certificate", func() {
 		request := &grpc_authx_go.EdgeControllerCertRequest{
 			OrganizationId:   "organization_id",
@@ -93,18 +93,18 @@ var _ = ginkgo.Describe("With a manager", func() {
 		gomega.Expect(ecCert).ToNot(gomega.BeNil())
 		gomega.Expect(ecCert.Certificate).ShouldNot(gomega.BeNil())
 		gomega.Expect(ecCert.PrivateKey).ShouldNot(gomega.BeNil())
-
+		
 		x509Cert, cErr := tls.X509KeyPair([]byte(ecCert.Certificate), []byte(ecCert.PrivateKey))
 		gomega.Expect(cErr).To(gomega.Succeed())
-
+		
 		block, _ := pem.Decode([]byte(ecCert.Certificate))
 		gomega.Expect(block).ShouldNot(gomega.BeNil())
-
+		
 		cert, perr := x509.ParseCertificate(block.Bytes)
 		gomega.Expect(perr).To(gomega.Succeed())
-
+		
 		log.Info().Interface("cert", x509Cert).Msg("result")
 		log.Info().Interface("cert", cert).Msg("result")
 	})
-
+	
 })

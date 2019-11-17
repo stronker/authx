@@ -19,8 +19,8 @@ package token
 
 import (
 	"fmt"
-	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/nalej/derrors"
+	"github.com/stronker/authx/internal/app/authx/entities"
 	"sync"
 	"time"
 )
@@ -42,7 +42,7 @@ func (p *TokenMockup) unsafeExists(username string, tokenID string) bool {
 }
 
 func (p *TokenMockup) unsafeGet(username string, tokenID string) (*entities.TokenData, derrors.Error) {
-
+	
 	data, ok := p.data[p.generateID(tokenID, username)]
 	if !ok {
 		return nil, derrors.NewNotFoundError("token not found").WithParams(username, tokenID)
@@ -52,16 +52,16 @@ func (p *TokenMockup) unsafeGet(username string, tokenID string) (*entities.Toke
 
 // Delete an existing token.
 func (p *TokenMockup) Delete(username string, tokenID string) derrors.Error {
-
+	
 	p.Lock()
 	defer p.Unlock()
-
+	
 	id := p.generateID(tokenID, username)
 	_, err := p.unsafeGet(username, tokenID)
 	if err != nil {
 		return derrors.NewNotFoundError("username not found").WithParams(username)
 	}
-
+	
 	delete(p.data, id)
 	return nil
 }
@@ -97,10 +97,10 @@ func (p *TokenMockup) Exist(username string, tokenID string) (*bool, derrors.Err
 }
 
 func (p *TokenMockup) Update(token *entities.TokenData) derrors.Error {
-
+	
 	p.Lock()
 	defer p.Unlock()
-
+	
 	if !p.unsafeExists(token.Username, token.TokenID) {
 		return derrors.NewNotFoundError("token").WithParams(token.Username, token.TokenID)
 	}
@@ -123,15 +123,15 @@ func (p *TokenMockup) generateID(tokenID string, username string) string {
 func (p *TokenMockup) DeleteExpiredTokens() derrors.Error {
 	p.Lock()
 	defer p.Unlock()
-
+	
 	idBorrow := make([]string, 0)
-
+	
 	for _, token := range p.data {
 		if token.ExpirationDate < time.Now().Unix() {
 			id := p.generateID(token.TokenID, token.Username)
 			idBorrow = append(idBorrow, id)
 		}
-
+		
 	}
 	for _, id := range idBorrow {
 		delete(p.data, id)

@@ -18,12 +18,12 @@
 package inventory
 
 import (
-	"github.com/nalej/authx/internal/app/authx/config"
-	"github.com/nalej/authx/internal/app/authx/entities"
-	"github.com/nalej/authx/internal/app/authx/providers/inventory"
 	"github.com/nalej/derrors"
 	"github.com/nalej/grpc-authx-go"
 	"github.com/nalej/grpc-organization-go"
+	"github.com/stronker/authx/internal/app/authx/config"
+	"github.com/stronker/authx/internal/app/authx/entities"
+	"github.com/stronker/authx/internal/app/authx/providers/inventory"
 	"time"
 )
 
@@ -48,7 +48,7 @@ func (m *Manager) CreateEICJoinToken(organizationID *grpc_organization_go.Organi
 	if err != nil {
 		return nil, err
 	}
-
+	
 	return &grpc_authx_go.EICJoinToken{
 		OrganizationId: organizationID.OrganizationId,
 		Token:          token.TokenID,

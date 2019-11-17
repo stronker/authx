@@ -19,9 +19,9 @@ package inventory
 
 import (
 	"github.com/google/uuid"
-	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
+	"github.com/stronker/authx/internal/app/authx/entities"
 	"time"
 )
 
@@ -30,11 +30,11 @@ func CreateTestECJoinToken() *entities.EICJoinToken {
 }
 
 func RunTest(provider Provider) {
-
+	
 	ginkgo.BeforeEach(func() {
 		provider.Clear()
 	})
-
+	
 	ginkgo.Context("Edge controllers", func() {
 		ginkgo.It("should be able to add a join token", func() {
 			toAdd := CreateTestECJoinToken()

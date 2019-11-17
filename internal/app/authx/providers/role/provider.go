@@ -18,8 +18,8 @@
 package role
 
 import (
-	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/nalej/derrors"
+	"github.com/stronker/authx/internal/app/authx/entities"
 )
 
 // Role is the interface to store role entities in the system.

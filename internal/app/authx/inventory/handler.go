@@ -19,13 +19,13 @@ package inventory
 
 import (
 	"context"
-	"github.com/nalej/authx/internal/app/entities"
 	"github.com/nalej/derrors"
 	"github.com/nalej/grpc-authx-go"
 	"github.com/nalej/grpc-common-go"
 	"github.com/nalej/grpc-organization-go"
 	"github.com/nalej/grpc-utils/pkg/conversions"
 	"github.com/rs/zerolog/log"
+	"github.com/stronker/authx/internal/app/entities"
 )
 
 // Handler for inventory related operations.

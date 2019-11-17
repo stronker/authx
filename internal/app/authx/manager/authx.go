@@ -18,17 +18,17 @@
 package manager
 
 import (
-	"github.com/nalej/authx/internal/app/authx/entities"
-	"github.com/nalej/authx/internal/app/authx/providers/credentials"
-	"github.com/nalej/authx/internal/app/authx/providers/device"
-	"github.com/nalej/authx/internal/app/authx/providers/device_token"
-	"github.com/nalej/authx/internal/app/authx/providers/role"
 	"github.com/nalej/authx/pkg/token"
 	"github.com/nalej/derrors"
 	pbAuthx "github.com/nalej/grpc-authx-go"
 	"github.com/nalej/grpc-device-go"
 	"github.com/nalej/grpc-organization-go"
 	"github.com/nalej/grpc-user-go"
+	"github.com/stronker/authx/internal/app/authx/entities"
+	"github.com/stronker/authx/internal/app/authx/providers/credentials"
+	"github.com/stronker/authx/internal/app/authx/providers/device"
+	"github.com/stronker/authx/internal/app/authx/providers/device_token"
+	"github.com/stronker/authx/internal/app/authx/providers/role"
 	"time"
 )
 
@@ -57,7 +57,7 @@ type Authx struct {
 func NewAuthx(password Password, tokenManager Token, deviceToken DeviceToken, credentialsProvider credentials.BasicCredentials,
 	roleProvide role.Role, deviceProvider device.Provider, secret string, expirationDuration time.Duration, deviceExpiration time.Duration,
 	deviceTokenProvider device_token.Provider) *Authx {
-
+	
 	return &Authx{
 		Password:            password,
 		Token:               tokenManager,
@@ -70,7 +70,7 @@ func NewAuthx(password Password, tokenManager Token, deviceToken DeviceToken, cr
 		DeviceExpiration:    deviceExpiration,
 		DeviceTokenProvider: deviceTokenProvider,
 	}
-
+	
 }
 
 // NewAuthxMockup create a new mockup manager.
@@ -96,7 +96,7 @@ func (m *Authx) AddBasicCredentials(username string, organizationID string, role
 	if err != nil {
 		return err
 	}
-
+	
 	exist, err := m.CredentialsProvider.Exist(username)
 	if err != nil {
 		return err
@@ -104,12 +104,12 @@ func (m *Authx) AddBasicCredentials(username string, organizationID string, role
 	if *exist {
 		return derrors.NewAlreadyExistsError("credentials already exists")
 	}
-
+	
 	hashedPassword, err := m.Password.GenerateHashedPassword(password)
 	if err != nil {
 		return err
 	}
-
+	
 	entity := entities.NewBasicCredentialsData(username, hashedPassword, roleID, organizationID)
 	return m.CredentialsProvider.Add(entity)
 }
@@ -131,7 +131,7 @@ func (m *Authx) LoginWithBasicCredentials(username string, password string) (*pb
 	personalClaim := token.NewPersonalClaim(username, role.Name, role.Primitives, credentials.OrganizationID)
 	gToken, err := m.Token.Generate(personalClaim, m.expirationDuration, m.secret)
 	if err != nil {
-
+		
 		return nil, err
 	}
 	response := &pbAuthx.LoginResponse{Token: gToken.Token, RefreshToken: gToken.RefreshToken}
@@ -181,11 +181,11 @@ func (m *Authx) EditUserRole(username string, roleID string) derrors.Error {
 	if err != nil {
 		return err
 	}
-
+	
 	if role == nil {
 		return derrors.NewNotFoundError("role not found")
 	}
-
+	
 	edit := entities.NewEditBasicCredentialsData().WithRoleID(roleID)
 	return m.CredentialsProvider.Edit(username, edit)
 }
@@ -220,7 +220,7 @@ func (m *Authx) Clean() derrors.Error {
 	if err != nil {
 		return err
 	}
-
+	
 	return nil
 }
 
@@ -235,7 +235,7 @@ func PrimitivesToString(primitives []pbAuthx.AccessPrimitive) []string {
 
 // -- Device Credentials -- //
 func (m *Authx) AddDeviceCredentials(deviceCredentials *pbAuthx.AddDeviceCredentialsRequest) (*entities.DeviceCredentials, derrors.Error) {
-
+	
 	// Check if the group exists
 	exists, err := m.DeviceProvider.ExistsDeviceGroup(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId)
 	if err != nil {
@@ -244,7 +244,7 @@ func (m *Authx) AddDeviceCredentials(deviceCredentials *pbAuthx.AddDeviceCredent
 	if !exists {
 		return nil, derrors.NewNotFoundError("deviceGroupID").WithParams(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId)
 	}
-
+	
 	// Get the group to review if it is enable
 	group, err := m.DeviceProvider.GetDeviceGroup(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId)
 	if err != nil {
@@ -253,11 +253,11 @@ func (m *Authx) AddDeviceCredentials(deviceCredentials *pbAuthx.AddDeviceCredent
 	if !group.Enabled {
 		return nil, derrors.NewPermissionDeniedError("the group is temporarily disabled").WithParams(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId)
 	}
-
+	
 	toAdd := entities.NewDeviceCredentialsFromGRPC(deviceCredentials)
 	// the device will be enable or disabled depending at group default value
 	toAdd.Enabled = group.DefaultDeviceConnectivity
-
+	
 	err = m.DeviceProvider.AddDeviceCredentials(toAdd)
 	if err != nil {
 		return nil, err
@@ -274,19 +274,19 @@ func (m *Authx) UpdateDeviceCredentials(deviceCredentials *pbAuthx.UpdateDeviceC
 	if !exists {
 		return derrors.NewNotFoundError("device credentials").WithParams(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId, deviceCredentials.DeviceId)
 	}
-
+	
 	toUpdate, err := m.DeviceProvider.GetDevice(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId, deviceCredentials.DeviceId)
 	if err != nil {
 		return err
 	}
-
+	
 	toUpdate.Enabled = deviceCredentials.Enabled
-
+	
 	err = m.DeviceProvider.UpdateDeviceCredentials(toUpdate)
 	if err != nil {
 		return err
 	}
-
+	
 	return nil
 }
 
@@ -307,7 +307,7 @@ func (m *Authx) GetDeviceCredentials(request *grpc_device_go.DeviceId) (*entitie
 	if !exists {
 		return nil, derrors.NewNotFoundError("device credentials").WithParams(request.OrganizationId, request.DeviceGroupId, request.DeviceId)
 	}
-
+	
 	credentials, err := m.DeviceProvider.GetDevice(request.OrganizationId, request.DeviceGroupId, request.DeviceId)
 	if err != nil {
 		return nil, err
@@ -316,7 +316,7 @@ func (m *Authx) GetDeviceCredentials(request *grpc_device_go.DeviceId) (*entitie
 }
 
 func (m *Authx) RemoveDeviceCredentials(deviceCredentials *grpc_device_go.DeviceId) derrors.Error {
-
+	
 	exists, err := m.DeviceProvider.ExistsDevice(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId, deviceCredentials.DeviceId)
 	if err != nil {
 		return err
@@ -324,26 +324,26 @@ func (m *Authx) RemoveDeviceCredentials(deviceCredentials *grpc_device_go.Device
 	if !exists {
 		return derrors.NewNotFoundError("device credentials").WithParams(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId, deviceCredentials.DeviceId)
 	}
-
+	
 	err = m.DeviceProvider.RemoveDevice(deviceCredentials.OrganizationId, deviceCredentials.DeviceGroupId, deviceCredentials.DeviceId)
 	if err != nil {
 		return err
 	}
-
+	
 	return nil
 }
 
 func (m *Authx) LoginDeviceCredentials(loginRequest *pbAuthx.DeviceLoginRequest) (*pbAuthx.LoginResponse, derrors.Error) {
-
+	
 	credentials, err := m.DeviceProvider.GetDeviceByApiKey(loginRequest.DeviceApiKey)
 	if err != nil {
 		return nil, err
 	}
-
+	
 	if credentials.OrganizationID != loginRequest.OrganizationId {
 		return nil, derrors.NewUnauthenticatedError("Invalid credentials")
 	}
-
+	
 	// Get the group to review if it is enable
 	group, err := m.DeviceProvider.GetDeviceGroup(credentials.OrganizationID, credentials.DeviceGroupID)
 	if err != nil {
@@ -353,22 +353,22 @@ func (m *Authx) LoginDeviceCredentials(loginRequest *pbAuthx.DeviceLoginRequest)
 	if !group.Enabled {
 		return nil, derrors.NewPermissionDeniedError("the group is temporarily disabled").WithParams(credentials.OrganizationID, credentials.DeviceGroupID)
 	}
-
+	
 	deviceClaim := token.NewDeviceClaim(credentials.OrganizationID, credentials.DeviceGroupID, credentials.DeviceID, m.DeviceExpiration)
-
+	
 	gToken, err := m.DeviceToken.Generate(deviceClaim, m.DeviceExpiration, group.Secret)
 	if err != nil {
-
+		
 		return nil, err
 	}
 	response := &pbAuthx.LoginResponse{Token: gToken.Token, RefreshToken: gToken.RefreshToken}
-
+	
 	return response, nil
-
+	
 }
 
 func (m *Authx) AddDeviceGroupCredentials(groupCredentials *pbAuthx.AddDeviceGroupCredentialsRequest) (*entities.DeviceGroupCredentials, derrors.Error) {
-
+	
 	toAdd := entities.NewDeviceGroupCredentialsFromGRPC(groupCredentials)
 	err := m.DeviceProvider.AddDeviceGroupCredentials(toAdd)
 	if err != nil {
@@ -386,7 +386,7 @@ func (m *Authx) UpdateDeviceGroupCredentials(groupCredentials *pbAuthx.UpdateDev
 	if !exists {
 		return derrors.NewNotFoundError("device group credentials").WithParams(groupCredentials.OrganizationId, groupCredentials.DeviceGroupId)
 	}
-
+	
 	toUpdate, err := m.DeviceProvider.GetDeviceGroup(groupCredentials.OrganizationId, groupCredentials.DeviceGroupId)
 	if err != nil {
 		return err
@@ -397,12 +397,12 @@ func (m *Authx) UpdateDeviceGroupCredentials(groupCredentials *pbAuthx.UpdateDev
 	if groupCredentials.UpdateDeviceConnectivity {
 		toUpdate.DefaultDeviceConnectivity = groupCredentials.DefaultDeviceConnectivity
 	}
-
+	
 	err = m.DeviceProvider.UpdateDeviceGroupCredentials(toUpdate)
 	if err != nil {
 		return err
 	}
-
+	
 	return nil
 }
 
@@ -415,7 +415,7 @@ func (m *Authx) GetDeviceGroupCredentials(request *grpc_device_go.DeviceGroupId)
 	if !exists {
 		return nil, derrors.NewNotFoundError("device group credentials").WithParams(request.OrganizationId, request.DeviceGroupId)
 	}
-
+	
 	group, err := m.DeviceProvider.GetDeviceGroup(request.OrganizationId, request.DeviceGroupId)
 	if err != nil {
 		return nil, err
@@ -424,7 +424,7 @@ func (m *Authx) GetDeviceGroupCredentials(request *grpc_device_go.DeviceGroupId)
 }
 
 func (m *Authx) RemoveDeviceGroupCredentials(groupCredentials *grpc_device_go.DeviceGroupId) derrors.Error {
-
+	
 	exists, err := m.DeviceProvider.ExistsDeviceGroup(groupCredentials.OrganizationId, groupCredentials.DeviceGroupId)
 	if err != nil {
 		return err
@@ -432,17 +432,17 @@ func (m *Authx) RemoveDeviceGroupCredentials(groupCredentials *grpc_device_go.De
 	if !exists {
 		return derrors.NewNotFoundError("device group credentials").WithParams(groupCredentials.OrganizationId, groupCredentials.DeviceGroupId)
 	}
-
+	
 	err = m.DeviceProvider.RemoveDeviceGroup(groupCredentials.OrganizationId, groupCredentials.DeviceGroupId)
 	if err != nil {
 		return err
 	}
-
+	
 	return nil
 }
 
 func (m *Authx) LoginDeviceGroup(credentials *pbAuthx.DeviceGroupLoginRequest) derrors.Error {
-
+	
 	group, err := m.DeviceProvider.GetDeviceGroupByApiKey(credentials.DeviceGroupApiKey)
 	if err != nil {
 		return err
@@ -455,29 +455,29 @@ func (m *Authx) LoginDeviceGroup(credentials *pbAuthx.DeviceGroupLoginRequest) d
 		return derrors.NewPermissionDeniedError("the group is temporarily disabled").WithParams(group.OrganizationID, group.DeviceGroupID)
 	}
 	return nil
-
+	
 }
 
 // RefreshDeviceToken renew an old token.
 func (m *Authx) RefreshDeviceToken(oldToken string, refreshToken string) (*pbAuthx.LoginResponse, derrors.Error) {
-
+	
 	// get the device info
 	// 1.- Get the token info
 	// 2.- Get the secret
 	// 3.- Validate
-
+	
 	dToken, err := m.DeviceTokenProvider.GetByRefreshToken(refreshToken)
 	if err != nil {
 		return nil, derrors.NewInternalError("error getting token info", err)
 	}
-
+	
 	group, err := m.DeviceProvider.GetDeviceGroup(dToken.OrganizationId, dToken.DeviceGroupId)
 	if err != nil {
 		return nil, err
 	}
-
+	
 	claim, err := m.DeviceToken.GetTokenInfo(oldToken, group.Secret)
-
+	
 	// check if the token is correct
 	if claim.OrganizationID != dToken.OrganizationId || claim.DeviceGroupID != dToken.DeviceGroupId {
 		return nil, derrors.NewUnauthenticatedError("the refresh token is not valid", err)
@@ -486,7 +486,7 @@ func (m *Authx) RefreshDeviceToken(oldToken string, refreshToken string) (*pbAut
 	if !group.Enabled {
 		return nil, derrors.NewPermissionDeniedError("the group is temporarily disabled").WithParams(group.OrganizationID, group.DeviceGroupID)
 	}
-
+	
 	gToken, err := m.DeviceToken.Refresh(oldToken, refreshToken, m.expirationDuration, group.Secret)
 	if err != nil {
 		return nil, err
@@ -497,7 +497,7 @@ func (m *Authx) RefreshDeviceToken(oldToken string, refreshToken string) (*pbAut
 
 // GetDeviceGroupSecret returns secret of the device group
 func (m *Authx) GetDeviceGroupSecret(request *grpc_device_go.DeviceGroupId) (*pbAuthx.DeviceGroupSecret, derrors.Error) {
-
+	
 	// get the devicegroup info
 	group, err := m.DeviceProvider.GetDeviceGroup(request.OrganizationId, request.DeviceGroupId)
 	if err != nil {
@@ -509,5 +509,5 @@ func (m *Authx) GetDeviceGroupSecret(request *grpc_device_go.DeviceGroupId) (*pb
 		DeviceGroupId:  group.DeviceGroupID,
 		Secret:         group.Secret,
 	}, nil
-
+	
 }

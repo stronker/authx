@@ -18,8 +18,8 @@
 package inventory
 
 import (
-	"github.com/nalej/authx/internal/app/authx/entities"
 	"github.com/nalej/derrors"
+	"github.com/stronker/authx/internal/app/authx/entities"
 	"sync"
 	"time"
 )
